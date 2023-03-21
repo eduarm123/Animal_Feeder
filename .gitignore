@@ -4,3 +4,15 @@
 *.exe
 *.lib
 *.pdb
+*.yml
+
+*.bin
+*.elf 
+
+*.cmake
+*.bin_timestamp
+*.json
+*.map
+*.ninja
+
+*.a

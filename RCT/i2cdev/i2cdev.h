@@ -45,6 +45,8 @@
 extern "C" {
 #endif
 
+#define CONFIG_I2CDEV_TIMEOUT 1000 // esto se anade en la configuracion, lo he puesto aqui porque no le encontre en config
+
 #if HELPER_TARGET_IS_ESP8266
 
 #define I2CDEV_MAX_STRETCH_TIME 0xffffffff

@@ -4,6 +4,9 @@
 #include <ds3231.h>
 #include <string.h>
 
+
+
+
 void ds3231_test(void *pvParameters)
 {
     i2c_dev_t dev;
