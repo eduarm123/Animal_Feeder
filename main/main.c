@@ -30,14 +30,24 @@ extern "C"
 
 /**********************************INCLUDES ******************************************************/
 #include <stdio.h>
+#include <stdint.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <ds3231.h>
 #include <string.h>
+#include <time.h>
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
 /*********************************** (2) PUBLIC VARS *********************************************/
+
+struct tm time_tc=
+{
+    .tm_hour=0,
+    .tm_min=0,
+    .tm_sec=0,
+};
+   
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 
@@ -53,19 +63,22 @@ extern "C"
 void ds3231_test(void *pvParameters)
 {
     i2c_dev_t dev;
+    uint16_t min=0;
+    uint16_t hora=0;
+
     memset(&dev, 0, sizeof(i2c_dev_t));
 
     ESP_ERROR_CHECK(ds3231_init_desc(&dev, 0, 21, 22));
 
-    struct tm time = {
-        .tm_year = 122, // (2022 - 1900)
-        .tm_mon  = 11,  // 0-based
-        .tm_mday = 15,
-        .tm_hour = 0,
-        .tm_min  = 50,
-        .tm_sec  = 10
-    };
-    ESP_ERROR_CHECK(ds3231_set_time(&dev, &time));
+    printf("Inserte los minutos");
+    min=getchar();
+    time_tc.tm_min=min;
+    printf("Inserte la hora");
+    hora=getchar();
+    time_tc.tm_hour=hora;
+    time_tc.tm_sec=0;
+
+    ESP_ERROR_CHECK(ds3231_set_time(&dev, &time_tc));
 
     while (1)
     {
@@ -79,7 +92,7 @@ void ds3231_test(void *pvParameters)
             continue;
         }
 
-        if (ds3231_get_time(&dev, &time) != ESP_OK)
+        if (ds3231_get_time(&dev, &time_tc) != ESP_OK)
         {
             printf("Could not get time\n");
             continue;
@@ -89,15 +102,14 @@ void ds3231_test(void *pvParameters)
          * sdkconfig for ESP8266, which is enabled by default for this
          * example. see sdkconfig.defaults.esp8266
          */
-        printf("%04d-%02d-%02d %02d:%02d:%02d, %.2f deg Cel\n", time.tm_year + 1900 /*Add 1900 for better readability*/, time.tm_mon + 1,
-            time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec, temp);
+        printf("%02d:%02d:%02d, %.2f deg Cel\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec, temp);
     }
 }
 
 void app_main()
 {
     ESP_ERROR_CHECK(i2cdev_init());
-    xTaskCreate(ds3231_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
+     xTaskCreate(ds3231_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 }
 
 #ifdef __cplusplus
