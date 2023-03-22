@@ -32,12 +32,14 @@ extern "C"
 #include <stdio.h>
 #include <stdint.h>
 #include <freertos/FreeRTOS.h>
+
 #include <freertos/task.h>
 #include <ds3231.h>
 #include <string.h>
 #include <time.h>
 
 /********************************* (1) PUBLIC METHODS ********************************************/
+void ds3231_test(void *pvParameters);
 
 /*********************************** (2) PUBLIC VARS *********************************************/
 
@@ -53,11 +55,16 @@ struct tm time_tc=
 
 /*********************************** (4) PRIVATE VARS ********************************************/
 
+
 /**************************** (5) PRIVATE METHODS DEFINITION *************************************/
 
 /***************************** (6) PUBLIC METHODS IMPLEMENTATION *********************************/
 
-/************************* (7)  STATIC METHODS IMPLEMENTATION ************************************/
+void app_main()
+{
+    ESP_ERROR_CHECK(i2cdev_init());
+     xTaskCreate(ds3231_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
+}
 
 
 void ds3231_test(void *pvParameters)
@@ -106,11 +113,12 @@ void ds3231_test(void *pvParameters)
     }
 }
 
-void app_main()
-{
-    ESP_ERROR_CHECK(i2cdev_init());
-     xTaskCreate(ds3231_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
-}
+/************************* (7)  STATIC METHODS IMPLEMENTATION ************************************/
+
+
+
+
+
 
 #ifdef __cplusplus
 };
