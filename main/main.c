@@ -1,10 +1,53 @@
+/*************************************************************************************************/
+/*! @file	main.c
+ *	@brief	Introducir breve descripcion del fichero
+ *
+ *	\b Descripciï¿½n: Introducir aquï¿½ descripciï¿½n de las funcionalidades del fichero \n
+ *
+ *
+ *		Compiler  :  \n
+ *		Copyright :  \n
+ *		Target    :  \n
+ *
+ *	@author		
+ *	@date		22 mar. 2023
+ *	@version	1.0
+ *
+ ****************************************************************************
+ *
+ *	Log: main.c
+ * Revision [Date // Author]:  Modifications \n
+ * -----------------------------------------------------------\n
+ * V1.0 [ 28 oct. 2020 // earmijos ]: Original \n
+ *
+ */
+/*************************************************************************************************/
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+/************************* ********INCLUDES ******************************************************/
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <ds3231.h>
 #include <string.h>
 
+/********************************* (1) PUBLIC METHODS ********************************************/
 
+/*********************************** (2) PUBLIC VARS *********************************************/
+
+/******************************** (3) DEFINES & MACROS *******************************************/
+
+/*********************************** (4) PRIVATE VARS ********************************************/
+
+/**************************** (5) PRIVATE METHODS DEFINITION *************************************/
+
+/***************************** (6) PUBLIC METHODS IMPLEMENTATION *********************************/
+
+/************************* (7)  STATIC METHODS IMPLEMENTATION ************************************/
 
 
 void ds3231_test(void *pvParameters)
@@ -56,3 +99,7 @@ void app_main()
     ESP_ERROR_CHECK(i2cdev_init());
     xTaskCreate(ds3231_test, "ds3231_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 }
+
+#ifdef __cplusplus
+};
+#endif
