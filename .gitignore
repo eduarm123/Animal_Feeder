@@ -16,3 +16,4 @@
 *.ninja
 
 *.a
+build/
