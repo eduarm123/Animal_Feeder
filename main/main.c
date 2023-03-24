@@ -116,7 +116,7 @@ void ds3231_test(void *pvParameters)
 /************************* (7)  STATIC METHODS IMPLEMENTATION ************************************/
 
 
-
+/*HOLA*/
 
 
 
