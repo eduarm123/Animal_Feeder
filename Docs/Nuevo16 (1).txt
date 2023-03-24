@@ -1,0 +1,499 @@
+/*
+ * Proyecto.c
+ *
+ * Created: 31/05/2020 11:24:29 a. m.
+ * Author : Edwin
+ */ 
+#define F_CPU 1000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h> 
+#include <util/delay.h>
+#include <stdlib.h>  //Librería sirve para convertir de números a cadena de caracteres, para visualización en la LCD
+#include <avr/eeprom.h>
+#include "LCD/LCD.h"
+#include "RTC/RTC.h"
+#include "PWM/PWM.h"
+
+
+/*Variables para PWM*/
+unsigned char val=0;
+unsigned char old_val=0;
+unsigned char state=0;
+uint16_t cont;
+//unsigned char seg=0;
+
+/*Variables para Modulo Reloj*/
+char hora[0];
+char minuto[0];
+char segundo[0];
+/*Variables para selección de hora*/
+char minut[0];
+char segund[0];
+char manual_c[0];
+uint8_t c=2; //c=130 ;para determinar la frecuencia del SCL
+uint8_t alarma[6]={30,50,20,30,40,50};//las dos primeras alarmas pertenecen a Adulto y las siguientes a Cachorro
+uint8_t automatico;//int automatico;
+uint8_t nose1=0; //int nose1=0;
+uint8_t nose=0;
+uint8_t manual_ing=0; //numero[6];//int manual_ing=0, numero[6];
+uint8_t numero[6];
+uint8_t page, seg=0, min=0; //seg=0
+uint8_t variable;
+uint8_t al_manual=0;
+uint8_t t_seg=0;
+int i=0; //Para contadores
+uint8_t rtime=0;
+uint8_t EEMEM page1 = 5; //Variable almacenada en memoria EEPROM (siempre debe ir como global)
+uint8_t EEMEM automatico1 = 0;
+/*--------------------------------------*/
+uint8_t *seleccion=NULL; //Para seleccionar el menú de teclas
+uint8_t *pin2d=NULL;
+volatile uint8_t *eleccion=NULL; //Para que indique menú en alarmas
+//uint8_t *seleccion=(uint8_t*)0x0060;
+
+/*FUNCION PARA LAs TECLAS*/
+void teclas(unsigned char max_valor, volatile unsigned char *valor); //Función para mostrar las teclas
+static void imprimir(uint8_t tiempo, char horario[0]); //Función para imprimir en LCD convirtiendo de entero a cadena de caracter
+void imprimir1(char *nombre, char *nombre1); //Imprimir mediante caracteres (reducir código) 
+uint8_t servomotor(uint8_t m, uint8_t n, uint8_t *escoger); //Función para activar servomotor ya sea en automatico o manual
+void lecturas_EEPROM();
+
+int main(void)
+{
+	uint8_t pepe=1;
+	uint8_t juan=0;
+	uint8_t hola1=1;
+	
+	cli(); //Deshabilito todas las interrupciones
+	
+	/*----------------CODIGO PARA COMER MANUAL--------------*/
+	//////////////////////////////DDRC &=~ 1<<DDD4; //Pin 4 del puerto D como entrada
+	PORTD|= 1<<PORTD4; //Activar pull up
+	/*------------------------------------------------------*/
+	
+	DDRD &=~ 1<<DDD2; //Pin 2 del puerto D como entrada
+	
+	/*--------------CODIGO PARA CONFIGURAR ALARMA-----------*/
+	DDRD &=~ 1<<DDD3; //Pin 3 del puerto D como entrada
+	//PORTD|= 1<<PORTD3; //Activar pull up
+	
+	//DDRB &=~ ((1<<DDB3)|(1<<DDB4)); //Pin 3 y 4 del puerto B como entrada
+	//PORTB|= 1<<PORTB2; //Activar pull up
+	//PORTB|= 1<<PORTB3; //Activar pull up
+	//PORTB|= 1<<PORTB4; //Activar pull up
+	
+	DDRB |= 1<<DDB5; //Pin 5 del puerto B como salida (indicador alarma)
+	PORTB&=~(1<<PB5);//el estado incial del pin PB5 es bajo
+	/*------------------------------------------------------*/
+	
+	
+	
+	/*------------------MOTOR PASO A PASO---------------------------*/
+	DDRC|= 1<<DDC1 ;
+	PORTC&=~(1<<PC1);
+	DDRC|= 1<<DDC2 ;
+	PORTC&=~(1<<PC2);
+	DDRC|= 1<<DDC3 ;
+	PORTC&=~(1<<PC3);
+	DDRB|= 1<<DDB6 ;
+	PORTB&=~(1<<PB6);
+	//DDRC|= 1<<DDC6 ;
+	//PORTC&=~(1<<PC6);
+	/*--------------------------------------------------------------*/
+	
+	/*------------------HABILITACIÓN DE INTERRUPCIONES EXTERNAS------------*/
+	//PCICR |= (1<<PCIE1);
+	//PCMSK2 = (1<<PCINT17);
+	
+	EICRA |= ((1<<ISC00)|(1<<ISC01)); // INT0 configurado para interrupcion por flanco de subida
+	//MCUCR &=~ (1<<ISC01);
+	
+	EICRA |= ((1<<ISC10)|(1<<ISC11)); //INT1 configurado para interrupcion por flanco de subida
+	
+	///*---- INTERRUPCIONES PCINT (Genera interrupción por cambio de valores)
+	DDRB &=~ ((1<<DDB3)|(1<<DDB4)); //Pin 3 y 4 del puerto B como entrada
+	PCICR |= (1<<PCIE0); //Habilitación de interrupciones 
+	//PCMSK0 |= ((1<<PCINT3)|(1<<PCINT4)); //Habilitamos interrupción en PINB3 y PINB4 
+	
+	//MCUCSR |= (1<<ISC2); //INT2 configurado para interrupcion por cambio de valor
+	
+	//GICR |= ((1<<INT0)|(1<<INT1)|(1<<INT2)); // Interrupciones externas habilitadas
+	//GICR |= (1<<INT2); // INT2 activado
+	/*-------------------------------------------------------------------------*/
+	
+	/*------------------Codigo PWM---------------------------*/
+	/* COM1B1=1 , COM1B0=1 (PWM por el pin OC1B y en modo invertido)  ;  
+	WGM11 = 1 y WGM12 = 1 para PWM rápido de 9 bits  */
+	DDRB|=(1<<2);//pin OC1B como salida, obligatorio para PWM
+	//--------------TCCR1A = (1<<WGM11)|(1<<COM1B0)|(1<<COM1B1);
+	//TCCR1B = (1<<CS10)|(1<<WGM12);
+	//TCCR1A = (1<<WGM11);
+	/* Sin prescaler CS12=0 CS11=0 CS10=1 */
+	//PWM_init();
+	/*-------------------------------------------------------*/
+	
+	/*------------------Inicializar LCD y rtc---------------------------*/
+	lcd_init();
+	lcd_write(LCD_INST, CLEAR);
+	lcd_write(LCD_INST, LINEA1 + 3);
+	lcd_print("STALIN MUNDO");
+	_delay_ms(1000);
+	//lcd_write(LCD_INST, CLEAR);
+	lcd_write(LCD_INST, LINEA2 + 1);
+	lcd_print("CONFIG LA HORA");
+	_delay_ms(1000);
+	lcd_write(LCD_INST, CLEAR);
+	/*------------------------------------------------------------*/
+	/*-----------Variables iniciales de hora y alarma-------------*/
+	uint8_t h=0, m=0, s=0;
+	uint8_t al_hour=0, al_min=0, al_second=0;
+	rtc_init();
+	/*------------------------------------------------------------*/
+	
+	/*------------------Establecer Hora y Alarma INICIALES----------------------------*/
+	//rtc_setTime(dec2bcd(16), dec2bcd(47), dec2bcd(40)); //19:45:30 //0x13, 0x2D, 0x1E
+	rtc_setTime(dec2bcd(16), dec2bcd(m), dec2bcd(s));
+	//set_alarm(dec2bcd(16), dec2bcd(47), dec2bcd(43)); //19:45:30 //0x13, 0x2D, 0x1E
+	set_alarm(dec2bcd(al_hour), dec2bcd(al_min), dec2bcd(al_second));
+	/*-------------------------------------------------------------------------------*/
+	
+	//TCCR2= 0b00000101;
+	//TCNT2=158;
+	page= eeprom_read_byte(&page1); //Obtenemos valor de 5 y entramos directamente a config la hora
+	eleccion=&hola1;
+	sei(); //Habilito interrupciones
+	EIMSK |= 1<<INT1; //Interrupcion de la hora
+	PCMSK0 |= ((1<<PCINT3)|(1<<PCINT4)); //Habilitamos interrupción en PINB3 y PINB4 para teclas arriba y abajo
+	seleccion=&pepe;
+	rtc_getTime(&h, &m, &s);
+	seg=bcd2dec(s);
+	min=bcd2dec(m);
+	while (1)
+	{
+		switch(page)
+		{
+			case 5:
+			{*seleccion=1; //Para que en la interrupción se dirija a modificar la variable minuto
+				//PCMSK0 |= ((1<<PCINT3)|(1<<PCINT4)); //Habilitamos interrupción en PINB3 y PINB4 para teclas arriba y abajo
+				imprimir(min, minut); //Para imprimir los minutos
+				lcd_write(LCD_INST, LINEA1 + 4);
+				imprimir(seg, segund); //Para imprimir los segundos
+				_delay_ms(500);
+				lcd_write(LCD_INST, CLEAR);}
+			case 6:
+			{
+				while(page==6)
+				{	
+					*seleccion=2; //Para que en la interrupción se dirija a modificar la variable segundo
+					//PCMSK0 |= ((1<<PCINT3)|(1<<PCINT4)); //Habilitamos interrupción en PINB3 y PINB4 para teclas arriba y abajo
+					imprimir(min, minut); //Para imprimir los minutos
+					lcd_write(LCD_INST, LINEA1 + 4);
+					imprimir(seg, segund); //Para imprimir los segundos
+					_delay_ms(500);
+					lcd_write(LCD_INST, CLEAR);
+				}
+				rtc_setTime(dec2bcd(16), dec2bcd(min), dec2bcd(seg)); //Se establece la hora que ya se seleccionó
+			break;
+			}
+		}
+			
+		if(page==0)
+		{	
+			/*PARA QUE A LO QUE VAYA LA ENERGÍA*/
+			EIMSK |= (1<<INT0); // Interrupciones externas habilitadas para config ALARMA o la HORA
+			PCMSK1 |= (1<<PCINT8); //Interrupción para manual habilitada
+			/*--------------------IMPRIMIR LA HORA ACTUALIZADA-------------------*/
+			rtc_getTime(&h, &m, &s);
+			rtime=bcd2dec(s);
+			uint8_t rtime_m=bcd2dec(m);
+			imprimir(rtime_m, minuto); //Para imprimir los minutos reales (rtc)
+			lcd_write(LCD_INST, LINEA1 + 4);
+			imprimir(rtime, segundo); //Para imprimir los segundos reales (rtc)
+			_delay_ms(1000);
+			lcd_write(LCD_INST, CLEAR);
+			/*------------------------------------------------------------------*/	
+			variable=0; //para que no se dirija automaticamente a automatico
+			pin2d=&juan;
+			*pin2d=0;
+			lecturas_EEPROM();
+			cont=0; //Para que empiece en 0 el contador para PWM y se pueda apreciar todas las alarmas.
+			if(manual_ing==1)
+			{	
+				servomotor(2,al_manual+2,numero); //El '2' indica el 'for' de donde inicia y el 'al_manual+2' donde termina
+			}									  //'numero' indica que se activará el array de manual
+			if (nose1==1) //PARA DARLE DE COMER AUTOMATICAMENTE (ADULTO O CACHORRO)
+			{
+				if (automatico==2) //adulto 1
+				{
+					servomotor(0,1,alarma); //El '0' indica el 'for' de donde inicia y el '1' donde termina
+											//'alarma' indica que se activará el array de automatico
+				}
+				if (automatico==1) //cachorro 0
+				{
+					servomotor(2,5,alarma); //El '2' indica el 'for' de donde inicia y el '5' donde termina
+				}
+			}	
+		}
+		
+		/*---------------PARA INGRESAR A LAS ALARMAS-------------------*/	
+		if(page==1)
+		{
+			EIMSK &=~ (1<<INT1); // Interrupcion externa INT1(HORA) deshabilitada
+			PCMSK1 &=~ (1<<PCINT8); //Interrupción para manual deshabilitada
+			//pin2d=&juan;
+			*pin2d=0;
+			char *A[15],*M[15]; //Se declara caracteres para la impresión en LCD
+			while(page==1)
+			{				
+				switch(*eleccion)
+				{
+					case 2:
+					{	A[11]="AUTOMATICO";
+						M[7]="MANUAL";
+						imprimir1(A[11],M[7]);
+						variable =1;
+						//_delay_ms(500);
+						break;}
+					case 1:
+					{	lcd_write(LCD_INST, LINEA1 + 0);
+						lcd_print("  ");
+						lcd_write(LCD_INST, LINEA2 + 0);
+						lcd_print("->");
+						variable =2;
+						//_delay_ms(500);
+						break;}
+				}
+				
+				if((variable==1)&&((*pin2d != 0)))
+				{
+					lcd_write(LCD_INST, CLEAR);
+					nose=0; //Para entrar al ciclo WHILE
+					manual_ing=0; //Para que no entre a las alarmas manuales de page=0
+					eeprom_write_byte (( uint8_t *) 8, manual_ing); //Se almacena en la memoria EEPROM 1 para que no ingrese en modo manual
+					*pin2d=0;
+					while (nose== 0)
+					{	
+						switch(*eleccion)
+						{
+							//EIMSK |= (1<<INT0); // Interrupciones externas habilitadas
+							case 2:
+							{	A[9]="CACHORRO";
+								M[7]="ADULTO";
+								imprimir1(A[9],M[7]);
+								automatico=1;
+								//eeprom_write_byte (( uint8_t *) 12, automatico ); //Se almacena en la memoria EEPROM valor automatico para entrar en la siguiente condición
+								eeprom_update_byte(&automatico1, automatico); //Actualiza el dato de page para cuando se vaya la energía y no vaya a la config de la hora
+								//_delay_ms(500);
+							break;
+							}
+							case 1:
+							{	lcd_write(LCD_INST, LINEA1 + 0);
+								lcd_print("  ");
+								lcd_write(LCD_INST, LINEA2 + 0);
+								lcd_print("->");
+								automatico=2;
+								//eeprom_write_byte (( uint8_t *) 12, automatico ); //Se almacena en la memoria EEPROM valor automatico para entrar en la siguiente condición
+								eeprom_update_byte(&automatico1, automatico); //Actualiza el dato de page para cuando se vaya la energía y no vaya a la config de la hora
+								//_delay_ms(500);
+							break;
+							}
+						}
+						if(*pin2d != 0) //Además de cumplirse "automático", se debe presionar el "OK" de alarma
+						{	_delay_ms(500);
+							EIMSK |= (1<<INT1); // Interrupciones externas habilitadas
+							PCMSK1 |= (1<<PCINT8); //Interrupción para manual habilitada
+							nose=1; //Para salir del primer WHILE
+							page=0; //Para salir del segundo WHILE y vaya a PAGE=0
+							eeprom_update_byte(&page1, page); //Actualiza el dato de page para cuando se vaya la energía y no vaya a la config de la hora
+							nose1=1; // Para entrar en modo AUTOMATICO en PAGE=0
+							eeprom_write_byte (( uint8_t *) 15, nose1 ); //Se almacena en la memoria EEPROM valor '1'  en nose1 para entrar en AUTOMATICO en PAGE=0
+							lcd_write(LCD_INST, CLEAR);}
+					}
+				}
+				
+				if((variable==2)&&((*pin2d != 0)))
+				{
+					lcd_write(LCD_INST, CLEAR);
+					*pin2d=0;
+					nose1=0; //Para que no dentre a las alarmas automaticas de page=0
+					eeprom_write_byte (( uint8_t *) 15, nose1 ); //Se almacena en la memoria EEPROM el valor '0' en nose1 para no entrar en AUTOMÁTICO en PAGE=0
+					//uint8_t manual=0; //Para que ingrese al WHILE
+					int contador=0; //Para volver a config las alarmas manuales desde cero
+					al_manual=0; //Para reiniciar a 0 el proceso de nuevo
+					*seleccion=3; //Para seleccionar el número máximo de alarmas
+					
+					while (page== 1)
+					{	
+						if((*pin2d != 0)&&(al_manual!=0))  //Para que le den de comer al menos 2 veces al día
+						{
+							manual_ing=1; //Para que ingrese a modo MANUAL en PAGE=0
+							eeprom_write_byte (( uint8_t *) 8, manual_ing); //Se almacena en la memoria EEPROM 1 para que ingrese en modo manual
+							eeprom_write_byte (( uint8_t *) 10, al_manual); //Se almacena en la memoria EEPROM el valor de cuantas alarmas se quiere
+							t_seg=0; //Para reiniciar a 0 el proceso de selección de los segundos
+							*seleccion=4; //Para seleccionar en que segundos quiero que se ejecute la alarma en funcion de *seleccion=3
+							while(contador<=al_manual)
+							{		
+								//teclas(59, &t_seg); //Esto lo hacemos mediante la interrupción y seleccion 4	  
+								if((*pin2d != 0)&&(t_seg!=0)) // Aquí podemos restringir la hora a dar de comer de 6AM a 6PM
+								{   
+									*pin2d=0;
+									eeprom_write_byte (( uint8_t *) contador+2, t_seg ); //Almacena en cada celda de memoria EEPROM el dato del número de alarmas escritas
+									contador++;
+								}
+								if (contador>al_manual)
+								{
+									EIMSK &=~ 1<<INT0; //Deshabilito interrupción
+									page=0;
+									eeprom_update_byte(&page1, page); //Actualiza el dato de page para cuando se vaya la energía y no vaya a la config de la hora
+								}
+								lcd_write(LCD_INST, CLEAR);
+								lcd_write(LCD_INST, LINEA1 + 0);
+								itoa(t_seg,segund,10);
+								lcd_print(segund);
+								_delay_ms(200);
+								
+								lcd_write(LCD_INST, LINEA1 + 6);
+								imprimir(contador, manual_c); //Se imprime el número de alarmas seleccionadas
+								_delay_ms(100);
+								lcd_write(LCD_INST, CLEAR);
+							}
+						}
+						imprimir(al_manual, manual_c); //Se imprime el número de alarmas seleccionadas
+						_delay_ms(100);
+						lcd_write(LCD_INST, CLEAR); 
+					}
+				}
+			}
+		}
+	}
+}
+ISR(TIMER1_OVF_vect)
+{
+	cont++;
+	PORTB |= 1<<PB5;
+}
+ISR(PCINT1_vect) //PCINT20
+{
+	OCR1B^= 511; //(111111111)XOR(111111111)=0 
+	PORTB ^= 1<<PB5; //PARA PROBAR LA INTERRUPCION
+}
+
+ISR(PCINT0_vect) //Interrupción para cuando se presione teclas
+{
+	*pin2d=0;
+	switch(*seleccion)
+	{
+		case 1:
+			teclas(59, &min);
+		break;
+		case 2:
+			teclas(59, &seg);
+		break;
+		case 3:
+			teclas(5, &al_manual);
+		break;
+		case 4:
+			teclas(59, &t_seg);
+		break;
+	}
+	//void teclas(unsigned char max_valor, volatile unsigned char *valor);
+	//teclas(5, &al_manual);
+	//retraso=1; //Para que deje de parpadear en Page=5
+}
+
+ISR(INT0_vect) //INTERRUPCIÓN PARA CONFIGURAR LAS ALARMAS
+{
+	*pin2d=1;
+	switch(page)
+	{
+		case 0:
+		{	page=1;
+			//automatico=0; //Para que no ingrese directamente a esta condición sino que se elija entre cachorro y adulto
+			//eeprom_update_byte(&automatico1, automatico); //Actualiza el dato de automático para que no vaya directo al reloj sino que escoja 'cachorro' o 'adulto'
+		break;}  //configurar minutos de alarma
+		case 2:
+		{	page=0; break;}	//configurar minutos de la hora
+		default:
+		{	break;}
+	}
+}
+ISR(INT1_vect) //INTERRUPCIÓN PARA CONFIGURAR LA HORA DEL RELOJ
+{
+	lcd_write(LCD_INST, CLEAR);
+	//z^=1; //Para que alterne su valor y no se quede en el ciclo "if (z==1)"
+	switch(page)
+	{
+		case 0:	
+		{	page=5; break;}	//configurar minutos de la hora
+		case 5:
+		{	page=6; break;}	//configurar minutos de la hora
+		case 6:
+		{	page=0; break;}	//configurar minutos de la hora
+	}
+}
+void teclas(unsigned char max_valor, volatile unsigned char *valor)
+{
+	if((PINB & (1<<PB4)) != 0)
+	{
+		if(*valor)	*valor -= 1;
+		else *valor=max_valor;
+		*eleccion=1;
+		_delay_ms(100);
+	}
+	if((PINB & (1<<PB3)) != 0)
+	{
+		if(*valor!=max_valor)	*valor += 1;
+		else *valor=0;
+		*eleccion=2;
+		_delay_ms(100);
+	}
+}
+void imprimir(uint8_t tiempo, char horario[0])
+{
+	itoa(tiempo,horario,10); //convierte un número entero en una cadena
+	lcd_print(horario);
+}
+void imprimir1(char *nombre, char *nombre1)
+{
+	lcd_write(LCD_INST, LINEA1 + 0);
+	lcd_print("->");
+	lcd_write(LCD_INST, LINEA2 + 0);
+	lcd_print("  ");
+	lcd_write(LCD_INST, LINEA1 + 3);
+	lcd_print(nombre);
+	lcd_write(LCD_INST, LINEA2 + 3);
+	lcd_print(nombre1);	
+}
+
+uint8_t servomotor(uint8_t m, uint8_t n, uint8_t *escoger)
+{
+	for (i=m; i<=n; i++)
+	{
+		numero[i]=eeprom_read_byte((uint8_t*)i); //Leemos las celdas de la memoria EEPROM ***SE MODIFICÓ 2 por 1****
+		if(rtime==escoger[i])
+		{
+			PWM_init();
+			PWM_on();
+			TIMSK1|= (1<<TOIE1); //Interrupcion por desborde
+			while(cont<=2000)
+			{
+				PWM_setDutyB(10);
+			}
+			cont=0;
+			PWM_setDutyB(511);
+			PORTB&=~(1<<PB5);
+			TIMSK1&=~ (1<<TOIE1);
+		}
+		//else PORTB&=~(1<<PB5);//PORTB &=~ PB5;
+	}
+	return 0;
+}
+
+void lecturas_EEPROM()
+{
+	manual_ing=eeprom_read_byte((uint8_t*)8); //Leemos el valor de la celda 8 de la memoria EEPROM
+	al_manual=eeprom_read_byte((uint8_t*)10); //Leemos el valor de la celda 10 de la memoria EEPROM
+	nose1=eeprom_read_byte((uint8_t*)15); //Leemos la celda 15 de la memoria EEPROM para E/S de automático/manual
+	//automatico=eeprom_read_byte((uint8_t*)12); //Leemos la celda 12 de la memoria EEPROM para E/S de automático/manual
+	automatico= eeprom_read_byte(&automatico1); //Obtenemos valor de 0 y entramos directamente a config la hora
+}
