@@ -346,6 +346,13 @@ esp_err_t ds3231_set_aging_offset(i2c_dev_t *dev, int8_t age);
  */
 esp_err_t ds3231_get_aging_offset(i2c_dev_t *dev, int8_t *age);
 
+/**
+ * @brief Initialize the module.
+ *
+ * @return none
+ */
+void RTC_init(void);
+
 
 #ifdef	__cplusplus
 }

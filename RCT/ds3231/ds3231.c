@@ -39,6 +39,7 @@
 #include <esp_err.h>
 #include <esp_idf_lib_helpers.h>
 #include "ds3231.h"
+#include <string.h>
 
 #define I2C_FREQ_HZ 400000
 
@@ -76,6 +77,9 @@ enum {
     DS3231_CLEAR,
     DS3231_REPLACE
 };
+
+i2c_dev_t dev;
+
 
 static uint8_t bcd2dec(uint8_t val)
 {
@@ -476,4 +480,12 @@ esp_err_t ds3231_get_aging_offset(i2c_dev_t *dev, int8_t *age)
     *age = (int8_t) age_u8;
 
     return ESP_OK;
+}
+
+void RTC_init(void){
+
+    memset(&dev, 0, sizeof(i2c_dev_t));
+
+    ESP_ERROR_CHECK(ds3231_init_desc(&dev, 0, 21, 22)); // Sino se llama a abort()
+
 }
