@@ -1,5 +1,5 @@
 /*************************************************************************************************/
-/*! @file	main.c
+/*! @file	Main_Screen.h
  *	@brief	Introducir breve descripcion del fichero
  *
  *	\b Descripciï¿½n: Introducir aquï¿½ descripciï¿½n de las funcionalidades del fichero \n
@@ -36,7 +36,25 @@ extern "C" {
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
+/**
+ * @brief Se visualiza la pantalla principal.
+ *
+ *
+ * @param pvParameters no hacemos nada con el
+ * @param[out] 
+ * @return void
+ */
 void Main_Screen( void * pvParameters );
+
+/**
+ * @brief Se configura la hora por consola. Esto se tiene que configurar para que configure por teclado matricial.
+ *
+ *
+ * @param _time estructura tipo tm que se le debe pasar a la funcion.
+ * @param[out] _time Se modifica la estructura con el tiempo que haya puesto el usuario.
+ * @return void
+ */
+void Time_config(struct tm *_time);
 
 /*********************************** (2) PUBLIC VARS *********************************************/
 

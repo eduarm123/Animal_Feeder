@@ -1,8 +1,8 @@
 /*************************************************************************************************/
-/*! @file	main.c
+/*! @file	Main_Screen.c
  *	@brief	Introducir breve descripcion del fichero
  *
- *	\b Descripciï¿½n: Introducir aquï¿½ descripciï¿½n de las funcionalidades del fichero \n
+ *	\b Descripcionn: Introducir aquï¿½ descripciï¿½n de las funcionalidades del fichero \n
  *
  *
  *		Compiler  :  \n
@@ -47,7 +47,7 @@ struct tm time_tc=
     .tm_sec=0,
 };
 
-extern i2c_dev_t dev; // necessary for RTC_init()
+i2c_dev_t s_dev; // necessary for RTC_init()
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 
@@ -63,28 +63,16 @@ extern i2c_dev_t dev; // necessary for RTC_init()
 
 void Main_Screen( void * pvParameters )
 {
-    bool b_ret=FALSE;
-    uint32_t hour_1=0;
-    uint32_t min_1=0;
-
-    RTC_init();
-
     
-        printf("Set the time:hour ");
-        scanf("%d", &hour_1);
-        time_tc.tm_hour=hour_1;
-        printf("Set the time:min ");
-        scanf("%d", &min_1);
-        time_tc.tm_min=min_1;
-        time_tc.tm_sec=0;
-
-    ESP_ERROR_CHECK(ds3231_set_time(&dev, &time_tc));
+    RTC_init(&s_dev);
+    Time_config(&time_tc);
+    ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc));
 
     for (;;)
     {      
 
         vTaskDelay(pdMS_TO_TICKS(250));
-        if (ds3231_get_time(&dev, &time_tc) != ESP_OK)
+        if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
         {
             printf("Could not get time\n");
             continue;
@@ -94,7 +82,40 @@ void Main_Screen( void * pvParameters )
          * sdkconfig for ESP8266, which is enabled by default for this
          * example. see sdkconfig.defaults.esp8266
          */
+
+        printf("1.--- Configurar alarmas ---");
+
         printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
     }
 
+}
+
+void Time_config(struct tm *_time){
+
+    int hour_1=65; // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
+    int min_1=65;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
+
+     while (1) {
+        printf("hour: ");
+        scanf("%d", &hour_1);
+        if (hour_1 >= 0 && hour_1 < 24) {
+            break;
+        }
+        printf("Invalid hour value. Please enter a value between 0 and 23.\n");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+
+    while (1) {
+        printf("min: ");
+        scanf("%d", &min_1);
+        if (min_1 >= 0 && min_1 < 60) {
+            break;
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        printf("Invalid minute value. Please enter a value between 0 and 59.\n");
+    }
+
+    _time->tm_sec=0;
+    _time->tm_hour=hour_1;
+    _time->tm_min=min_1;
 }

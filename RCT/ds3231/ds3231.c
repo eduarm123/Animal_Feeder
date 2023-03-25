@@ -78,8 +78,6 @@ enum {
     DS3231_REPLACE
 };
 
-i2c_dev_t dev;
-
 
 static uint8_t bcd2dec(uint8_t val)
 {
@@ -482,12 +480,12 @@ esp_err_t ds3231_get_aging_offset(i2c_dev_t *dev, int8_t *age)
     return ESP_OK;
 }
 
-void RTC_init(void){
+void RTC_init(i2c_dev_t *dev){
 
-    memset(&dev, 0, sizeof(i2c_dev_t));
+    memset(dev, 0, sizeof(i2c_dev_t));
     
     ESP_ERROR_CHECK(i2cdev_init()); // sino se llama a abort
 
-    ESP_ERROR_CHECK(ds3231_init_desc(&dev, 0, 21, 22)); // Sino se llama a abort()
+    ESP_ERROR_CHECK(ds3231_init_desc(dev, 0, 21, 22)); // Sino se llama a abort()
 
 }

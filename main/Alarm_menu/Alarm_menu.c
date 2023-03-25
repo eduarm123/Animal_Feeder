@@ -1,5 +1,5 @@
 /*************************************************************************************************/
-/*! @file	main.c
+/*! @file	Alarm_menu.c
  *	@brief	Introducir breve descripcion del fichero
  *
  *	\b Descripciï¿½n: Introducir aquï¿½ descripciï¿½n de las funcionalidades del fichero \n
@@ -23,24 +23,12 @@
  */
 /*************************************************************************************************/
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 /**********************************INCLUDES ******************************************************/
-#include <stdio.h>
-#include <stdint.h>
-#include <freertos/FreeRTOS.h>
-
-#include <freertos/task.h>
-#include <ds3231.h>
-#include <string.h>
-#include <time.h>
-
-#include "ds3231.h"
-#include "Main_Screen.h"
 #include "Alarm_menu.h"
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
@@ -59,40 +47,13 @@ extern "C"
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 
-
-void app_main(void)
+void Alarm_menu( void * pvParameters )
 {
+    
 
-	// Unlike Vanilla FreeRTOS, users of FreeRTOS in ESP-IDF must never call vTaskStartScheduler() and vTaskEndScheduler().
+    for (;;)
+    {      
 
-	static uint8_t ucParameterToPass;
-    TaskHandle_t xHandle = NULL;
+    }
 
-    xTaskCreate(Main_Screen,
-                "Main_Screen",
-                configMINIMAL_STACK_SIZE * 3,
-                &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle);
-
-    xTaskCreate(Alarm_menu, 
-                "Alarm_menu",
-                configMINIMAL_STACK_SIZE * 3,
-                &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle);
-
-	// xTaskCreate(Button_Handler, 
-    //             "Button_Handler",
-    //             STACK_SIZE,
-    //             &ucParameterToPass,
-    //             10, //tskIDLE_PRIORITY (Prioridad)
-    //             &xHandle);
 }
-	
-
-
-
-#ifdef __cplusplus
-};
-#endif
