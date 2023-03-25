@@ -485,6 +485,8 @@ esp_err_t ds3231_get_aging_offset(i2c_dev_t *dev, int8_t *age)
 void RTC_init(void){
 
     memset(&dev, 0, sizeof(i2c_dev_t));
+    
+    ESP_ERROR_CHECK(i2cdev_init()); // sino se llama a abort
 
     ESP_ERROR_CHECK(ds3231_init_desc(&dev, 0, 21, 22)); // Sino se llama a abort()
 

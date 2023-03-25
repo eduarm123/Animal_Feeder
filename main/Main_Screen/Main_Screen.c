@@ -23,10 +23,6 @@
  */
 /*************************************************************************************************/
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 /**********************************INCLUDES ******************************************************/
 #include <stdio.h>
@@ -37,7 +33,6 @@ extern "C"
 #include <ds3231.h>
 #include <string.h>
 #include <time.h>
-
 #include "ds3231.h"
 #include "Main_Screen.h"
 
@@ -45,7 +40,14 @@ extern "C"
 
 
 /*********************************** (2) PUBLIC VARS *********************************************/
+struct tm time_tc=
+{
+    .tm_hour=0,
+    .tm_min=0,
+    .tm_sec=0,
+};
 
+extern i2c_dev_t dev; // necessary for RTC_init()
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 
@@ -59,48 +61,40 @@ extern "C"
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 
 
-// void ds3231_test(void *pvParameters)
-// {
-   
-
-// }
-
-
-
-
-void app_main(void)
+void Main_Screen( void * pvParameters )
 {
+    bool b_ret=FALSE;
+    uint32_t hour_1=0;
+    uint32_t min_1=0;
 
-	// Unlike Vanilla FreeRTOS, users of FreeRTOS in ESP-IDF must never call vTaskStartScheduler() and vTaskEndScheduler().
+    RTC_init();
 
-	static uint8_t ucParameterToPass;
-    TaskHandle_t xHandle = NULL;
+    
+        printf("Set the time:hour ");
+        scanf("%d", &hour_1);
+        time_tc.tm_hour=hour_1;
+        printf("Set the time:min ");
+        scanf("%d", &min_1);
+        time_tc.tm_min=min_1;
+        time_tc.tm_sec=0;
 
-    xTaskCreate(Main_Screen,
-                "Main_Screen",
-                configMINIMAL_STACK_SIZE * 3,
-                &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle);
+    ESP_ERROR_CHECK(ds3231_set_time(&dev, &time_tc));
 
-    // xTaskCreate(Alarm_menu, 
-    //             "Alarm_menu",
-    //             STACK_SIZE,
-    //             &ucParameterToPass,
-    //             10, //tskIDLE_PRIORITY (Prioridad)
-    //             &xHandle);
+    for (;;)
+    {      
 
-	// xTaskCreate(Button_Handler, 
-    //             "Button_Handler",
-    //             STACK_SIZE,
-    //             &ucParameterToPass,
-    //             10, //tskIDLE_PRIORITY (Prioridad)
-    //             &xHandle);
+        vTaskDelay(pdMS_TO_TICKS(250));
+        if (ds3231_get_time(&dev, &time_tc) != ESP_OK)
+        {
+            printf("Could not get time\n");
+            continue;
+        }
+
+        /* float is used in printf(). you need non-default configuration in
+         * sdkconfig for ESP8266, which is enabled by default for this
+         * example. see sdkconfig.defaults.esp8266
+         */
+        printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
+    }
+
 }
-	
-
-
-
-#ifdef __cplusplus
-};
-#endif

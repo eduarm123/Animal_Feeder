@@ -23,26 +23,20 @@
  */
 /*************************************************************************************************/
 
-#ifdef __cplusplus
-extern "C"
-{
+#ifndef __MAIN_SCREEN_H__
+#define __MAIN_SCREEN_H__
+
+#ifdef	__cplusplus
+extern "C" {
 #endif
 
+
 /**********************************INCLUDES ******************************************************/
-#include <stdio.h>
-#include <stdint.h>
-#include <freertos/FreeRTOS.h>
 
-#include <freertos/task.h>
-#include <ds3231.h>
-#include <string.h>
-#include <time.h>
-
-#include "ds3231.h"
-#include "Main_Screen.h"
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
+void Main_Screen( void * pvParameters );
 
 /*********************************** (2) PUBLIC VARS *********************************************/
 
@@ -59,48 +53,12 @@ extern "C"
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 
 
-// void ds3231_test(void *pvParameters)
-// {
-   
-
-// }
 
 
 
 
-void app_main(void)
-{
-
-	// Unlike Vanilla FreeRTOS, users of FreeRTOS in ESP-IDF must never call vTaskStartScheduler() and vTaskEndScheduler().
-
-	static uint8_t ucParameterToPass;
-    TaskHandle_t xHandle = NULL;
-
-    xTaskCreate(Main_Screen,
-                "Main_Screen",
-                configMINIMAL_STACK_SIZE * 3,
-                &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle);
-
-    // xTaskCreate(Alarm_menu, 
-    //             "Alarm_menu",
-    //             STACK_SIZE,
-    //             &ucParameterToPass,
-    //             10, //tskIDLE_PRIORITY (Prioridad)
-    //             &xHandle);
-
-	// xTaskCreate(Button_Handler, 
-    //             "Button_Handler",
-    //             STACK_SIZE,
-    //             &ucParameterToPass,
-    //             10, //tskIDLE_PRIORITY (Prioridad)
-    //             &xHandle);
+#ifdef	__cplusplus
 }
-	
-
-
-
-#ifdef __cplusplus
-};
 #endif
+
+#endif  /* __MAIN_SCREEN_H__ */
