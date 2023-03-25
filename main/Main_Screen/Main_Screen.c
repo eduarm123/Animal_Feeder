@@ -78,11 +78,6 @@ void Main_Screen( void * pvParameters )
             continue;
         }
 
-        /* float is used in printf(). you need non-default configuration in
-         * sdkconfig for ESP8266, which is enabled by default for this
-         * example. see sdkconfig.defaults.esp8266
-         */
-
         printf("1.--- Configurar alarmas ---");
 
         printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
