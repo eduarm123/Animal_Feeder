@@ -41,6 +41,7 @@ extern "C"
 #include "ds3231.h"
 #include "Main_Screen.h"
 #include "Alarm_menu.h"
+#include "Button_Handler.h"
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
@@ -82,12 +83,12 @@ void app_main(void)
                 10, //tskIDLE_PRIORITY (Prioridad)
                 &xHandle);
 
-	// xTaskCreate(Button_Handler, 
-    //             "Button_Handler",
-    //             STACK_SIZE,
-    //             &ucParameterToPass,
-    //             10, //tskIDLE_PRIORITY (Prioridad)
-    //             &xHandle);
+	xTaskCreate(Button_Handler, 
+                "Button_Handler",
+                configMINIMAL_STACK_SIZE * 3,
+                &ucParameterToPass,
+                10, //tskIDLE_PRIORITY (Prioridad)
+                &xHandle);
 }
 	
 

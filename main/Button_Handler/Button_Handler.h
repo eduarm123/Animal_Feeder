@@ -1,5 +1,5 @@
 /*************************************************************************************************/
-/*! @file	Main_Screen.h
+/*! @file	Button_Handler.c
  *	@brief	Introducir breve descripcion del fichero
  *
  *	\b Descripciï¿½n: Introducir aquï¿½ descripciï¿½n de las funcionalidades del fichero \n
@@ -15,7 +15,7 @@
  *
  ****************************************************************************
  *
- *	Log: main.c
+ *	Log: Button_Handler.c
  * Revision [Date // Author]:  Modifications \n
  * -----------------------------------------------------------\n
  * V1.0 [ 28 oct. 2020 // earmijos ]: Original \n
@@ -23,8 +23,8 @@
  */
 /*************************************************************************************************/
 
-#ifndef __MAIN_SCREEN_H__
-#define __MAIN_SCREEN_H__
+#ifndef __BUTTON_HANDLER_H__
+#define __BUTTON_HANDLER_H__
 
 #ifdef	__cplusplus
 extern "C" {
@@ -32,33 +32,12 @@ extern "C" {
 
 
 /**********************************INCLUDES ******************************************************/
-#include <time.h>
 
-/*********************************** (2) PUBLIC VARS *********************************************/
-
-typedef struct tm tm_t;
 
 /********************************* (1) PUBLIC METHODS ********************************************/
+void Button_Handler( void * pvParameters );
 
-/**
- * @brief Se visualiza la pantalla principal.
- *
- *
- * @param pvParameters no hacemos nada con el
- * @param[out] 
- * @return void
- */
-void Main_Screen( void * pvParameters );
-
-/**
- * @brief Se configura la hora por consola. Esto se tiene que configurar para que configure por teclado matricial.
- *
- *
- * @param _time estructura tipo tm que se le debe pasar a la funcion.
- * @param[out] _time Se modifica la estructura con el tiempo que haya puesto el usuario.
- * @return void
- */
-void Time_config(tm_t *_time);
+/*********************************** (2) PUBLIC VARS *********************************************/
 
 
 /******************************** (3) DEFINES & MACROS *******************************************/
@@ -81,4 +60,4 @@ void Time_config(tm_t *_time);
 }
 #endif
 
-#endif  /* __MAIN_SCREEN_H__ */
+#endif  /* __BUTTON_HANDLER_H__ */

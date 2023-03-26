@@ -30,7 +30,6 @@
 #include <freertos/FreeRTOS.h>
 
 #include <freertos/task.h>
-#include <ds3231.h>
 #include <string.h>
 #include <time.h>
 #include "ds3231.h"
@@ -40,7 +39,8 @@
 
 
 /*********************************** (2) PUBLIC VARS *********************************************/
-struct tm time_tc=
+
+tm_t time_tc=
 {
     .tm_hour=0,
     .tm_min=0,
@@ -68,6 +68,8 @@ void Main_Screen( void * pvParameters )
     Time_config(&time_tc);
     ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc));
 
+    vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
+
     for (;;)
     {      
 
@@ -83,9 +85,12 @@ void Main_Screen( void * pvParameters )
         printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
     }
 
+
 }
 
-void Time_config(struct tm *_time){
+//Intentar meter esto en otra funcion o tarea para que cada modulo sea independiente.
+
+void Time_config(tm_t *_time){
 
     int hour_1=65; // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
     int min_1=65;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
