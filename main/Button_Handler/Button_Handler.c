@@ -27,11 +27,11 @@
 /**********************************INCLUDES ******************************************************/
 #include "Button_Handler.h"
 
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <driver/gpio.h>
 #include "freertos/semphr.h"
+
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
@@ -39,10 +39,12 @@
 /*********************************** (2) PUBLIC VARS *********************************************/
 TaskHandle_t ISR = NULL;
 SemaphoreHandle_t xSemaphore;
+extern TaskHandle_t xTaskHandle_alarm;
 
 /******************************** (3) DEFINES & MACROS *******************************************/
+#define CONFIG_LED_PIN 2
 #define ESP_INR_FLAG_DEFAULT 0
-#define PUSH_BUTTON_PIN 33
+#define PUSH_BUTTON_PIN 0 // Boot button in the esp32
 
 /*********************************** (4) PRIVATE VARS ********************************************/
 
@@ -54,30 +56,40 @@ SemaphoreHandle_t xSemaphore;
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 // interrupt service routine, called when the button is pressed
 void IRAM_ATTR button_isr_handler(void* arg) {
-    //xTaskResumeFromISR(ISR);
-
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     
-    // Set the binary semaphore to unblock the waiting task
-    xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken);
-    // If a higher priority task is woken up by the semaphore give, yield
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    xTaskResumeFromISR(ISR); 
+      
 }
 
-// task that will react to button clicks
-//  void button_task(void *arg)
-// {
+//task that will react to button clicks
+ void button_task(void *arg)
+{
+    bool toggle=false;
 
-//     while(1){  
-//         vTaskSuspend(NULL);
-      
-//     }
-// }
+
+    while(1){  
+        vTaskSuspend(NULL);
+        gpio_set_level(CONFIG_LED_PIN,toggle^=1); // Para probar en debug
+        
+        // if (eTaskGetState(xTaskHandle_alarm)==eSuspended) { // TODO: no funciona hay que ver que pasa
+        //     vTaskResume(xTaskHandle_alarm);
+        // } else {
+        //     continue;
+        // }
+
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;   
+        // Set the binary semaphore to unblock the waiting task
+        xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken);
+        // If a higher priority task is woken up by the semaphore give, yield
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
+}
 
 
 void Button_Handler( void * pvParameters )
 {
 
+    gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
     gpio_set_direction(PUSH_BUTTON_PIN, GPIO_MODE_INPUT);
 
     gpio_set_intr_type(PUSH_BUTTON_PIN, GPIO_INTR_NEGEDGE); // falling edge
@@ -90,7 +102,7 @@ void Button_Handler( void * pvParameters )
 
     gpio_isr_handler_add(PUSH_BUTTON_PIN, button_isr_handler, NULL);
 
-    //xTaskCreate( button_task, "button_task", 4096, NULL , 10,&ISR );
+    xTaskCreate( button_task, "button_task", 4096, NULL , 10,&ISR );
     
     vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
 

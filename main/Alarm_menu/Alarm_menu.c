@@ -32,6 +32,7 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include "freertos/semphr.h"
 #include <time.h>
 #include "Button_Handler.h"
 
@@ -62,6 +63,8 @@ tm_t time_alarm_2=
 
 extern i2c_dev_t s_dev; // Configurado en Main_screen.c 
 extern SemaphoreHandle_t xSemaphore;
+TaskHandle_t xTaskHandle_alarm;
+
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 
@@ -86,7 +89,7 @@ void Alarm_menu( void * pvParameters )
 
     for (;;)
     {
-        xSemaphoreTake(xSemaphore, portMAX_DELAY); // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN 33
+        xSemaphoreTake(xSemaphore, portMAX_DELAY); // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN 0
 
         switch (alarm_state) // TODO: cambiar esto. Ahora entra directo a Manual
         {
@@ -139,7 +142,12 @@ void Alarm_menu( void * pvParameters )
             break;
         }
 
+        
+        vTaskSuspend(NULL);
+        
         xSemaphoreGive(xSemaphore);// se libera el semaforo
+        xTaskHandle_alarm = xTaskGetCurrentTaskHandle();
+        
     }
 
 }
