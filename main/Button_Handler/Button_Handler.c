@@ -39,7 +39,6 @@
 /*********************************** (2) PUBLIC VARS *********************************************/
 TaskHandle_t ISR = NULL;
 SemaphoreHandle_t xSemaphore;
-extern TaskHandle_t xTaskHandle_alarm;
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 #define CONFIG_LED_PIN 2
@@ -58,7 +57,7 @@ extern TaskHandle_t xTaskHandle_alarm;
 void IRAM_ATTR button_isr_handler(void* arg) {
     
     xTaskResumeFromISR(ISR); 
-      
+
 }
 
 //task that will react to button clicks
@@ -66,22 +65,15 @@ void IRAM_ATTR button_isr_handler(void* arg) {
 {
     bool toggle=false;
 
-
     while(1){  
         vTaskSuspend(NULL);
         gpio_set_level(CONFIG_LED_PIN,toggle^=1); // Para probar en debug
-        
-        // if (eTaskGetState(xTaskHandle_alarm)==eSuspended) { // TODO: no funciona hay que ver que pasa
-        //     vTaskResume(xTaskHandle_alarm);
-        // } else {
-        //     continue;
-        // }
-
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;   
+        //BaseType_t xHigherPriorityTaskWoken = pdFALSE; 
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         // Set the binary semaphore to unblock the waiting task
         xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken);
         // If a higher priority task is woken up by the semaphore give, yield
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        //portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 }
 

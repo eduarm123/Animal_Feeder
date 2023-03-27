@@ -63,7 +63,6 @@ tm_t time_alarm_2=
 
 extern i2c_dev_t s_dev; // Configurado en Main_screen.c 
 extern SemaphoreHandle_t xSemaphore;
-TaskHandle_t xTaskHandle_alarm;
 
 
 /******************************** (3) DEFINES & MACROS *******************************************/
@@ -86,68 +85,63 @@ void Alarm_menu( void * pvParameters )
     static uint32_t alarm_state = Manual; 
 
     vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
-
+    
     for (;;)
     {
-        xSemaphoreTake(xSemaphore, portMAX_DELAY); // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN 0
-
-        switch (alarm_state) // TODO: cambiar esto. Ahora entra directo a Manual
+        if(xSemaphoreTake(xSemaphore,portMAX_DELAY) ==pdTRUE ) // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN 0
         {
-        case Manual:
-            
-            printf("Please slecte how many alarms you want");
-             while (1) {
-                printf("Alarms: ");
-                scanf("%d", &manual_alarm);
-                if (manual_alarm > 0 && manual_alarm <3 ) {
-                    break;
-                }
-                printf("Invalid alarm value. Please enter a value greater than 0.\n");
-                vTaskDelay(pdMS_TO_TICKS(1000));
-            }
-            if (manual_alarm ==1)
+            switch (alarm_state) // TODO: cambiar esto. Ahora entra directo a Manual
             {
-                Time_config(&time_alarm_1);
-                ds3231_set_alarm(&s_dev, DS3231_ALARM_1, &time_alarm_1, DS3231_ALARM1_MATCH_SECMINHOUR, 0, 0);
-                ds3231_enable_alarm_ints(&s_dev, DS3231_ALARM_1); // Se activa las interrupciones de alarma
-                // Esto deberia activar la funcion motor
-            }
-            else if (manual_alarm ==2)
-            {
-                Time_config(&time_alarm_1);
-                Time_config(&time_alarm_2);
-                ds3231_set_alarm(&s_dev, DS3231_ALARM_1, &time_alarm_1, DS3231_ALARM1_MATCH_SECMINHOUR, &time_alarm_2,
-                 DS3231_ALARM2_MATCH_MINHOUR);
-                ds3231_enable_alarm_ints(&s_dev, DS3231_ALARM_BOTH); // Se activa las interrupciones de alarma
-                // Esto deberia activar la funcion motor
-            }
-            break;
-        case Automatico:
-             printf("Select 1.Adulto o 2.Cachorro");
-             while (1) { // Esto se debe eliminar once we have the keyboard
-                printf("Age: ");
-                scanf("%d", &age_option);
-                if (age_option > 0 && age_option <3 ) {
-                    break;
+            case Manual:
+                
+                printf("Please slecte how many alarms you want");
+                while (1) {
+                    printf("Alarms: ");
+                    scanf("%d", &manual_alarm);
+                    if (manual_alarm > 0 && manual_alarm <3 ) {
+                        break;
+                    }
+                    printf("Invalid alarm value. Please enter a value greater than 0.\n");
+                    vTaskDelay(pdMS_TO_TICKS(1000));
                 }
-                printf("Invalid alarm value. Please enter a value greater than 0.\n");
-                vTaskDelay(pdMS_TO_TICKS(1000));
+                if (manual_alarm ==1)
+                {
+                    Time_config(&time_alarm_1);
+                    ds3231_set_alarm(&s_dev, DS3231_ALARM_1, &time_alarm_1, DS3231_ALARM1_MATCH_SECMINHOUR, 0, 0);
+                    ds3231_enable_alarm_ints(&s_dev, DS3231_ALARM_1); // Se activa las interrupciones de alarma
+                    // Esto deberia activar la funcion motor: TODO: Hacer Edwin. Utiliza esta senal para activar el motor 
+                }
+                else if (manual_alarm ==2)
+                {
+                    Time_config(&time_alarm_1);
+                    Time_config(&time_alarm_2);
+                    ds3231_set_alarm(&s_dev, DS3231_ALARM_1, &time_alarm_1, DS3231_ALARM1_MATCH_SECMINHOUR, &time_alarm_2,
+                    DS3231_ALARM2_MATCH_MINHOUR);
+                    ds3231_enable_alarm_ints(&s_dev, DS3231_ALARM_BOTH); // Se activa las interrupciones de alarma
+                    // Esto deberia activar la funcion motor.  TODO: Hacer Edwin. Utiliza esta senal para activar el motor 
+                }
+                break;
+            case Automatico:
+                printf("Select 1.Adulto o 2.Cachorro");
+                while (1) { // Esto se debe eliminar once we have the keyboard
+                    printf("Age: ");
+                    scanf("%d", &age_option);
+                    if (age_option > 0 && age_option <3 ) {
+                        break;
+                    }
+                    printf("Invalid alarm value. Please enter a value greater than 0.\n");
+                    vTaskDelay(pdMS_TO_TICKS(1000));
+                }
+
+                //TODO: falta implementar
+                break;
+            default:
+                // TODO: Seria bueno poner un boton de cancelar
+                printf("Please select an option");
+                break;
             }
 
-            //TODO: falta implementar
-            break;
-        default:
-            // TODO: Seria bueno poner un boton de cancelar
-            printf("Please select an option");
-            break;
         }
-
-        
-        vTaskSuspend(NULL);
-        
-        xSemaphoreGive(xSemaphore);// se libera el semaforo
-        xTaskHandle_alarm = xTaskGetCurrentTaskHandle();
-        
     }
 
 }
