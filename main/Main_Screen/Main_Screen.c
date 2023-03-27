@@ -64,9 +64,9 @@ i2c_dev_t s_dev; // necessary for RTC_init()
 void Main_Screen( void * pvParameters )
 {
     
-    RTC_init(&s_dev);
-    Time_config(&time_tc);
-    ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc));
+    RTC_init(&s_dev); // Inizializa el i2c
+    Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
+    ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
 
     vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
 
@@ -80,7 +80,8 @@ void Main_Screen( void * pvParameters )
             continue;
         }
 
-        printf("1.--- Configurar alarmas ---");
+        printf("1.--- Configurar alarmas ---\n");
+        printf("2.--- Configurar hora ------\n");
 
         printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
     }

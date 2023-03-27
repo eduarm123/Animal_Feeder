@@ -54,24 +54,32 @@ SemaphoreHandle_t xSemaphore;
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 // interrupt service routine, called when the button is pressed
-void IRAM_ATTR button_isr_handler(void* arg) {
-    
+void IRAM_ATTR button_isr_handler(void* arg) {    
     xTaskResumeFromISR(ISR); 
-
 }
 
-//task that will react to button clicks
+
+/**
+  * @brief Esta tarea se activa cuando se pulsa el pulsador boot
+  * TODO: falta implemtnar las demas teclas/pulsadores
+  *
+  * 
+  * @param arg no se usa
+  *
+  * @return void
+  *     
+  */
  void button_task(void *arg)
 {
     bool toggle=false;
 
     while(1){  
-        vTaskSuspend(NULL);
+        vTaskSuspend(NULL); // Se suspende la tarea
         gpio_set_level(CONFIG_LED_PIN,toggle^=1); // Para probar en debug
         //BaseType_t xHigherPriorityTaskWoken = pdFALSE; 
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         // Set the binary semaphore to unblock the waiting task
-        xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken);
+        xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken); // Desbloquea la tarea de Alarma
         // If a higher priority task is woken up by the semaphore give, yield
         //portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
@@ -81,7 +89,7 @@ void IRAM_ATTR button_isr_handler(void* arg) {
 void Button_Handler( void * pvParameters )
 {
 
-    gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
+    gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Lo tengo para debugear
     gpio_set_direction(PUSH_BUTTON_PIN, GPIO_MODE_INPUT);
 
     gpio_set_intr_type(PUSH_BUTTON_PIN, GPIO_INTR_NEGEDGE); // falling edge

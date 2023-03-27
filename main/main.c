@@ -89,6 +89,8 @@ void app_main(void)
                 &ucParameterToPass,
                 10, //tskIDLE_PRIORITY (Prioridad)
                 &xHandle);
+
+    
 }
 	
 

@@ -35,6 +35,17 @@ extern "C" {
 
 
 /********************************* (1) PUBLIC METHODS ********************************************/
+/**
+  * @brief Esto se encarga de todas las pulsaciones. 
+  * De momento solo configura la interrupcion para el pin 0 (boot) del esp32.
+  * TODO: falta implemtnar las demas teclas/pulsadores
+  *
+  * 
+  * @param pvParameters no se usa
+  *
+  * @return void
+  *     
+  */
 void Button_Handler( void * pvParameters );
 
 /*********************************** (2) PUBLIC VARS *********************************************/
