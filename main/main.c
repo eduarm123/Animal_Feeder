@@ -43,6 +43,8 @@ extern "C"
 #include "Alarm_menu.h"
 #include "Button_Handler.h"
 
+#include "ili9341.h"
+
 /********************************* (1) PUBLIC METHODS ********************************************/
 
 
