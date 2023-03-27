@@ -68,7 +68,7 @@ void Main_Screen( void * pvParameters )
     Time_config(&time_tc);
     ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc));
 
-    vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
+    vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen 
 
     for (;;)
     {      
@@ -96,7 +96,7 @@ void Time_config(tm_t *_time){
     int min_1=65;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
 
      while (1) {
-        printf("hour: ");
+        printf("hora: ");
         scanf("%d", &hour_1);
         if (hour_1 >= 0 && hour_1 < 24) {
             break;
