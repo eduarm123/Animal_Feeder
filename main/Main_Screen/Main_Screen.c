@@ -91,7 +91,7 @@ void Main_Screen( void * pvParameters )
 
 //Intentar meter esto en otra funcion o tarea para que cada modulo sea independiente.
 
-void Time_config(tm_t *_time){
+void Time_config(tm_t * const _time){
 
     int hour_1=65; // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
     int min_1=65;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
