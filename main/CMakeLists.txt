@@ -6,11 +6,13 @@ idf_component_register(SRCS "main.c" "C:/Repos/Animal_Feeder/RCT/i2cdev/i2cdev.c
                             "C:/Repos/Animal_Feeder/FTF_display/ili9341.c" 
                             "C:/Repos/Animal_Feeder/FTF_display/loma40px.c" 
                             "C:/Repos/Animal_Feeder/FTF_display/thaifont-esp32.c"
-                            "C:/Repos/Animal_Feeder/FTF_display/img.c"             
+                            "C:/Repos/Animal_Feeder/FTF_display/img.c"
+                            "C:/Repos/Animal_Feeder/main/Pwm_motor/Pwm_motor.c"               
                     INCLUDE_DIRS "." "C:/Repos/Animal_Feeder/RCT/ds3231"
                     "C:/Repos/Animal_Feeder/RCT/i2cdev"
                     "C:/Repos/Animal_Feeder/RCT/esp_idf_lib_helpers"
                     "C:/Repos/Animal_Feeder/main/Main_Screen"
                     "C:/Repos/Animal_Feeder/main/Alarm_menu"
                     "C:/Repos/Animal_Feeder/main/Button_Handler"
-                    "C:/Repos/Animal_Feeder/FTF_display")
+                    "C:/Repos/Animal_Feeder/FTF_display"
+                    "C:/Repos/Animal_Feeder/main/Pwm_motor" )

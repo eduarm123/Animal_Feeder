@@ -307,7 +307,7 @@ void thaifont_set_font(void* fontcode)
 	_font = fontcode;
 	
 	pHeader = (FONT_HEADER*)_font;
-	_fontHeight = pHeader->lineHeight;
+	_fontHeight = pHeader->lineHeight; //Aqui se puede modificar el tamaño de la fuente
 	//printf("_fontHeight=%d\n", _fontHeight);
 }
 

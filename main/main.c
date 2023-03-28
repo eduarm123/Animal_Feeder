@@ -44,6 +44,8 @@ extern "C"
 #include "Button_Handler.h"
 
 #include "ili9341.h"
+#include "Pwm_motor.h"
+//#include "esp_err.h"
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
@@ -62,9 +64,13 @@ extern "C"
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 
-
 void app_main(void)
 {
+    /*---------------------------Generar la señal PWM--------------------------------------*/
+    example_ledc_init();
+    ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, LEDC_DUTY));
+    ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL));
+    /*-------------------------------------------------------------------------------------*/
 
 	// Unlike Vanilla FreeRTOS, users of FreeRTOS in ESP-IDF must never call vTaskStartScheduler() and vTaskEndScheduler().
 
@@ -91,12 +97,8 @@ void app_main(void)
                 &ucParameterToPass,
                 10, //tskIDLE_PRIORITY (Prioridad)
                 &xHandle);
-
     
 }
-	
-
-
 
 #ifdef __cplusplus
 };
