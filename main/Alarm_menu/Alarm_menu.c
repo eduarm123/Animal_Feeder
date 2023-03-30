@@ -28,6 +28,7 @@
 #include "Alarm_menu.h"
 #include "Main_Screen.h"
 #include "ds3231.h"
+#include "Pwm_motor.h"
 
 
 #include <freertos/FreeRTOS.h>
@@ -90,6 +91,7 @@ extern SemaphoreHandle_t xSemaphore;
 
 
 /**************************** (5) PRIVATE METHODS DEFINITION *************************************/
+void Activacion_motor();
 void init_manual_alarm_3();
 void init_adulto_alarm();
 void init_cachorro_alarm();
@@ -105,7 +107,8 @@ void Alarm_menu( void * pvParameters )
     int manual_alarm=-1; // utilizo esto de momento por la funcion scanf. Valor -1 por la UART. Se cambio cuando se utilice display
     int age_option=-1;
     int activar_alarma =0;
-    static uint32_t alarm_state = Manual; 
+    static uint32_t alarm_state = Manual;
+    uint8_t* manual_alarm_isr=(void*)0;
 
     vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
     
@@ -191,6 +194,10 @@ void Alarm_menu( void * pvParameters )
 
             case Manual_alarmas_3:
                 init_manual_alarm_3();
+                ds3231_get_alarm_flags(&s_dev,(ds3231_alarm_t *)DS3231_ALARM_BOTH);
+                if (1){
+                    Activacion_motor();
+                }
                 break;
             case Adulto_alarmas:
                 init_adulto_alarm();
@@ -201,8 +208,6 @@ void Alarm_menu( void * pvParameters )
                 break;
 
         }
-
-        Activacion_motor();
 
     }
 
@@ -218,7 +223,7 @@ void init_manual_alarm_3(){
 
     if( time_tc.tm_hour ==s_alarmas_manual[2].tm_hour && time_tc.tm_min ==s_alarmas_manual[2].tm_min)
     {
-        manual_3=1; // hay que borrar cuando el motor lo lea
+        Activacion_motor();
     }
      
 }
@@ -233,15 +238,15 @@ void init_adulto_alarm(){
 
     if( time_tc.tm_hour ==s_alarmas_auto[0].tm_hour && time_tc.tm_min ==s_alarmas_auto[0].tm_min)
     {
-        automatico_1=1; // hay que borrar cuando el motor lo lea
+        Activacion_motor();
     }
     if( time_tc.tm_hour ==s_alarmas_auto[1].tm_hour && time_tc.tm_min ==s_alarmas_auto[1].tm_min)
     {
-        automatico_2=1; // hay que borrar cuando el motor lo lea
+        Activacion_motor();
     }
     if( time_tc.tm_hour ==s_alarmas_auto[2].tm_hour && time_tc.tm_min ==s_alarmas_auto[2].tm_min)
     {
-        automatico_3=1; // hay que borrar cuando el motor lo lea
+        Activacion_motor();
     }
      
 }
@@ -256,15 +261,15 @@ void init_cachorro_alarm(){
 
    if( time_tc.tm_hour ==s_alarmas_auto[3].tm_hour && time_tc.tm_min ==s_alarmas_auto[3].tm_min)
     {
-        automatico_4=1; // hay que borrar cuando el motor lo lea
+        Activacion_motor();
     }
     if( time_tc.tm_hour ==s_alarmas_auto[4].tm_hour && time_tc.tm_min ==s_alarmas_auto[4].tm_min)
     {
-        automatico_5=1; // hay que borrar cuando el motor lo lea
+        Activacion_motor();
     }
     if( time_tc.tm_hour ==s_alarmas_auto[5].tm_hour && time_tc.tm_min ==s_alarmas_auto[5].tm_min)
     {
-        automatico_6=1; // hay que borrar cuando el motor lo lea
+        Activacion_motor();
     }
      
 }
@@ -272,17 +277,17 @@ void init_cachorro_alarm(){
 void Activacion_motor()
 {
     // Esto es para alarma de manual 1 y 2 
-    if (ds3231_get_alarm_flags(&s_dev,(ds3231_alarm_t *)DS3231_ALARM_BOTH)
-    &&manual_3 && automatico_1 && automatico_2 && automatico_3 && automatico_4
-    && automatico_5 && automatico_6)  // Hay un warnig. tengo que mirarlo bien. creo que ahi tengo q
-    //poner las alarmas que configure
-    {
+    // if (ds3231_get_alarm_flags(&s_dev,(ds3231_alarm_t *)DS3231_ALARM_BOTH)
+    // &&manual_3 && automatico_1 && automatico_2 && automatico_3 && automatico_4
+    // && automatico_5 && automatico_6)  // Hay un warnig. tengo que mirarlo bien. creo que ahi tengo q
+    // //poner las alarmas que configure
+    
         // Hay que poner mutex
         WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_50);
         vTaskDelay(pdMS_TO_TICKS(2000));
         // Hay que poner mutex
         WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_0);
-    }
+    
 }
 
 
