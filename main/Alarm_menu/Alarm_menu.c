@@ -174,7 +174,7 @@ void Alarm_menu( void * pvParameters )
                     Time_config(&s_alarmas_auto[3]);
                     Time_config(&s_alarmas_auto[4]);
                     Time_config(&s_alarmas_auto[5]); 
-                    activar_alarma=Adulto_alarmas;
+                    activar_alarma=Cachorro_alarmas;
                 }
 
                 //TODO: falta implementar
@@ -201,6 +201,8 @@ void Alarm_menu( void * pvParameters )
                 break;
 
         }
+
+        Activacion_motor();
 
     }
 
@@ -266,4 +268,21 @@ void init_cachorro_alarm(){
     }
      
 }
+
+void Activacion_motor()
+{
+    // Esto es para alarma de manual 1 y 2 
+    if (ds3231_get_alarm_flags(&s_dev,(ds3231_alarm_t *)DS3231_ALARM_BOTH)
+    &&manual_3 && automatico_1 && automatico_2 && automatico_3 && automatico_4
+    && automatico_5 && automatico_6)  // Hay un warnig. tengo que mirarlo bien. creo que ahi tengo q
+    //poner las alarmas que configure
+    {
+        // Hay que poner mutex
+        WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_50);
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        // Hay que poner mutex
+        WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_0);
+    }
+}
+
 

@@ -88,26 +88,12 @@ void example_ledc_init(void)
     ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
 }
 
-//ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, LEDC_DUTY);
-//ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
-/*void app_main(void)
+
+void WPWM_motor(const ledc_channel_t _channel, const uint32_t _dutyCycle)
 {
-    // Set the LEDC peripheral configuration
+ /*---------------------------Generar la señal PWM--------------------------------------*/
     example_ledc_init();
-    // Set duty to 50%
-    ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, LEDC_DUTY));
-    // Update duty to apply the new value
-    ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL));
-}*/
-
-void Activacion_motor()
-{
-    // Esto es para alarma de manual 1 y 2 
-    if (ds3231_get_alarm_flags(&s_dev,DS3231_ALARM_BOTH))  // Hay un warnig. tengo que mirarlo bien. creo que ahi tengo q
-    //poner las alarmas que configure
-    {
-
-        ;
-    }
+    ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, _channel, _dutyCycle));
+    ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, _channel));
+    /*-------------------------------------------------------------------------------------*/
 }
-
