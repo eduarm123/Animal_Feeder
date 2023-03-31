@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "author": "Benny Meisels",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 299.31,
+      "left": -208.87,
+      "attrs": { "color": "green" }
+    },
+    { "type": "wokwi-ds1307", "id": "rtc1", "top": 68.36, "left": 187.99, "attrs": {} },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 326.54,
+      "left": -79.01,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-membrane-keypad",
+      "id": "keypad1",
+      "top": -331.94,
+      "left": -603.99,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 58.97,
+      "left": -572.74,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": 76.17,
+      "left": -547.68,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r4",
+      "top": 88.09,
+      "left": -526.02,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r5",
+      "top": 107.73,
+      "left": -503,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "esp:GND.1", "rtc1:GND", "black", [ "h30.58", "v-68.94" ] ],
+    [ "rtc1:5V", "esp:VIN", "red", [ "h-59.43", "v108.71", "h-144.76", "v-42.72" ] ],
+    [ "rtc1:SDA", "esp:D21", "green", [ "h-44.24", "v-37.01" ] ],
+    [ "rtc1:SCL", "esp:D22", "green", [ "h-54.68", "v-77.36" ] ],
+    [ "btn1:2.r", "r1:1", "green", [ "h0" ] ],
+    [ "btn1:1.r", "esp:GND.1", "green", [ "v-0.2", "h306.87", "v186.64" ] ],
+    [ "r1:2", "esp:VIN", "green", [ "v0.92", "h7.05", "v-102.52", "h-22.18", "v-72.09" ] ],
+    [
+      "r2:2",
+      "esp:VIN",
+      "green",
+      [ "h-0.48", "v75.58", "h404.56", "v-0.53", "h124.54", "v-10.32" ]
+    ],
+    [ "r3:2", "esp:VIN", "green", [ "h-3.46", "v52.36", "h526.79" ] ],
+    [ "r4:2", "esp:VIN", "green", [ "h-0.03", "v33.41" ] ],
+    [
+      "r5:2",
+      "esp:VIN",
+      "green",
+      [ "h-0.97", "v9.76", "h234.95", "v24.59", "h183.14", "v-24.18", "h37.36", "v5.8" ]
+    ],
+    [ "r2:1", "keypad1:R1", "green", [ "h0" ] ],
+    [ "r3:1", "keypad1:R2", "green", [ "h0" ] ],
+    [ "r4:1", "keypad1:R3", "green", [ "h0" ] ],
+    [ "r5:1", "keypad1:R4", "green", [ "h0" ] ],
+    [ "esp:D32", "r2:1", "green", [ "h-410.77", "v-38.76" ] ],
+    [ "esp:D33", "r3:1", "green", [ "h-419.86", "v-30.08" ] ],
+    [ "esp:D34", "r4:1", "green", [ "h-366.33", "v10.99" ] ],
+    [ "esp:D35", "r5:1", "green", [ "h-201.68", "v26.09", "h-242.09", "v-5.26" ] ],
+    [ "esp:D12", "keypad1:C1", "green", [ "h0" ] ],
+    [ "esp:D13", "keypad1:C2", "green", [ "h-463.57", "v4.13" ] ],
+    [ "esp:D14", "keypad1:C3", "green", [ "h-455.58", "v-9.19" ] ],
+    [ "esp:D2", "r1:1", "green", [ "h49.25", "v150.49", "h-229.91" ] ],
+    [ "esp:D15", "keypad1:C4", "green", [ "h22.07", "v102.92", "h-558.74" ] ]
+  ],
+  "dependencies": {}
+}

@@ -43,7 +43,7 @@ SemaphoreHandle_t xSemaphore;
 /******************************** (3) DEFINES & MACROS *******************************************/
 #define CONFIG_LED_PIN 2
 #define ESP_INR_FLAG_DEFAULT 0
-#define PUSH_BUTTON_PIN 0 // Boot button in the esp32
+#define PUSH_BUTTON_PIN 2 // Boot button in the esp32
 
 /*********************************** (4) PRIVATE VARS ********************************************/
 

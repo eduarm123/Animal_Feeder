@@ -93,8 +93,8 @@ void Main_Screen( void * pvParameters )
 
 void Time_config(tm_t * const _time){
 
-    int hour_1=65; // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
-    int min_1=65;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
+    int hour_1=3; // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
+    int min_1=3;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
 
      while (1) {
         printf("hora: ");
