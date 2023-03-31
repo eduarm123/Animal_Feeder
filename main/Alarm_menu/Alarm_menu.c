@@ -70,13 +70,13 @@ tm_t s_alarmas_manual[]={
 
 // Esto se usa como flags para saber que se ha activado alguna de esas alarmas.
 // mirar si se puede hacer con bitfields
-uint8_t manual_3     = 0;
-uint8_t automatico_1 = 0;
-uint8_t automatico_2 = 0;
-uint8_t automatico_3 = 0;
-uint8_t automatico_4 = 0;
-uint8_t automatico_5 = 0;
-uint8_t automatico_6 = 0;
+// uint8_t manual_3     = 0;
+// uint8_t automatico_1 = 0;
+// uint8_t automatico_2 = 0;
+// uint8_t automatico_3 = 0;
+// uint8_t automatico_4 = 0;
+// uint8_t automatico_5 = 0;
+// uint8_t automatico_6 = 0;
 
 
 extern tm_t time_tc;
@@ -100,8 +100,12 @@ void init_cachorro_alarm();
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 
-
-// Aqui se deberia entrar por una interrupcion
+/**
+ * @brief Menu alarma. Aqui se configura la hora y se monitorea las alarmas. Si alguna alarma salta
+ *        se activa el motor.  
+ * @param pvParameters 
+ * @return void
+ */
 void Alarm_menu( void * pvParameters )
 {
     int manual_alarm=-1; // utilizo esto de momento por la funcion scanf. Valor -1 por la UART. Se cambio cuando se utilice display
@@ -180,7 +184,6 @@ void Alarm_menu( void * pvParameters )
                     activar_alarma=Cachorro_alarmas;
                 }
 
-                //TODO: falta implementar
                 break;
             default:
                 // TODO: Seria bueno poner un boton de cancelar
