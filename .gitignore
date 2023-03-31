@@ -11,7 +11,7 @@
 
 *.cmake
 *.bin_timestamp
-*.json
+#*.json
 *.map
 *.ninja
 
