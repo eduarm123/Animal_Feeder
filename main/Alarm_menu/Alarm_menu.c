@@ -48,6 +48,11 @@ typedef enum{
 }MENU_OPT;
 
 typedef enum{
+    Adulto=1,
+    Cachorro
+}AGE_t;
+
+typedef enum{
     Manual_alarmas_3=1,
     Adulto_alarmas,
     Cachorro_alarmas
@@ -169,14 +174,14 @@ void Alarm_menu( void * pvParameters )
                     vTaskDelay(pdMS_TO_TICKS(1000));
                 }
 
-                if (age_option ==1)
+                if (age_option ==Adulto)
                 {
                     Time_config(&s_alarmas_auto[0]);
                     Time_config(&s_alarmas_auto[1]);
                     Time_config(&s_alarmas_auto[2]);
                     activar_alarma=Adulto_alarmas;
                 }
-                else if (age_option ==2)
+                else if (age_option ==Cachorro)
                 {
                     Time_config(&s_alarmas_auto[3]);
                     Time_config(&s_alarmas_auto[4]);
@@ -233,7 +238,6 @@ void init_manual_alarm_3(){
 
 void init_adulto_alarm(){
 
-
     if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
         {
             printf("Could not get time\n");
@@ -255,7 +259,6 @@ void init_adulto_alarm(){
 }
 
 void init_cachorro_alarm(){
-
 
     if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
         {
