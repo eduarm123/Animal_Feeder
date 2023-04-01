@@ -34,6 +34,7 @@
 #include <time.h>
 #include "ds3231.h"
 #include "Main_Screen.h"
+#include "Button_Handler.h"
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
@@ -71,7 +72,11 @@ void Main_Screen( void * pvParameters )
     vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen 
 
     for (;;)
-    {      
+    {   
+        
+        printf("Presionar la tecla 1 para continuar");
+        while(!ReadKey("1"));
+         
 
         vTaskDelay(pdMS_TO_TICKS(250));
         if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
