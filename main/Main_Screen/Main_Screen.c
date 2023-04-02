@@ -69,14 +69,14 @@ void Main_Screen( void * pvParameters )
     Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
     ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
 
-    vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen 
+    vTaskDelay(pdMS_TO_TICKS(100)); // espera de x tiempo para que las otras tareas se inicialicen 
 
     for (;;)
     {   
         
-        printf("Presionar la tecla 1 para continuar");
-        while(!ReadKey("1"));
-         
+        printf("Presionar la tecla x para continuar");
+        while(!ReadKey("2"));
+        printf("Well done"); 
 
         vTaskDelay(pdMS_TO_TICKS(250));
         if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
@@ -98,8 +98,8 @@ void Main_Screen( void * pvParameters )
 
 void Time_config(tm_t * const _time){
 
-    int hour_1=3; // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
-    int min_1=3;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
+    int hour_1=63; // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
+    int min_1=63;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
 
      while (1) {
         printf("hora: ");

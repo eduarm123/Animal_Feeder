@@ -51,14 +51,22 @@ SemaphoreHandle_t xSemaphore;
 #define ESP_INR_FLAG_DEFAULT (0)
 #define PUSH_BUTTON_PIN_0    (0) // Boot button in the esp32
 
-#define PUSH_BUTTON_PIN_1   (32)
-#define PUSH_BUTTON_PIN_2   (33)
-#define PUSH_BUTTON_PIN_3   (34)
-#define PUSH_BUTTON_PIN_4   (35)
-#define PUSH_BUTTON_PIN_5   (12)
-#define PUSH_BUTTON_PIN_6   (13)
-#define PUSH_BUTTON_PIN_7   (14)
-#define PUSH_BUTTON_PIN_8   (15)
+// #define PUSH_BUTTON_PIN_1   (15)
+// #define PUSH_BUTTON_PIN_2   (14)
+// #define PUSH_BUTTON_PIN_3   (13)
+// #define PUSH_BUTTON_PIN_4   (12)
+
+#define PUSH_BUTTON_PIN_1   (12)
+#define PUSH_BUTTON_PIN_2   (13)
+#define PUSH_BUTTON_PIN_3   (14)
+#define PUSH_BUTTON_PIN_4   (15)
+
+#define PUSH_BUTTON_PIN_5   (35)
+#define PUSH_BUTTON_PIN_6   (34)
+#define PUSH_BUTTON_PIN_7   (33)
+#define PUSH_BUTTON_PIN_8   (32)
+
+
 
 #define FILA                  (4)
 #define COLUMNA               (4)
