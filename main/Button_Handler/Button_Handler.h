@@ -47,7 +47,7 @@ extern "C" {
   * @return void
   *     
   */
-void Button_Handler( void * pvParameters );
+void Button_Handler();
 
 bool ReadKey(const char *const _c_key);
 

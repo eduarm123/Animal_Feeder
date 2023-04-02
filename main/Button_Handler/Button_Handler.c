@@ -130,8 +130,6 @@ static bool TEST_GPIO_Debounce_button(s_gpio_t* _p_s_gpio, bool _b_Value_pressed
 
 }
 
-
-
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 
 bool ReadKey(const char *const _c_key){
@@ -214,7 +212,7 @@ void IRAM_ATTR button_isr_handler(void* arg) {
 }
 
 
-void Button_Handler( void * pvParameters )
+void Button_Handler()
 {
 
     gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Lo tengo para debugear
@@ -235,12 +233,6 @@ void Button_Handler( void * pvParameters )
     xTaskCreate( button_task, "button_task", 4096, NULL , 10,&ISR );
     
     vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
-
-
-    for (;;)
-    {      
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
 
 }
 
