@@ -74,9 +74,9 @@ void Main_Screen( void * pvParameters )
     for (;;)
     {   
         
-        printf("Presionar la tecla x para continuar");
+        printf("Presionar la tecla x para continuar\n");
         while(!ReadKey("2"));
-        printf("Well done"); 
+        printf("Well done\n"); 
 
         vTaskDelay(pdMS_TO_TICKS(250));
         if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
