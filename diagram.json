@@ -57,6 +57,38 @@
       "left": -505.88,
       "rotate": 90,
       "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r6",
+      "top": 296.2,
+      "left": -492.71,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r7",
+      "top": 324.21,
+      "left": -466.04,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r8",
+      "top": 341.55,
+      "left": -440.69,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r9",
+      "top": 360.23,
+      "left": -412.68,
+      "rotate": 90,
+      "attrs": { "value": "220" }
     }
   ],
   "connections": [
@@ -69,10 +101,6 @@
     [ "btn1:2.r", "r1:1", "green", [ "h0" ] ],
     [ "btn1:1.r", "esp:GND.1", "green", [ "v-0.2", "h306.87", "v186.64" ] ],
     [ "r1:2", "esp:VIN", "green", [ "v0.92", "h7.05", "v-102.52", "h-22.18", "v-72.09" ] ],
-    [ "keypad1:C1", "esp:D26", "green", [ "v0" ] ],
-    [ "keypad1:C2", "esp:D25", "green", [ "v0" ] ],
-    [ "keypad1:C3", "esp:D33", "green", [ "v0" ] ],
-    [ "keypad1:C4", "esp:D32", "green", [ "v0" ] ],
     [ "r2:1", "keypad1:R1", "green", [ "h0.81", "v-29.04", "h41.54" ] ],
     [ "keypad1:R2", "r3:1", "green", [ "v45.36", "h-29.39" ] ],
     [ "keypad1:R3", "r4:1", "green", [ "v58.83", "h-13.06" ] ],
@@ -85,7 +113,19 @@
     [ "r2:2", "esp:VIN", "green", [ "h0.27", "v124.02", "h474.58", "v-82.4" ] ],
     [ "r3:2", "esp:VIN", "green", [ "h0.27", "v91.48", "h432.86", "v-67.8" ] ],
     [ "r4:2", "esp:VIN", "green", [ "h-0.68", "v70.06", "h386.97", "v-53.19" ] ],
-    [ "r5:2", "esp:VIN", "green", [ "h-0.2", "v34.2", "h340.03", "v-38.59" ] ]
+    [ "r5:2", "esp:VIN", "green", [ "h-0.2", "v34.2", "h340.03", "v-38.59" ] ],
+    [ "keypad1:C1", "r6:1", "green", [ "v0" ] ],
+    [ "keypad1:C2", "r7:1", "green", [ "v168.98", "h23.31" ] ],
+    [ "keypad1:C3", "r8:1", "green", [ "v154.3", "h36.24", "v157.19" ] ],
+    [ "keypad1:C4", "r9:1", "green", [ "v24.9", "h45.16" ] ],
+    [ "r9:2", "esp:VIN", "green", [ "h0.01", "v56.15", "h117.39", "v-290.82" ] ],
+    [ "r8:2", "esp:VIN", "green", [ "h0", "v66.82", "h130.73", "v-282.81" ] ],
+    [ "r7:2", "esp:VIN", "green", [ "h0.01", "v76.16", "h136.07", "v-276.14" ] ],
+    [ "r6:2", "esp:VIN", "green", [ "h1.33", "v97.5", "h145.41", "v-269.47" ] ],
+    [ "esp:D26", "r9:1", "green", [ "h-336.29", "v238.12" ] ],
+    [ "esp:D25", "r8:1", "green", [ "h-344.3", "v2.36" ] ],
+    [ "esp:D33", "r7:1", "green", [ "h-360.31", "v6.63" ] ],
+    [ "esp:D32", "r6:1", "green", [ "h-376.32", "v21.46" ] ]
   ],
   "dependencies": {}
 }
