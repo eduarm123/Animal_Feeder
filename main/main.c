@@ -31,6 +31,7 @@ extern "C"
 /**********************************INCLUDES ******************************************************/
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <freertos/FreeRTOS.h>
 
 #include <freertos/task.h>
@@ -45,6 +46,7 @@ extern "C"
 
 #include "ili9341.h"
 #include "Pwm_motor.h"
+
 //#include "esp_err.h"
 
 /********************************* (1) PUBLIC METHODS ********************************************/
