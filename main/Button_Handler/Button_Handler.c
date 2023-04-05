@@ -231,6 +231,7 @@ void Button_Handler()
     
     //Pulsadores
     gpio_set_direction(PUSH_BUTTON_PIN_0, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(PUSH_BUTTON_PIN_0, GPIO_PULLUP_ONLY);
 
     gpio_set_intr_type(PUSH_BUTTON_PIN_0, GPIO_INTR_NEGEDGE); // falling edge
 
