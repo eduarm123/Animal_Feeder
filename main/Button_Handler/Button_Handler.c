@@ -152,6 +152,7 @@ bool ReadKey(const char *const _c_key){
     for(u32_it = 0; u32_it<8; u32_it++){
         
         gpio_set_direction(vs_as_keyboard_t[u32_it].e_gpioID, vs_as_keyboard_t[u32_it].e_gpioMode);
+        gpio_set_pull_mode(vs_as_keyboard_t[u32_it].e_gpioID, GPIO_PULLUP_ONLY);
     }
 
      for(u32_itrow = 4; u32_itrow<8; u32_itrow ++){
