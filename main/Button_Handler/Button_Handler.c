@@ -47,9 +47,9 @@ TaskHandle_t ISR = NULL;
 SemaphoreHandle_t xSemaphore;
 
 /******************************** (3) DEFINES & MACROS *******************************************/
-#define CONFIG_LED_PIN       (1)//2
+#define CONFIG_LED_PIN       (2)//2
 #define ESP_INR_FLAG_DEFAULT (0)
-#define PUSH_BUTTON_PIN_0    (2)//0 // Boot button in the esp32
+#define PUSH_BUTTON_PIN_0    (4)//0 // Boot button in the esp32
 
 // #define PUSH_BUTTON_PIN_1   (15)
 // #define PUSH_BUTTON_PIN_2   (14)
