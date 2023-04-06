@@ -3,3 +3,7 @@
 7-4-5-6
 
 4-5-6-7
+
+
+Tutorial tareas
+https://esp32tutorials.com/esp32-esp-idf-freertos-semaphore-tutorial/
