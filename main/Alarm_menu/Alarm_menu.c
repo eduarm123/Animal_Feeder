@@ -218,6 +218,7 @@ void Alarm_menu( void * pvParameters )
         }
 
     }
+    vTaskDelay(pdMS_TO_TICKS(10));
 
 }
 
