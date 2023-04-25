@@ -39,7 +39,7 @@
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
-
+#define CONFIG_LED_PIN       (2)//2
 /*********************************** (2) PUBLIC VARS *********************************************/
 
 typedef enum{
@@ -121,6 +121,14 @@ void Alarm_menu( void * pvParameters )
 
     vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
     
+    /*Probar que si funcionan las 2 tareas al mismo tiempo*/
+    gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
+    gpio_set_level(CONFIG_LED_PIN,true); 
+    vTaskDelay(pdMS_TO_TICKS(2000));
+    gpio_set_level(CONFIG_LED_PIN,false); // Para probar en debug
+    printf("HOLA CAPULLO\n");
+    /*-----------------------------------------------------*/
+
     for (;;)
     {
         if(xSemaphoreTake(xSemaphore,portMAX_DELAY) ==pdTRUE ) // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN_0 0

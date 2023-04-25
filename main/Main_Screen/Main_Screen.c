@@ -37,7 +37,7 @@
 #include "Button_Handler.h"
 
 /********************************* (1) PUBLIC METHODS ********************************************/
-
+#define CONFIG_LED_PIN       (2)//2
 
 /*********************************** (2) PUBLIC VARS *********************************************/
 
@@ -65,12 +65,12 @@ i2c_dev_t s_dev; // necessary for RTC_init()
 void Main_Screen( void * pvParameters )
 {
     
-    RTC_init(&s_dev); // Inizializa el i2c
+    /*RTC_init(&s_dev); // Inizializa el i2c
     Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
-    ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
-
+    ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo*/
+    //gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
     vTaskDelay(pdMS_TO_TICKS(100)); // espera de x tiempo para que las otras tareas se inicialicen 
-
+    //gpio_set_level(CONFIG_LED_PIN,1); // Para probar en debug
     for (;;)
     {   
         
@@ -79,16 +79,16 @@ void Main_Screen( void * pvParameters )
         printf("Well done\n"); 
 
         vTaskDelay(pdMS_TO_TICKS(250));
-        if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
+        /*if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
         {
             printf("Could not get time\n");
             continue;
-        }
+        }*/
 
         printf("1.--- Configurar alarmas ---\n");
         printf("2.--- Configurar hora ------\n");
 
-        printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
+        //printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
     }
 
 
@@ -98,8 +98,8 @@ void Main_Screen( void * pvParameters )
 
 void Time_config(tm_t * const _time){
 
-    int hour_1=63; // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
-    int min_1=63;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
+    int hour_1=3; // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
+    int min_1=3;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
 
      while (1) {
         printf("hora: ");
