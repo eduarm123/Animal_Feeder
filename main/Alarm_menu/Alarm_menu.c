@@ -131,8 +131,8 @@ void Alarm_menu( void * pvParameters )
 
     for (;;)
     {
-        if(xSemaphoreTake(xSemaphore,portMAX_DELAY) ==pdTRUE ) // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN_0 0
-        {
+        //if(xSemaphoreTake(xSemaphore,portMAX_DELAY) ==pdTRUE ) // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN_0 0
+        //{
             switch (alarm_state) // TODO: cambiar esto. Ahora entra directo a Manual
             {
             case Manual:
@@ -204,7 +204,7 @@ void Alarm_menu( void * pvParameters )
                 break;
             }
 
-        }
+        //}
     
         switch (activar_alarma){
 
@@ -226,7 +226,7 @@ void Alarm_menu( void * pvParameters )
         }
 
     }
-
+    //vTaskDelete(NULL);
 }
 
 void init_manual_alarm_3(){
