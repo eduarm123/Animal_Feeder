@@ -37,7 +37,7 @@
 #include "Button_Handler.h"
 
 
-int8_t num1;
+//int8_t num1;
 char m[1]; //Sirve para almacenar el número ingresado por teclado tipo char
 /********************************* (1) PUBLIC METHODS ********************************************/
 #define CONFIG_LED_PIN       (2)//2
@@ -109,21 +109,74 @@ void Main_Screen( void * pvParameters )
 
 void Time_config(tm_t * const _time){
 
-    int hour_1; // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
+    int hour_1; //Para ingresar el 1er dígito de la hora
+    int hour_2; //Para ingresar el 2do dígito de la hora
+    int hour_total; //Para ingresar el 2do dígito de la hora
     unsigned num;
-    unsigned num1;
-    int min_1;  // Esto se debe cambiar a 0. Lo pongo asi para poder configurar desde consola UART
+    //unsigned num1;
+    int num1;
+    int min_1; //Para ingresaar el 1er dígito del minuto
+    //int min_2;  //Para ingresaar el 1er dígito del minuto
+    int cont=0;
 
-     while (1) {
-        //printf("Pressed key: %c\n", hour_1);
+    int obtenerHora() 
+    {
+        char numeroStr[2+1] = "";
+        //int cont=0;
+
+        while (cont < 2) 
+        {
+            num = keypad_getkey();
+
+            if (num != '\0') {
+                numeroStr[cont] = num;
+                cont++;
+                printf("Número actual: %s\n", numeroStr);
+            }
+            //printf("Nada impreso.\n");
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
+        num1 = atoi(numeroStr);
+        return num1;
+    }
+
+    int concatenarHoras(int numero1) 
+    {
+        printf("Concatenado.\n");
+        vTaskDelay(pdMS_TO_TICKS(100));
+        if (numero1 < 0 || numero1 > 90) {
+            printf("Error.\n");
+            return -1;
+        }
+        int numeroConcatenado = numero1;
+        cont=0;
+        return numeroConcatenado;
+    }
+
+    while (1)
+    {
+        printf("Hora1\n");
+        hour_1= obtenerHora();
+        printf("Hora2\n");
+        //cont=0;
+        //hour_2= obtenerHora();
+        printf("Hora3\n");
+        hour_total= concatenarHoras(hour_1);
+        if (hour_total != -1) {
+            printf("La hora es: %c\n", hour_total);
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+    }
+
+    /*while (1) {
         num = keypad_getkey();  /// gets from key queue
         //char m[]={keypressed}; //es otra manera de almacenar el caracter del teclado
         *m = num; //Lo convertimos a puntero al caracter del teclado para usar el atoi
-        //fgets(keypressed, sizeof(keypressed),stdin);
         hour_1= atoi(m);
-       // printf("Pressed key: %c\n", num1);
-        //scanf("%d", &hour_1);
-        if (hour_1 > 0 && hour_1 < 24) {
+
+        //Concatenar dichos números para formar un valor y compararlo si es mayor a 0 y menor a 24.
+        if (hour_1 > 0 && hour_1 < 24) //&&(Boton_OK)
+        {
             printf("Presionado: %c\n", hour_1);
             vTaskDelay(pdMS_TO_TICKS(2000));
             break;
@@ -134,14 +187,11 @@ void Time_config(tm_t * const _time){
     }
 
     while (1) {
-//printf("Pressed key: %c\n", hour_1);
         num1 = keypad_getkey();  /// gets from key queue
         //char m[]={keypressed}; //es otra manera de almacenar el caracter del teclado
         *m = num1; //Lo convertimos a puntero al caracter del teclado para usar el atoi
         //fgets(keypressed, sizeof(keypressed),stdin);
         min_1= atoi(m);
-       // printf("Pressed key: %c\n", num1);
-        //scanf("%d", &hour_1);
         if (min_1 > 0 && min_1 < 60) {
             printf("Presionado: %c\n", min_1);
             vTaskDelay(pdMS_TO_TICKS(2000));
@@ -150,7 +200,7 @@ void Time_config(tm_t * const _time){
         printf("Invalid minute value. Please enter a value between 0 and 59.\n");
         printf("Pressed key: %c\n", min_1);
         vTaskDelay(pdMS_TO_TICKS(1000));
-    }
+    }*/
 
     _time->tm_sec=0;
     _time->tm_hour=hour_1;
