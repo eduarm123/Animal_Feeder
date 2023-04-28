@@ -141,11 +141,11 @@ void Time_config(tm_t * const _time){
         return num1;
     }
 
-    int concatenarHoras(int numero1) 
+    int concatenarHoras(int numero1, float mult) 
     {
         printf("Concatenado.\n");
         vTaskDelay(pdMS_TO_TICKS(100));
-        if (numero1 < 0 || numero1 > 90) {
+        if (numero1 < 0*mult || numero1 > 24*mult) {
             printf("Error.\n");
             return -1;
         }
@@ -162,8 +162,8 @@ void Time_config(tm_t * const _time){
         cont=0;
         min_1= obtenerHora();
         printf("Hora3\n");
-        hour_total= concatenarHoras(hour_1);
-        min_total= concatenarHoras(min_1);
+        hour_total= concatenarHoras(hour_1, 1);
+        min_total= concatenarHoras(min_1, 2.5);
         if (hour_total != -1) {
             printf("La hora es: %c\n", hour_total);
             vTaskDelay(pdMS_TO_TICKS(1000));
