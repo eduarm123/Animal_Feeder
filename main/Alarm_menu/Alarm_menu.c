@@ -123,7 +123,7 @@ void Alarm_menu( void * pvParameters )
     
     for (;;)
     {
-        if(xSemaphoreTake(xSemaphore,portMAX_DELAY) ==pdTRUE ) // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN 0
+        if(xSemaphoreTake(xSemaphore,portMAX_DELAY) ==pdTRUE ) // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN_0 0
         {
             switch (alarm_state) // TODO: cambiar esto. Ahora entra directo a Manual
             {
@@ -202,8 +202,8 @@ void Alarm_menu( void * pvParameters )
 
             case Manual_alarmas_3:
                 init_manual_alarm_3();
-                ds3231_get_alarm_flags(&s_dev,(ds3231_alarm_t *)DS3231_ALARM_BOTH);
-                if (1){
+                ds3231_get_alarm_flags(&s_dev,(ds3231_alarm_t *)manual_alarm_isr);
+                if (*manual_alarm_isr!=0){ // TODO: Comprobar si esto funciona. No estoy seguro si se guarda ahi el flag de la interrupcion
                     Activacion_motor();
                 }
                 break;
