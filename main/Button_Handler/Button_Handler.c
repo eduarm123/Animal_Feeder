@@ -31,16 +31,10 @@
 #include <freertos/task.h>
 #include <driver/gpio.h>
 #include "freertos/semphr.h"
-#include <string.h>
 
 
 /********************************* (1) PUBLIC METHODS ********************************************/
-typedef volatile struct
-{
-    gpio_num_t e_gpioID;
-    gpio_mode_t e_gpioMode;
 
-}s_gpio_t;
 
 /*********************************** (2) PUBLIC VARS *********************************************/
 TaskHandle_t ISR = NULL;
@@ -49,82 +43,11 @@ SemaphoreHandle_t xSemaphore;
 /******************************** (3) DEFINES & MACROS *******************************************/
 #define CONFIG_LED_PIN       (2)//2
 #define ESP_INR_FLAG_DEFAULT (0)
-#define PUSH_BUTTON_PIN_0    (4)//0 // Boot button in the esp32
+#define PUSH_BUTTON_PIN_0    (0)//0 // Boot button in the esp32
 
-// #define PUSH_BUTTON_PIN_1   (15)
-// #define PUSH_BUTTON_PIN_2   (14)
-// #define PUSH_BUTTON_PIN_3   (13)
-// #define PUSH_BUTTON_PIN_4   (12)
-
-/*-----------------PINES CON ERROR----------------*/
-/*#define PUSH_BUTTON_PIN_1   (12)
-#define PUSH_BUTTON_PIN_2   (13)
-#define PUSH_BUTTON_PIN_3   (14)
-#define PUSH_BUTTON_PIN_4   (15)
-
-#define PUSH_BUTTON_PIN_5   (35)
-#define PUSH_BUTTON_PIN_6   (34)
-#define PUSH_BUTTON_PIN_7   (33)
-#define PUSH_BUTTON_PIN_8   (32)*/
-/*-------------------------------------------------*/
-
-#define PUSH_BUTTON_PIN_1   (32)
-#define PUSH_BUTTON_PIN_2   (33)
-#define PUSH_BUTTON_PIN_3   (25)
-#define PUSH_BUTTON_PIN_4   (26)
-
-#define PUSH_BUTTON_PIN_5   (27)
-#define PUSH_BUTTON_PIN_6   (14)
-#define PUSH_BUTTON_PIN_7   (12)
-#define PUSH_BUTTON_PIN_8   (13)
-
-
-#define FILA                  (4)
-#define COLUMNA               (4)
 
 
 /*********************************** (4) PRIVATE VARS ********************************************/
-static s_gpio_t vs_as_keyboard_t[8] =
-{
- {
-  .e_gpioID = PUSH_BUTTON_PIN_1,
-  .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_2,
-    .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_3,
-  .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_4,
-    .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_5,
-  .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_6,
-    .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_7,
-  .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_8,
-    .e_gpioMode = GPIO_MODE_INPUT,
- },
-};
-
-
-static const char* const MATRIX[FILA][COLUMNA]={{"1","2","3","A"},
-                                                {"4","5","6","B"},
-                                                {"7","8","9","C"},
-                                                {"Esc","0","#","D"}};
 
 
 /**************************** (5) PRIVATE METHODS DEFINITION *************************************/
@@ -191,6 +114,7 @@ bool ReadKey(const char *const _c_key){
      return (b_KeyPressed);
 }
 
+/***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 // interrupt service routine, called when the button is pressed
 void IRAM_ATTR button_isr_handler(void* arg) {    
     xTaskResumeFromISR(ISR); 
@@ -232,8 +156,9 @@ void Button_Handler()
     //Pulsadores
     gpio_set_direction(PUSH_BUTTON_PIN_0, GPIO_MODE_INPUT);
     gpio_set_pull_mode(PUSH_BUTTON_PIN_0, GPIO_PULLUP_ONLY);
+    gpio_set_direction(PUSH_BUTTON_PIN, GPIO_MODE_INPUT);
 
-    gpio_set_intr_type(PUSH_BUTTON_PIN_0, GPIO_INTR_NEGEDGE); // falling edge
+    gpio_set_intr_type(PUSH_BUTTON_PIN, GPIO_INTR_NEGEDGE); // falling edge
 
     xSemaphore = xSemaphoreCreateBinary(); // esto es para activar las alarmas
 
@@ -241,7 +166,7 @@ void Button_Handler()
     //Install ISR service with defautl configuration
     gpio_install_isr_service(ESP_INR_FLAG_DEFAULT);
 
-    gpio_isr_handler_add(PUSH_BUTTON_PIN_0, button_isr_handler, NULL);
+    gpio_isr_handler_add(PUSH_BUTTON_PIN, button_isr_handler, NULL);
 
     xTaskCreate( button_task, "button_task", 4096, NULL , 10,&ISR );
     
@@ -249,3 +174,10 @@ void Button_Handler()
 
 }
 
+
+    for (;;)
+    {      
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+
+}
