@@ -115,7 +115,8 @@ void Time_config(tm_t * const _time){
     unsigned num;
     //unsigned num1;
     int num1;
-    int min_1; //Para ingresaar el 1er dígito del minuto
+    int min_1=0; //Para ingresaar el 1er dígito del minuto
+    int min_total;
     //int min_2;  //Para ingresaar el 1er dígito del minuto
     int cont=0;
 
@@ -149,7 +150,7 @@ void Time_config(tm_t * const _time){
             return -1;
         }
         int numeroConcatenado = numero1;
-        cont=0;
+        //cont=0;
         return numeroConcatenado;
     }
 
@@ -158,13 +159,20 @@ void Time_config(tm_t * const _time){
         printf("Hora1\n");
         hour_1= obtenerHora();
         printf("Hora2\n");
-        //cont=0;
-        //hour_2= obtenerHora();
+        cont=0;
+        min_1= obtenerHora();
         printf("Hora3\n");
         hour_total= concatenarHoras(hour_1);
+        min_total= concatenarHoras(min_1);
         if (hour_total != -1) {
             printf("La hora es: %c\n", hour_total);
             vTaskDelay(pdMS_TO_TICKS(1000));
+            break;
+        }
+        if (min_total != -1) {
+            printf("La hora es: %c\n", min_total);
+            vTaskDelay(pdMS_TO_TICKS(1000));
+            break;
         }
     }
 
@@ -203,6 +211,6 @@ void Time_config(tm_t * const _time){
     }*/
 
     _time->tm_sec=0;
-    _time->tm_hour=hour_1;
-    _time->tm_min=min_1;
+    _time->tm_hour=hour_total;
+    _time->tm_min=min_total;
 }
