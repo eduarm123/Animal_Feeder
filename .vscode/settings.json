@@ -6,6 +6,10 @@
   "cmake.cmakePath": "cmake",
   "C_Cpp.errorSquiggles": "enabled",
   "files.associations": {
-    "esp_cpu.h": "c"
+    "esp_cpu.h": "c",
+    "button_handler.h": "c",
+    "stdbool.h": "c",
+    "gpio.h": "c",
+    "esp_task_wdt.h": "c"
   }
 }

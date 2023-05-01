@@ -190,10 +190,11 @@ void Alarm_menu( void * pvParameters )
                 printf("Please select an option");
                 break;
             }
+            vTaskDelay(pdMS_TO_TICKS(100));
 
         }
     
-        switch (activar_alarma){
+/*         switch (activar_alarma){
 
             case Manual_alarmas_3:
                 init_manual_alarm_3();
@@ -210,7 +211,7 @@ void Alarm_menu( void * pvParameters )
              default:
                 break;
 
-        }
+        } */
 
     }
 

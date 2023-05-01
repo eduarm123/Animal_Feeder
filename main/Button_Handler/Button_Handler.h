@@ -32,7 +32,7 @@ extern "C" {
 
 
 /**********************************INCLUDES ******************************************************/
-
+#include <stdbool.h>
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 /**
@@ -47,6 +47,12 @@ extern "C" {
   *     
   */
 void Button_Handler( void * pvParameters );
+
+bool ReadKey( const char _c_key);
+
+void HAL_GPIO_test_Init(void);
+
+int Read2digits(int _buffer);
 
 /*********************************** (2) PUBLIC VARS *********************************************/
 
