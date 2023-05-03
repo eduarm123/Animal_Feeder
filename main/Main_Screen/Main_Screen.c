@@ -35,8 +35,9 @@
 #include "ds3231.h"
 #include "Main_Screen.h"
 #include "Button_Handler.h"
+#include "freertos/semphr.h"
 
-
+//SemaphoreHandle_t LlaveGlobal;
 //int8_t num1;
 char m[1]; //Sirve para almacenar el número ingresado por teclado tipo char
 /********************************* (1) PUBLIC METHODS ********************************************/
@@ -74,7 +75,7 @@ void Main_Screen( void * pvParameters )
     ///                     R1  R2  R3  R4  C1  C2  C3  C4 
     gpio_num_t keypad[8] = {13, 12, 14, 27, 26, 25, 33, 32};
     keypad_initalize(keypad); /// Inicializa keyboard
-
+    
 
     RTC_init(&s_dev); // Inizializa el i2c
     Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
@@ -83,26 +84,32 @@ void Main_Screen( void * pvParameters )
     vTaskDelay(pdMS_TO_TICKS(100)); // espera de x tiempo para que las otras tareas se inicialicen 
     //gpio_set_level(CONFIG_LED_PIN,1); // Para probar en debug
     for (;;)
-    {   
-        
-        printf("Presionar la tecla x para continuar\n");
-        //while(!ReadKey("2"));
-        printf("Well done\n"); 
+    {
+        for(int i=0; i<=8; i++)
+        {    
+            printf("Presionar la tecla x para continuar\n");
+            //while(!ReadKey("2"));
+            printf("Well done\n"); 
 
-        vTaskDelay(pdMS_TO_TICKS(250));
-        if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
-        {
-            printf("Could not get time\n");
-            continue;
+            vTaskDelay(pdMS_TO_TICKS(250));
+            if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
+            {
+                printf("Could not get time\n");
+                continue;
+            }
+
+            printf("1.--- Configurar alarmas ---\n");
+            printf("2.--- Configurar hora ------\n");
+
+            printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
+            vTaskDelay(pdMS_TO_TICKS(1000));
         }
-
-        printf("1.--- Configurar alarmas ---\n");
-        printf("2.--- Configurar hora ------\n");
-
-        printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
+        printf("FIIIIIIIN\n");
+        //vTaskDelay(pdMS_TO_TICKS(2000));
+        xSemaphoreGive(LlaveGlobal);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
-
-
+    
 }
 
 //Intentar meter esto en otra funcion o tarea para que cada modulo sea independiente.
@@ -110,7 +117,7 @@ void Main_Screen( void * pvParameters )
 void Time_config(tm_t * const _time){
 
     int hour_1; //Para ingresar el 1er dígito de la hora
-    int hour_2; //Para ingresar el 2do dígito de la hora
+    //int hour_2; //Para ingresar el 2do dígito de la hora
     int hour_total; //Para ingresar el 2do dígito de la hora
     unsigned num;
     //unsigned num1;
