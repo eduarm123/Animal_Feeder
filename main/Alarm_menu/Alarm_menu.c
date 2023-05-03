@@ -87,7 +87,7 @@ tm_t s_alarmas_manual[]={
 extern tm_t time_tc;
 extern i2c_dev_t s_dev; // Configurado en Main_screen.c 
 extern SemaphoreHandle_t xSemaphore;
-
+SemaphoreHandle_t LlaveGlobal;
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 #define ARRAY_SIZE(a) (sizeof(a)/ sizeof(a[0]))
@@ -121,13 +121,26 @@ void Alarm_menu( void * pvParameters )
 
     vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
     
-    /*Probar que si funcionan las 2 tareas al mismo tiempo*/
-    gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
-    gpio_set_level(CONFIG_LED_PIN,true); 
-    vTaskDelay(pdMS_TO_TICKS(2000));
-    gpio_set_level(CONFIG_LED_PIN,false); // Para probar en debug
-    printf("HOLA CAPULLO\n");
-    /*-----------------------------------------------------*/
+    for (;;)
+    {
+        if(xSemaphoreTake(LlaveGlobal, portMAX_DELAY))
+        {
+            for(int i=0; i<=8; i++)
+            { 
+                /*Probar que si funcionan las 2 tareas al mismo tiempo*/
+                gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
+                gpio_set_level(CONFIG_LED_PIN,true); 
+                vTaskDelay(pdMS_TO_TICKS(2000));
+                gpio_set_level(CONFIG_LED_PIN,false); // Para probar en debug
+                printf("HOLA CAPULLO\n");
+                vTaskDelay(pdMS_TO_TICKS(2000));  
+                /*-----------------------------------------------------*/
+            }
+        } 
+        vTaskDelay(pdMS_TO_TICKS(2000));    
+    }
+
+    
 
     for (;;)
     {
