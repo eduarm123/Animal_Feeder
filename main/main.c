@@ -70,8 +70,9 @@ extern "C"
 
 void app_main(void)
 {
+    //extern SemaphoreHandle_t LlaveGlobal;
     LlaveGlobal = xSemaphoreCreateBinary();
-	// Unlike Vanilla FreeRTOS, users of FreeRTOS in ESP-IDF must never call vTaskStartScheduler() and vTaskEndScheduler().
+    xSemaphoreGive(LlaveGlobal);
 
 	static uint8_t ucParameterToPass;
     TaskHandle_t xHandle = NULL;
@@ -91,7 +92,6 @@ void app_main(void)
                 1, //tskIDLE_PRIORITY (Prioridad)
                 &xHandle,
                 1);
-    
     
 }
 
