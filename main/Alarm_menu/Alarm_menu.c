@@ -86,7 +86,7 @@ tm_t s_alarmas_manual[]={
 
 extern tm_t time_tc;
 extern i2c_dev_t s_dev; // Configurado en Main_screen.c 
-extern SemaphoreHandle_t xSemaphore;
+//extern SemaphoreHandle_t xSemaphore;
 SemaphoreHandle_t LlaveGlobal;
 
 /******************************** (3) DEFINES & MACROS *******************************************/
@@ -123,21 +123,22 @@ void Alarm_menu( void * pvParameters )
     
     for (;;)
     {
-        if(xSemaphoreTake(LlaveGlobal, portMAX_DELAY))
+        if (xSemaphoreTake(LlaveGlobal, portMAX_DELAY))
         {
-            for(int i=0; i<=8; i++)
+            for(int i=0; i<=4; i++)
             { 
                 /*Probar que si funcionan las 2 tareas al mismo tiempo*/
                 gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
                 gpio_set_level(CONFIG_LED_PIN,true); 
-                vTaskDelay(pdMS_TO_TICKS(2000));
+                vTaskDelay(pdMS_TO_TICKS(500));
                 gpio_set_level(CONFIG_LED_PIN,false); // Para probar en debug
                 printf("HOLA CAPULLO\n");
-                vTaskDelay(pdMS_TO_TICKS(2000));  
+                vTaskDelay(pdMS_TO_TICKS(500));  
                 /*-----------------------------------------------------*/
             }
-        } 
-        vTaskDelay(pdMS_TO_TICKS(2000));    
+        }
+        xSemaphoreGive(LlaveGlobal); 
+        vTaskDelay(pdMS_TO_TICKS(500));    
     }
 
     
