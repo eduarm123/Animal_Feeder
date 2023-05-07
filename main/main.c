@@ -33,6 +33,7 @@ extern "C"
 #include <stdint.h>
 #include <stdlib.h>
 #include <freertos/FreeRTOS.h>
+#include "freertos/semphr.h"
 
 #include <freertos/task.h>
 #include <ds3231.h>
@@ -65,28 +66,32 @@ extern "C"
 /************************* (6)  STATIC METHODS IMPLEMENTATION ************************************/
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
+//extern SemaphoreHandle_t LlaveGlobal;
 
 void app_main(void)
 {
-	// Unlike Vanilla FreeRTOS, users of FreeRTOS in ESP-IDF must never call vTaskStartScheduler() and vTaskEndScheduler().
+    //extern SemaphoreHandle_t LlaveGlobal;
+    LlaveGlobal = xSemaphoreCreateBinary();
+    xSemaphoreGive(LlaveGlobal);
 
 	static uint8_t ucParameterToPass;
     TaskHandle_t xHandle = NULL;
 
-    xTaskCreate(Main_Screen,
+    xTaskCreatePinnedToCore(Main_Screen,
                 "Main_Screen",
                 configMINIMAL_STACK_SIZE * 3,
                 &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle);
+                1, //tskIDLE_PRIORITY (Prioridad)
+                &xHandle,
+                1);
 
-    xTaskCreate(Alarm_menu, 
+    xTaskCreatePinnedToCore(Alarm_menu, 
                 "Alarm_menu",
                 configMINIMAL_STACK_SIZE * 3,
                 &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle);
-
+                1, //tskIDLE_PRIORITY (Prioridad)
+                &xHandle,
+                1);
     
 }
 

@@ -47,149 +47,149 @@ TaskHandle_t ISR = NULL;
 SemaphoreHandle_t xSemaphore;
 
 /******************************** (3) DEFINES & MACROS *******************************************/
-#define CONFIG_LED_PIN       (1)//2
+#define CONFIG_LED_PIN       (2)//2
 #define ESP_INR_FLAG_DEFAULT (0)
-#define PUSH_BUTTON_PIN_0    (2)//0 // Boot button in the esp32
+#define PUSH_BUTTON_PIN_0    (4)//0 // Boot button in the esp32
 
-// #define PUSH_BUTTON_PIN_1   (15)
-// #define PUSH_BUTTON_PIN_2   (14)
-// #define PUSH_BUTTON_PIN_3   (13)
-// #define PUSH_BUTTON_PIN_4   (12)
+#include <memory.h>
+#include <time.h>
+#include <esp_log.h>
 
-/*-----------------PINES CON ERROR----------------*/
-/*#define PUSH_BUTTON_PIN_1   (12)
-#define PUSH_BUTTON_PIN_2   (13)
-#define PUSH_BUTTON_PIN_3   (14)
-#define PUSH_BUTTON_PIN_4   (15)
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/queue.h>
 
-#define PUSH_BUTTON_PIN_5   (35)
-#define PUSH_BUTTON_PIN_6   (34)
-#define PUSH_BUTTON_PIN_7   (33)
-#define PUSH_BUTTON_PIN_8   (32)*/
-/*-------------------------------------------------*/
+/** \brief Keypad mapping array*/
+const char keypad[] = { 
+    '1', '2', '3', 'A',
+    '4', '5', '6', 'B',
+    '7', '8', '9', 'C',
+    '*', '0', '#', 'D'
+};  
 
-#define PUSH_BUTTON_PIN_1   (32)
-#define PUSH_BUTTON_PIN_2   (33)
-#define PUSH_BUTTON_PIN_3   (25)
-#define PUSH_BUTTON_PIN_4   (26)
+/** \brief Keypad configuration pions*/
+static gpio_num_t _keypad_pins[8];
 
-#define PUSH_BUTTON_PIN_5   (27)
-#define PUSH_BUTTON_PIN_6   (14)
-#define PUSH_BUTTON_PIN_7   (12)
-#define PUSH_BUTTON_PIN_8   (13)
+/** \brief Last isr time*/
+time_t time_old_isr = 0;
 
+/** \brief Pressed keys queue*/
+QueueHandle_t keypad_queue;
 
-#define FILA                  (4)
-#define COLUMNA               (4)
+/**
+ * @brief Handle keypad click
+ * @param [in]args row number
+ */
+void intr_click_handler(void *args);
 
-
-/*********************************** (4) PRIVATE VARS ********************************************/
-static s_gpio_t vs_as_keyboard_t[8] =
+/**
+ * @brief Enable rows'pin pullup resistor, and isr. Prepares
+ * keypad to read pressed row number.
+ */
+void turnon_rows()
 {
- {
-  .e_gpioID = PUSH_BUTTON_PIN_1,
-  .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_2,
-    .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_3,
-  .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_4,
-    .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_5,
-  .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_6,
-    .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_7,
-  .e_gpioMode = GPIO_MODE_INPUT,
- },
- {
-  .e_gpioID = PUSH_BUTTON_PIN_8,
-    .e_gpioMode = GPIO_MODE_INPUT,
- },
-};
-
-
-static const char* const MATRIX[FILA][COLUMNA]={{"1","2","3","A"},
-                                                {"4","5","6","B"},
-                                                {"7","8","9","C"},
-                                                {"Esc","0","#","D"}};
-
-
-/**************************** (5) PRIVATE METHODS DEFINITION *************************************/
-
-/************************* (6)  STATIC METHODS IMPLEMENTATION ************************************/
-
-static bool TEST_GPIO_Debounce_button(s_gpio_t* _p_s_gpio, bool _b_Value_pressed){
-    bool b_ret = true;
-    while(gpio_get_level(_p_s_gpio->e_gpioID)== _b_Value_pressed)
+    for(int i = 4; i < 8; i++) /// Columns
     {
-        b_ret = false;
+        gpio_set_pull_mode(_keypad_pins[i], GPIO_PULLDOWN_ONLY);
     }
-    return (b_ret);
-
+    for(int i = 0; i < 4; i++) /// Rows
+    {
+        gpio_set_pull_mode(_keypad_pins[i], GPIO_PULLUP_ONLY);
+        gpio_intr_enable(_keypad_pins[i]);
+    }
 }
 
-/***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
+/**
+ * @brief Enable columns'pin pullup resistor, and disable rows isr and pullup resistor.
+ * Prepares keypad to read pressed column number. 
+ */
+void turnon_cols()
+{
+    for(int i = 0; i < 4; i++) /// Rows
+    {
+        gpio_intr_disable(_keypad_pins[i]);
+        gpio_set_pull_mode(_keypad_pins[i], GPIO_PULLDOWN_ONLY);
+    }
+    for(int i = 4; i < 8; i++) /// Columns
+    {
+        gpio_set_pull_mode(_keypad_pins[i], GPIO_PULLUP_ONLY);
+    }
+}
 
-bool ReadKey(const char *const _c_key){
+esp_err_t keypad_initalize(gpio_num_t keypad_pins[8])
+{
+    memcpy(_keypad_pins, keypad_pins, 8*sizeof(gpio_num_t));
 
-    uint32_t u32_itcol, u32_itrow, u32_it;
-    bool b_KeyPressed=false;
-
-
-    for(u32_it = 0; u32_it<8; u32_it++){
+    /** Maybe cause issues if try to desinstall this flag because it's global allocated 
+     * to all pins try to use gpio_isr_register instrad of gpio_install_isr_service **/
+    ESP_ERROR_CHECK_WITHOUT_ABORT(gpio_install_isr_service(ESP_INTR_FLAG_EDGE));
+    for(int i = 0; i < 4; i++) /// Rows
+    {
+        gpio_intr_disable(keypad_pins[i]);
+        gpio_set_direction(keypad_pins[i], GPIO_MODE_INPUT);
+        gpio_set_intr_type(keypad_pins[i], GPIO_INTR_NEGEDGE);
+        ESP_ERROR_CHECK_WITHOUT_ABORT(gpio_isr_handler_add(_keypad_pins[i], (void*)intr_click_handler, (void*)i));
         
-        gpio_set_direction(vs_as_keyboard_t[u32_it].e_gpioID, vs_as_keyboard_t[u32_it].e_gpioMode);
-        gpio_set_pull_mode(vs_as_keyboard_t[u32_it].e_gpioID, GPIO_PULLUP_ONLY);
+    }
+    for(int i = 4; i < 8; i++)
+    {
+        gpio_set_direction(keypad_pins[i], GPIO_MODE_INPUT);
     }
 
-     for(u32_itrow = 4; u32_itrow<8; u32_itrow ++){
-        
-        /* Se configutra las salidas asi para evitar cortos  */
-        vs_as_keyboard_t[((u32_itrow +1)%4)+4].e_gpioMode  = GPIO_MODE_INPUT;
-        vs_as_keyboard_t[((u32_itrow +2)%4)+4].e_gpioMode  = GPIO_MODE_INPUT;
-        vs_as_keyboard_t[((u32_itrow +3)%4)+4].e_gpioMode  = GPIO_MODE_INPUT;
-        vs_as_keyboard_t[u32_itrow].e_gpioMode         = GPIO_MODE_OUTPUT;
+    keypad_queue = xQueueCreate(5, sizeof(char));
+    if(keypad_queue == NULL)
+        return ESP_ERR_NO_MEM;
 
-        /* Aqui se envia a la funcion gpio_set_direction   */
-        gpio_set_direction(vs_as_keyboard_t[((u32_itrow +1)%4)+4].e_gpioID, vs_as_keyboard_t[u32_it].e_gpioMode);
-        gpio_set_direction(vs_as_keyboard_t[((u32_itrow +2)%4)+4].e_gpioID, vs_as_keyboard_t[u32_it].e_gpioMode);
-        gpio_set_direction(vs_as_keyboard_t[((u32_itrow +3)%4)+4].e_gpioID, vs_as_keyboard_t[u32_it].e_gpioMode);
-        gpio_set_direction(vs_as_keyboard_t[u32_itrow].e_gpioID, vs_as_keyboard_t[u32_it].e_gpioMode);
+    turnon_rows();
 
-        gpio_set_level(vs_as_keyboard_t[u32_itrow].e_gpioID,0); // Se activa salida uno por uno en cada ciclo
-
-
-         for(u32_itcol = 0; u32_itcol <4; u32_itcol ++){
-             
-             if(!(TEST_GPIO_Debounce_button(&vs_as_keyboard_t[u32_itcol],0))){
-               vTaskDelay(pdMS_TO_TICKS(100));
-               if(!strcmp(_c_key, MATRIX[u32_itrow-4][u32_itcol])){
-                   b_KeyPressed=true;
-               }
-               else {
-
-                   b_KeyPressed = false;
-               }
-
-             }
-         }
-     }
-
-     return (b_KeyPressed);
+    return ESP_OK;
 }
+
+void intr_click_handler(void* args)
+{
+    int index = (int)(args);
+    
+    time_t time_now_isr = time(NULL);
+    time_t time_isr = (time_now_isr - time_old_isr)*1000L;
+    
+    if(time_isr >= KEYPAD_DEBOUNCING)
+    {
+        turnon_cols();
+        for(int j = 4; j < 8; j++)
+        {
+            if(!gpio_get_level(_keypad_pins[j]))
+            {
+                xQueueSendFromISR(keypad_queue, &keypad[index*4 + j - 4], NULL);
+                break;
+            }
+        }
+        turnon_rows();
+    }
+    time_old_isr = time_now_isr;
+    
+}
+
+char keypad_getkey()
+{
+    char key;
+    if(!uxQueueMessagesWaiting(keypad_queue)) /// if is empty, return teminator character
+        return '\0';
+    xQueueReceive(keypad_queue, &key, portMAX_DELAY);    
+    return key;
+}
+
+void keypad_delete()
+{
+    for(int i = 0; i < 8; i++)
+    {   
+        gpio_isr_handler_remove(_keypad_pins[i]);
+        gpio_set_direction(_keypad_pins[i], GPIO_MODE_DISABLE);
+    }
+    vQueueDelete(keypad_queue);
+}
+
+
+
 
 // interrupt service routine, called when the button is pressed
 void IRAM_ATTR button_isr_handler(void* arg) {    

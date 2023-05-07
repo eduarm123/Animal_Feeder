@@ -33,9 +33,11 @@ extern "C" {
 
 /**********************************INCLUDES ******************************************************/
 #include <time.h>
+#include <freertos/FreeRTOS.h>
+#include "freertos/semphr.h"
 
 /*********************************** (2) PUBLIC VARS *********************************************/
-
+extern SemaphoreHandle_t LlaveGlobal;
 typedef struct tm tm_t;
 
 /********************************* (1) PUBLIC METHODS ********************************************/

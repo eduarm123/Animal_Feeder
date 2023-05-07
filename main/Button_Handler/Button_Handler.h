@@ -34,6 +34,10 @@ extern "C" {
 /**********************************INCLUDES ******************************************************/
 
 #include <stdbool.h>
+#include <driver/gpio.h>
+
+#define KEYPAD_DEBOUNCING 100   ///< time in ms
+#define KEYPAD_STACKSIZE  5
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 /**
@@ -47,9 +51,16 @@ extern "C" {
   * @return void
   *     
   */
+esp_err_t keypad_initalize(gpio_num_t keypad_pins[8]);
+
+char keypad_getkey();
+
+void keypad_delete(void);
+
 void Button_Handler();
 
-bool ReadKey(const char *const _c_key);
+
+//bool ReadKey(const char *const _c_key);
 
 /*********************************** (2) PUBLIC VARS *********************************************/
 
