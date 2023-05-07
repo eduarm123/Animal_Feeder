@@ -11,5 +11,6 @@
     "stdbool.h": "c",
     "gpio.h": "c",
     "esp_task_wdt.h": "c"
-  }
+  },
+  "cmake.configureOnOpen": true
 }

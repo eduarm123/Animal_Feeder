@@ -497,3 +497,5 @@ void lecturas_EEPROM()
 	//automatico=eeprom_read_byte((uint8_t*)12); //Leemos la celda 12 de la memoria EEPROM para E/S de automático/manual
 	automatico= eeprom_read_byte(&automatico1); //Obtenemos valor de 0 y entramos directamente a config la hora
 }
+
+idf.py -p COM3 -b 115200 monitor

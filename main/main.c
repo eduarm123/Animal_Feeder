@@ -73,24 +73,18 @@ void app_main(void)
 
     xTaskCreate(Main_Screen,
                 "Main_Screen",
-                configMINIMAL_STACK_SIZE * 3,
+                configMINIMAL_STACK_SIZE * 4,
                 &ucParameterToPass,
                 10, //tskIDLE_PRIORITY (Prioridad)
                 &xHandle);
 
     xTaskCreate(Alarm_menu, 
                 "Alarm_menu",
-                configMINIMAL_STACK_SIZE * 3,
+                configMINIMAL_STACK_SIZE * 4,
                 &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
+                8, //tskIDLE_PRIORITY (Prioridad)
                 &xHandle);
 
-	xTaskCreate(Button_Handler, 
-                "Button_Handler",
-                configMINIMAL_STACK_SIZE * 3,
-                &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle);
     
 }
 

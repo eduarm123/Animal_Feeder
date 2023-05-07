@@ -49,7 +49,7 @@ SemaphoreHandle_t xSemaphore;
 /******************************** (3) DEFINES & MACROS *******************************************/
 #define CONFIG_LED_PIN 2
 #define ESP_INR_FLAG_DEFAULT 0
-#define PUSH_BUTTON_PIN 24 // Boot button in the esp32
+#define PUSH_BUTTON_PIN 0 // Boot button in the esp32
 
 #define PUSH_BUTTON_PIN_1   (32) // ROWs
 #define PUSH_BUTTON_PIN_2   (33)
@@ -181,8 +181,15 @@ void HAL_GPIO_test_Init(void)
 }
 
 // interrupt service routine, called when the button is pressed
-void IRAM_ATTR button_isr_handler(void* arg) {    
-    xTaskResumeFromISR(ISR); 
+void IRAM_ATTR button_isr_handler(void* arg) {
+
+    bool toggle=false;
+    gpio_set_level(CONFIG_LED_PIN,toggle^=1); // Para probar en debug
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken); // Desbloquea la tarea de Alarma 
+
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);    
+    //xTaskResumeFromISR(ISR); 
 }
 
 
@@ -196,24 +203,23 @@ void IRAM_ATTR button_isr_handler(void* arg) {
   * @return void
   *     
   */
- void button_task(void *arg)
+/*  void button_task(void *arg)
 {
     bool toggle=false;
 
     while(1){  
         vTaskSuspend(NULL); // Se suspende la tarea
-        gpio_set_level(CONFIG_LED_PIN,toggle^=1); // Para probar en debug
-        //BaseType_t xHigherPriorityTaskWoken = pdFALSE; 
+        gpio_set_level(CONFIG_LED_PIN,toggle^=1); // Para probar en debug       
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         // Set the binary semaphore to unblock the waiting task
         xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken); // Desbloquea la tarea de Alarma
         // If a higher priority task is woken up by the semaphore give, yield
         //portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
-}
+} */
 
 
-void Button_Handler( void * pvParameters )
+void Button_Handler(void)
 {
 
     gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Lo tengo para debugear
@@ -229,15 +235,8 @@ void Button_Handler( void * pvParameters )
 
     gpio_isr_handler_add(PUSH_BUTTON_PIN, button_isr_handler, NULL);
 
-    xTaskCreate( button_task, "button_task", 4096, NULL , 10,&ISR );
+    //xTaskCreate( button_task, "button_task", 4096, NULL , 10,&ISR );
     
-    vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
-
-
-    for (;;)
-    {      
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
 
 }
 
