@@ -183,8 +183,8 @@ void HAL_GPIO_test_Init(void)
 // interrupt service routine, called when the button is pressed
 void IRAM_ATTR button_isr_handler(void* arg) {
 
-    bool toggle=false;
-    gpio_set_level(CONFIG_LED_PIN,toggle^=1); // Para probar en debug
+    //bool toggle=false;
+    //gpio_set_level(CONFIG_LED_PIN,toggle^=1); // Para probar en debug
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken); // Desbloquea la tarea de Alarma 
 
