@@ -83,7 +83,7 @@ void app_main(void)
                 &ucParameterToPass,
                 1, //tskIDLE_PRIORITY (Prioridad)
                 &xHandle,
-                1);
+                0);
 
     xTaskCreatePinnedToCore(Alarm_menu, 
                 "Alarm_menu",
@@ -91,7 +91,7 @@ void app_main(void)
                 &ucParameterToPass,
                 1, //tskIDLE_PRIORITY (Prioridad)
                 &xHandle,
-                1);
+                0);
     
 }
 

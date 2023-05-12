@@ -73,18 +73,18 @@ i2c_dev_t s_dev; // necessary for RTC_init()
 void Main_Screen( void * pvParameters )
 {
     //xSemaphoreTake(LlaveGlobal, portMAX_DELAY);
-    gpio_num_t keypad[8] = {13, 12, 14, 27, 26, 25, 33, 32};
+    ///                     R1  R2  R3  R4  C1  C2  C3  C4 
+    //gpio_num_t keypad[8] = {13, 12, 14, 27, 26, 25, 33, 32};
+    gpio_num_t keypad[8] = {16, 17, 5, 27, 26, 25, 33, 32};
     keypad_initalize(keypad); /// Inicializa keyboard
     RTC_init(&s_dev); // Inizializa el i2c
-    
+    //Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
     for (;;)
     {
         xSemaphoreTake(LlaveGlobal, portMAX_DELAY);
-        ///                     R1  R2  R3  R4  C1  C2  C3  C4 
+        
         //gpio_num_t keypad[8] = {13, 12, 14, 27, 26, 25, 33, 32};
         //keypad_initalize(keypad); /// Inicializa keyboard
-        
-
         //RTC_init(&s_dev); // Inizializa el i2c
         Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
         ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
