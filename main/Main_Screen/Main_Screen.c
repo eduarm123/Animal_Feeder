@@ -35,7 +35,7 @@
 #include "ds3231.h"
 #include "Main_Screen.h"
 #include "Button_Handler.h"
-
+#include <driver/gpio.h>
 /********************************* (1) PUBLIC METHODS ********************************************/
 
 
@@ -49,6 +49,7 @@ tm_t time_tc=
 };
 
 i2c_dev_t s_dev; // necessary for RTC_init()
+ 
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 
@@ -65,9 +66,11 @@ i2c_dev_t s_dev; // necessary for RTC_init()
 void Main_Screen( void * pvParameters )
 {
 
-    
+    char ans=0;
     RTC_init(&s_dev); // Inizializa el i2c
+    //gpio_num_t keypad[8] = {16, 17, 5, 27, 26, 25, 33, 32};
     Button_Handler(); // Se activan interrupciones
+    //keypad_initalize(keypad); /// Inicializa keyboard
     Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
     ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
     
@@ -77,9 +80,9 @@ void Main_Screen( void * pvParameters )
     for (;;)
     {   
         
-        //printf("Presionar la tecla x para continuar\n");
-        //while(!ReadKey("2"));
-        //printf("Well done\n");    
+        printf("Presionar la tecla x para continuar\n");
+        //ans=keypad_getkey();
+        printf("esta es la tecla %d",ans);          
         if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
         {
             printf("Could not get time\n");

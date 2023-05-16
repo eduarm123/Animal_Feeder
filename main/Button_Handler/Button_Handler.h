@@ -33,6 +33,10 @@ extern "C" {
 
 /**********************************INCLUDES ******************************************************/
 #include <stdbool.h>
+#include <driver/gpio.h>
+
+#define KEYPAD_DEBOUNCING 100   ///< time in ms
+#define KEYPAD_STACKSIZE  5
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 /**
@@ -53,6 +57,10 @@ bool ReadKey( const char _c_key);
 void HAL_GPIO_test_Init(void);
 
 int Read2digits(int _buffer);
+
+char keypad_getkey();
+
+esp_err_t keypad_initalize(gpio_num_t keypad_pins[8]);
 
 /*********************************** (2) PUBLIC VARS *********************************************/
 
