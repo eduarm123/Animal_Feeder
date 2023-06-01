@@ -33,6 +33,11 @@ https://github.com/espressif/vscode-esp-idf-extension/blob/master/docs/DEBUGGING
 
 https://elmagnifico.tech/2022/08/16/ESP32-Develop/#
 
+https://habr.com/ru/articles/565544/
+
+http://microsin.net/programming/arm/esp-idf-fatal-errors.html
+
+
 Error
 
 Unable to step next. Operation failed with error code 0x80004004.
