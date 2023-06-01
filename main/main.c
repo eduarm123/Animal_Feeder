@@ -45,8 +45,8 @@ extern "C"
 #include "Alarm_menu.h"
 #include "Button_Handler.h"
 
-#include "ili9341.h"
 #include "Pwm_motor.h"
+//#include "easyio.h"
 
 //#include "esp_err.h"
 
