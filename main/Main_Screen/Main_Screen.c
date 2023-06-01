@@ -36,6 +36,7 @@
 #include "Main_Screen.h"
 #include "Button_Handler.h"
 #include "freertos/semphr.h"
+#include "easyio.h"
 
 //SemaphoreHandle_t LlaveGlobal;
 //int8_t num1;
@@ -72,8 +73,19 @@ i2c_dev_t s_dev; // necessary for RTC_init()
 
 void Main_Screen( void * pvParameters )
 {
+    spi_master_init(SPI3_HOST, LCD_DEF_DMA_CHAN, LCD_DMA_MAX_SIZE, SPI3_DEF_PIN_NUM_MISO, SPI3_DEF_PIN_NUM_MOSI, SPI3_DEF_PIN_NUM_CLK);
+    spi_lcd_init(SPI3_HOST, 40*1000*1000, LCD_SPI3_DEF_PIN_NUM_CS0);
+    LCD_Display_Resolution(horizontal);
+    LCD_Clear(LGRAYBLUE);
+
+    LCD_ShowString(90-1,20-1,LGRAYBLUE,BLACK,"HOLA",16,1);
+    LCD_ShowString(120-1,80-1,LGRAYBLUE,BLACK,"HELLO",24,1);
+    LCD_ShowString(60-1,130-1,LGRAYBLUE,BLACK,"--HI---!",32,1);
+    LCD_ShowPicture_16b(250, 140-1, 40, 40, gImage_qq);
+
     //xSemaphoreTake(LlaveGlobal, portMAX_DELAY);
-    gpio_num_t keypad[8] = {13, 12, 14, 27, 26, 25, 33, 32};
+    //gpio_num_t keypad[8] = {13, 12, 14, 27, 26, 25, 33, 32};
+    gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 35, 34, 39};
     keypad_initalize(keypad); /// Inicializa keyboard
     RTC_init(&s_dev); // Inizializa el i2c
     
@@ -110,6 +122,10 @@ void Main_Screen( void * pvParameters )
                 printf("2.--- Configurar hora ------\n");
 
                 printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
+                LCD_ShowNum(60-1,180-1,LGRAYBLUE,BLACK,time_tc.tm_hour,6,32,1); /* code */
+                LCD_ShowNum(75-1,180-1,LGRAYBLUE,BLACK,time_tc.tm_min,6,32,1); /* code */
+                LCD_ShowNum(90-1,180-1,LGRAYBLUE,BLACK,time_tc.tm_sec,6,32,1); /* code */
+                
                 vTaskDelay(pdMS_TO_TICKS(500));
             }
             printf("FIIIIIIIN\n");
@@ -172,12 +188,12 @@ void Time_config(tm_t * const _time){
     while (1)
     {
         printf("Hora1\n");
-        hour_1= obtenerHora();
-        //hour_1=3;
+        //hour_1= obtenerHora();
+        hour_1=3;
         printf("Hora2\n");
         cont=0;
-        min_1= obtenerHora();
-        //min_1=2;
+        //min_1= obtenerHora();
+        min_1=2;
         printf("Hora3\n");
         hour_total= concatenarHoras(hour_1, 1);
         min_total= concatenarHoras(min_1, 2.5);
