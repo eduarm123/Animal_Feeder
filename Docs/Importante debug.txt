@@ -1,0 +1,52 @@
+"miDebuggerPath": "C:\\ESP32\\.espressif\\tools\\xtensa-esp32-elf\\esp-2022r1-11.2.0\\xtensa-esp32-elf\\bin\\xtensa-esp32-elf-gdb.exe",
+
+
+"miDebuggerPath": "C:\\ESP32\\.espressif\\tools\\xtensa-esp-elf-gdb\\11.2_20220823\\xtensa-esp-elf-gdb\\bin\\xtensa-esp32-elf-gdb.exe",
+
+
+C:\ESP32\.espressif\tools\xtensa-esp-elf-gdb\11.2_20220823\xtensa-esp-elf-gdb\bin
+
+
+debug freertos esp32 vscode
+
+https://www.reddit.com/r/vscode/comments/85l4df/c_debugging_cant_step_out/
+
+https://github.com/microsoft/vscode-cpptools/issues/106
+
+https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/index.html
+
+https://www.freertos.org/2021/01/using-visual-studio-code-for-freertos-development.html
+
+https://www.bilibili.com/video/BV1Qq4y127pc/
+
+https://blog.csdn.net/zztiger123/article/details/103905323
+
+https://www.uchiembedded.co.in/jtag_debugging_for_esp32_en.pdf
+
+https://forums.freertos.org/t/eclipse-environment-setup-for-afrtos-on-esp32-devkitc/10686/3
+
+https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/tips-and-quirks.html#jtag-debugging-tip-debugger-startup-commands
+
+https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/using-debugger.html#jtag-debugging-using-debugger-command-line
+
+https://github.com/espressif/vscode-esp-idf-extension/blob/master/docs/DEBUGGING.md
+
+Error
+
+Unable to step next. Operation failed with error code 0x80004004.
+
+Unexpected GDB output from command "-exec-next". Cannot find bounds of current function
+
+Execute debugger commands using "-exec <command>", for example "-exec info registers" will list registers in use (when GDB is the debugger)
+
+
+
+openocd -f board/esp32-wrover-kit-3.3v.cfg
+
+openocd -c 'set ESP_RTOS none' -f board/esp32-wrover-kit-3.3v.cfg
+
+
+
+openocd -f interface/ftdi/esp32_devkitj_v1.cfg
+
+openocd -c 'set ESP_RTOS none' -f interface/ftdi/esp32_devkitj_v1.cfg
