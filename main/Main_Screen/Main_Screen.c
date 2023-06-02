@@ -41,6 +41,7 @@
 //SemaphoreHandle_t LlaveGlobal;
 //int8_t num1;
 char m[1]; //Sirve para almacenar el número ingresado por teclado tipo char
+char seg_car[2],min_car[2];
 /********************************* (1) PUBLIC METHODS ********************************************/
 //#define CONFIG_LED_PIN       (2)//2
 
@@ -78,10 +79,10 @@ void Main_Screen( void * pvParameters )
     LCD_Display_Resolution(horizontal);
     LCD_Clear(LGRAYBLUE);
 
-    LCD_ShowString(90-1,20-1,LGRAYBLUE,BLACK,"HOLA",16,1);
-    LCD_ShowString(120-1,80-1,LGRAYBLUE,BLACK,"HELLO",24,1);
-    LCD_ShowString(60-1,130-1,LGRAYBLUE,BLACK,"--HI---!",32,1);
-    LCD_ShowPicture_16b(250, 140-1, 40, 40, gImage_qq);
+    LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"HOLA",16,1);
+    LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"EDWIN",24,1);
+    LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"ORENSE!",32,1);
+    LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
 
     //xSemaphoreTake(LlaveGlobal, portMAX_DELAY);
 
@@ -109,7 +110,7 @@ void Main_Screen( void * pvParameters )
         //gpio_set_level(CONFIG_LED_PIN,1); // Para probar en debug
         //if (xSemaphoreTake(LlaveGlobal, portMAX_DELAY))
         //{
-            for(int i=0; i<=4; i++)
+            for(int i=0; i<=10; i++)
             {    
                 printf("Presionar la tecla x para continuar\n");
                 //while(!ReadKey("2"));
@@ -126,9 +127,18 @@ void Main_Screen( void * pvParameters )
                 printf("2.--- Configurar hora ------\n");
 
                 printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
-                LCD_ShowNum(60-1,180-1,LGRAYBLUE,BLACK,time_tc.tm_hour,6,32,1); /* code */
-                LCD_ShowNum(75-1,180-1,LGRAYBLUE,BLACK,time_tc.tm_min,6,32,1); /* code */
-                LCD_ShowNum(90-1,180-1,LGRAYBLUE,BLACK,time_tc.tm_sec,6,32,1); /* code */
+
+                itoa(time_tc.tm_min, min_car, 10);
+                itoa(time_tc.tm_sec, seg_car, 10);
+
+                LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,min_car,32,1);
+                LCD_ShowString(180-1,180-1,LGRAYBLUE,BLACK,seg_car,32,1);
+                
+
+                
+                //---LCD_ShowNum(60-1,180-1,LGRAYBLUE,BLACK,time_tc.tm_sec,6,32,1); /* code */
+                //LCD_ShowNum(75-1,150-1,LGRAYBLUE,BLACK,time_tc.tm_min,6,32,1); /* code */
+                //---LCD_ShowNum(120-1,150-1,LGRAYBLUE,BLACK,time_tc.tm_sec,6,32,1); /* code */
                 
                 vTaskDelay(pdMS_TO_TICKS(500));
             }
@@ -192,12 +202,12 @@ void Time_config(tm_t * const _time){
     while (1)
     {
         printf("Hora1\n");
-        //hour_1= obtenerHora();
-        hour_1=3;
+        hour_1= obtenerHora();
+        //hour_1=3;
         printf("Hora2\n");
         cont=0;
-        //min_1= obtenerHora();
-        min_1=2;
+        min_1= obtenerHora();
+        //min_1=2;
         printf("Hora3\n");
         hour_total= concatenarHoras(hour_1, 1);
         min_total= concatenarHoras(min_1, 2.5);
