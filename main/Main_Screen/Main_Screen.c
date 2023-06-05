@@ -110,7 +110,7 @@ void Main_Screen( void * pvParameters )
         //gpio_set_level(CONFIG_LED_PIN,1); // Para probar en debug
         //if (xSemaphoreTake(LlaveGlobal, portMAX_DELAY))
         //{
-            for(int i=0; i<=10; i++)
+            for(int i=0; i<=5; i++)
             {    
                 printf("Presionar la tecla x para continuar\n");
                 //while(!ReadKey("2"));
@@ -202,12 +202,12 @@ void Time_config(tm_t * const _time){
     while (1)
     {
         printf("Hora1\n");
-        hour_1= obtenerHora();
-        //hour_1=3;
+        //hour_1= obtenerHora();
+        hour_1=3;
         printf("Hora2\n");
         cont=0;
-        min_1= obtenerHora();
-        //min_1=2;
+        //min_1= obtenerHora();
+        min_1=2;
         printf("Hora3\n");
         hour_total= concatenarHoras(hour_1, 1);
         min_total= concatenarHoras(min_1, 2.5);
