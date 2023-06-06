@@ -74,6 +74,7 @@ i2c_dev_t s_dev; // necessary for RTC_init()
 
 void Main_Screen( void * pvParameters )
 {
+    /*------INICIALIZAR E IMPRIMIR EN LCD FTF-----*/
     spi_master_init(SPI3_HOST, LCD_DEF_DMA_CHAN, LCD_DMA_MAX_SIZE, SPI3_DEF_PIN_NUM_MISO, SPI3_DEF_PIN_NUM_MOSI, SPI3_DEF_PIN_NUM_CLK);
     spi_lcd_init(SPI3_HOST, 40*1000*1000, LCD_SPI3_DEF_PIN_NUM_CS0);
     LCD_Display_Resolution(horizontal);
@@ -83,26 +84,22 @@ void Main_Screen( void * pvParameters )
     LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"EDWIN",24,1);
     LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"ORENSE!",32,1);
     LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
-
-    //xSemaphoreTake(LlaveGlobal, portMAX_DELAY);
+    /*----------------------------------------------*/
 
     ///                     R1  R2  R3  R4  C1  C2  C3  C4 
     //gpio_num_t keypad[8] = {13, 12, 14, 27, 26, 25, 33, 32};
     //gpio_num_t keypad[8] = {16, 17, 5, 27, 26, 25, 33, 32};
-    gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 2, 16, 17};
+    gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 2, 16, 17}; //Pines a ocupar para teclado matricial
     //gpio_num_t keypad[8] = {39, 34, 35, 32, 33, 25, 26, 27};
-
-
     keypad_initalize(keypad); /// Inicializa keyboard
-    RTC_init(&s_dev); // Inizializa el i2c
+
+    RTC_init(&s_dev); // Inicializa el i2c
     //Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
+    
     for (;;)
     {
-        xSemaphoreTake(LlaveGlobal, portMAX_DELAY);
-        
-        //gpio_num_t keypad[8] = {13, 12, 14, 27, 26, 25, 33, 32};
-        //keypad_initalize(keypad); /// Inicializa keyboard
-        //RTC_init(&s_dev); // Inizializa el i2c
+        xSemaphoreTake(LlaveGlobal, portMAX_DELAY); //Tomar semáforo binario
+
         Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
         ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
         //gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
@@ -128,22 +125,17 @@ void Main_Screen( void * pvParameters )
 
                 printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
 
+                /*---Conversión entero a caracter para imprimir en TFT sin problema---*/
                 itoa(time_tc.tm_min, min_car, 10);
                 itoa(time_tc.tm_sec, seg_car, 10);
 
                 LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,min_car,32,1);
                 LCD_ShowString(180-1,180-1,LGRAYBLUE,BLACK,seg_car,32,1);
-                
+                /*--------------------------------------------------------------------*/
 
-                
-                //---LCD_ShowNum(60-1,180-1,LGRAYBLUE,BLACK,time_tc.tm_sec,6,32,1); /* code */
-                //LCD_ShowNum(75-1,150-1,LGRAYBLUE,BLACK,time_tc.tm_min,6,32,1); /* code */
-                //---LCD_ShowNum(120-1,150-1,LGRAYBLUE,BLACK,time_tc.tm_sec,6,32,1); /* code */
-                
                 vTaskDelay(pdMS_TO_TICKS(500));
             }
             printf("FIIIIIIIN\n");
-            //vTaskDelay(pdMS_TO_TICKS(2000));
             xSemaphoreGive(LlaveGlobal);
             vTaskDelay(pdMS_TO_TICKS(500));
         //}
@@ -172,17 +164,22 @@ void Time_config(tm_t * const _time){
 
         while (cont < 2) 
         {
-            num = keypad_getkey();
+            num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
 
             if (num != '\0') {
                 numeroStr[cont] = num;
+                /*if (boton_atras && numeroStr[cont])//Si se presiona "Atrás" y está en la casilla 1 en adelante
+                {
+                    cont--; // retroceder a la casilla anterior
+                }*/
+                
                 cont++;
                 printf("Número actual: %s\n", numeroStr);
             }
             //printf("Nada impreso.\n");
             vTaskDelay(pdMS_TO_TICKS(100));
         }
-        num1 = atoi(numeroStr);
+        num1 = atoi(numeroStr); //Conversion de caracter a entero
         return num1;
     }
 
@@ -202,12 +199,12 @@ void Time_config(tm_t * const _time){
     while (1)
     {
         printf("Hora1\n");
-        //hour_1= obtenerHora();
-        hour_1=3;
+        hour_1= obtenerHora();
+        //hour_1=3;
         printf("Hora2\n");
         cont=0;
-        //min_1= obtenerHora();
-        min_1=2;
+        min_1= obtenerHora();
+        //min_1=2;
         printf("Hora3\n");
         hour_total= concatenarHoras(hour_1, 1);
         min_total= concatenarHoras(min_1, 2.5);
