@@ -159,28 +159,62 @@ void Time_config(tm_t * const _time){
 
     int obtenerHora() 
     {
-        char numeroStr[2+1] = "";
+        //int numeros[4] = {0};
+        char numeroStr[4] = "";
+        int indice = 0;
+
+        while (indice < 4) {
+            num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
+            if (num == 'A') {
+                numeroStr[indice] = num;
+                indice++;
+            } else if (num == 'B') {
+                if (indice > 0) {
+                    indice--;
+                    numeroStr[indice] = '0';
+                    printf("Número anterior eliminado.\n");
+                } else {
+                    printf("No hay números anteriores para eliminar.\n");
+                }
+            }
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+        }
+
+        printf("Números ingresados: ");
+        for (int i = 0; i < 4; i++) {
+            printf("%d ", numeroStr[i]);
+        }
+        printf("\n");
+
+        vTaskDelete(NULL);
+
+        num1 = atoi(numeroStr); //Conversion de caracter a entero
+        return num1;
+
+
+
+        //-------char numeroStr[2+1] = "";
         //int cont=0;
 
-        while (cont < 2) 
-        {
-            num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
+        //-------while (cont < 2) 
+        //-------{
+            //-----num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
 
-            if (num != '\0') {
-                numeroStr[cont] = num;
+            //----if (num != '\0') {
+                //-----numeroStr[cont] = num;
                 /*if (boton_atras && numeroStr[cont])//Si se presiona "Atrás" y está en la casilla 1 en adelante
                 {
                     cont--; // retroceder a la casilla anterior
                 }*/
                 
-                cont++;
-                printf("Número actual: %s\n", numeroStr);
-            }
+                //------cont++;
+                //-----printf("Número actual: %s\n", numeroStr);
+            //-----}
             //printf("Nada impreso.\n");
-            vTaskDelay(pdMS_TO_TICKS(100));
-        }
-        num1 = atoi(numeroStr); //Conversion de caracter a entero
-        return num1;
+            //----vTaskDelay(pdMS_TO_TICKS(100));
+        //-----}
+        //-----num1 = atoi(numeroStr); //Conversion de caracter a entero
+        //------return num1;
     }
 
     int concatenarHoras(int numero1, float mult) 
