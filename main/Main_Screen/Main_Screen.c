@@ -165,13 +165,16 @@ void Time_config(tm_t * const _time){
 
         while (indice < 4) {
             num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
-            if (num == 'A') {
+            if (num != '\0') {
                 numeroStr[indice] = num;
+                printf("Número actual: %s\n", numeroStr);
                 indice++;
-            } else if (num == 'B') {
+            }
+            if (num == 'B') {
                 if (indice > 0) {
-                    indice--;
+                    indice=indice-2;
                     numeroStr[indice] = '0';
+                    //printf("Número actual: %s\n", numeroStr);
                     printf("Número anterior eliminado.\n");
                 } else {
                     printf("No hay números anteriores para eliminar.\n");
