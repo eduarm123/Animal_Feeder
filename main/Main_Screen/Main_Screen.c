@@ -37,6 +37,8 @@
 #include "Button_Handler.h"
 #include "freertos/semphr.h"
 #include "easyio.h"
+#include <stdlib.h>
+
 
 //SemaphoreHandle_t LlaveGlobal;
 //int8_t num1;
@@ -57,6 +59,12 @@ tm_t time_tc=
     .tm_min=0,
     .tm_sec=0,
 };
+
+typedef struct {
+    int resultado1;
+    int resultado2;
+} Resultados;
+
 
 i2c_dev_t s_dev; // necessary for RTC_init()
 
@@ -157,25 +165,29 @@ void Time_config(tm_t * const _time){
     //int min_2;  //Para ingresaar el 1er dígito del minuto
     int cont=0;
 
-    int obtenerHora() 
-    {
-        //int numeros[4] = {0};
-        char numeroStr[4] = "";
-        int indice = 0;
 
-        while (indice < 4) {
-            num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
-            if (num != '\0') {
-                numeroStr[indice] = num;
+    Resultados obtenerHora() 
+    {
+        LCD_Clear(LGRAYBLUE);
+        char numeroStr[5] = "";
+        int indice = 0;
+        int imprimir=1;
+        while (indice <= 3) {
+            num = keypad_getkey();
+            numeroStr[indice] = num;
+            if ((num != '\0')&&(num != 'B')) {
+                //numeroStr[indice] = num;
                 printf("Número actual: %s\n", numeroStr);
+                LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,numeroStr,32,1); //Mejorar
+                vTaskDelay(pdMS_TO_TICKS(500));
                 indice++;
             }
             if (num == 'B') {
                 if (indice > 0) {
-                    indice=indice-2;
-                    numeroStr[indice] = '0';
-                    //printf("Número actual: %s\n", numeroStr);
+                    indice=indice-1;
+                    numeroStr[indice] = '\0';
                     printf("Número anterior eliminado.\n");
+                    LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,numeroStr,32,1); //Mejorar
                 } else {
                     printf("No hay números anteriores para eliminar.\n");
                 }
@@ -183,42 +195,28 @@ void Time_config(tm_t * const _time){
             vTaskDelay(100 / portTICK_PERIOD_MS);
         }
 
-        printf("Números ingresados: ");
-        for (int i = 0; i < 4; i++) {
-            printf("%d ", numeroStr[i]);
-        }
-        printf("\n");
+        char primerNumeroStr[2] = {numeroStr[0], '\0'};
+        char segundoNumeroStr[2] = {numeroStr[1], '\0'};
+        char tercerNumeroStr[2] = {numeroStr[2], '\0'};
+        char cuartoNumeroStr[2] = {numeroStr[3], '\0'};
 
-        vTaskDelete(NULL);
+        int primerNumero = atoi(primerNumeroStr);
+        int segundoNumero = atoi(segundoNumeroStr);
+        int tercerNumero = atoi(tercerNumeroStr);
+        int cuartoNumero = atoi(cuartoNumeroStr);
 
-        num1 = atoi(numeroStr); //Conversion de caracter a entero
-        return num1;
+        int resultado1 = primerNumero * 10 + segundoNumero;
+        int resultado2 = tercerNumero * 10 + cuartoNumero;
 
-
-
-        //-------char numeroStr[2+1] = "";
-        //int cont=0;
-
-        //-------while (cont < 2) 
-        //-------{
-            //-----num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
-
-            //----if (num != '\0') {
-                //-----numeroStr[cont] = num;
-                /*if (boton_atras && numeroStr[cont])//Si se presiona "Atrás" y está en la casilla 1 en adelante
-                {
-                    cont--; // retroceder a la casilla anterior
-                }*/
-                
-                //------cont++;
-                //-----printf("Número actual: %s\n", numeroStr);
-            //-----}
-            //printf("Nada impreso.\n");
-            //----vTaskDelay(pdMS_TO_TICKS(100));
-        //-----}
-        //-----num1 = atoi(numeroStr); //Conversion de caracter a entero
-        //------return num1;
+        Resultados resultados;
+        resultados.resultado1 = resultado1;
+        resultados.resultado2 = resultado2;
+        LCD_Clear(LGRAYBLUE);
+        return resultados;
     }
+
+
+
 
     int concatenarHoras(int numero1, float mult) 
     {
@@ -235,15 +233,21 @@ void Time_config(tm_t * const _time){
 
     while (1)
     {
-        printf("Hora1\n");
-        hour_1= obtenerHora();
+        Resultados resultados = obtenerHora();
+        printf("Concatenación 1: %d\n", resultados.resultado1);
+        printf("Concatenación 2: %d\n", resultados.resultado2);
+        hour_total=resultados.resultado1;
+        min_total=resultados.resultado2;
+        break;
+        //printf("Hora1\n");
+        //hour_1= obtenerHora();
         //hour_1=3;
-        printf("Hora2\n");
-        cont=0;
-        min_1= obtenerHora();
+        //printf("Hora2\n");
+        //cont=0;
+        //min_1= obtenerHora();
         //min_1=2;
         printf("Hora3\n");
-        hour_total= concatenarHoras(hour_1, 1);
+        /*hour_total= concatenarHoras(hour_1, 1);
         min_total= concatenarHoras(min_1, 2.5);
         if (hour_total != -1) {
             printf("La hora es: %c\n", hour_total);
@@ -254,7 +258,7 @@ void Time_config(tm_t * const _time){
             printf("La hora es: %c\n", min_total);
             vTaskDelay(pdMS_TO_TICKS(1000));
             break;
-        }
+        }*/
     }
 
     /*while (1) {
