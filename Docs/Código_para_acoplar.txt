@@ -1,3 +1,129 @@
+CODIGO ANTES DE MODIFICACION
+
+    int obtenerHora() 
+    {
+        //int numeros[4] = {0};
+        char numeroStr[2] = "";
+        int indice = 0;
+
+        while (indice < 2) {
+            num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
+            if (num != '\0') {
+                numeroStr[indice] = num;
+                printf("Número actual: %s\n", numeroStr);
+                indice++;
+            }
+            if (num == 'B') {
+                if (indice > 0) {
+                    indice=indice-2;
+                    numeroStr[indice] = '0';
+                    //printf("Número actual: %s\n", numeroStr);
+                    printf("Número anterior eliminado.\n");
+                } else {
+                    printf("No hay números anteriores para eliminar.\n");
+                }
+            }
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+        }
+
+        num1 = atoi(numeroStr); //Conversion de caracter a entero
+        return num1;
+        /*printf("Números ingresados: ");
+        for (int i = 0; i < 4; i++) {
+            printf("%d ", numeroStr[i]);
+        }
+        printf("\n");
+
+        //vTaskDelete(NULL);*/
+
+        
+
+
+
+        //-------char numeroStr[2+1] = "";
+        //int cont=0;
+
+        //-------while (cont < 2) 
+        //-------{
+            //-----num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
+
+            //----if (num != '\0') {
+                //-----numeroStr[cont] = num;
+                /*if (boton_atras && numeroStr[cont])//Si se presiona "Atrás" y está en la casilla 1 en adelante
+                {
+                    cont--; // retroceder a la casilla anterior
+                }*/
+                
+                //------cont++;
+                //-----printf("Número actual: %s\n", numeroStr);
+            //-----}
+            //printf("Nada impreso.\n");
+            //----vTaskDelay(pdMS_TO_TICKS(100));
+        //-----}
+        //-----num1 = atoi(numeroStr); //Conversion de caracter a entero
+        //------return num1;
+    }
+
+
+
+
+
+
+
+
+
+
+CONCATENAR UNA ARRAY DE 4 PARA INGRESAR HORAS Y MUNUTOS UNA SOLA
+
+    int obtenerHora() 
+{
+    char numeroStr[4] = ""; // Aumentamos el tamaño del arreglo para almacenar 3 caracteres
+    int indice = 0;
+
+    while (indice < 4) { // Cambiamos el límite del bucle a 4
+        num = keypad_getkey();
+        if (num != '\0') {
+            numeroStr[indice] = num;
+            printf("Número actual: %s\n", numeroStr);
+            indice++;
+        }
+        if (num == 'B') {
+            if (indice > 0) {
+                indice=indice-2;
+                numeroStr[indice] = '\0'; // Eliminamos el último caracter ingresado
+                printf("Número anterior eliminado.\n");
+            } else {
+                printf("No hay números anteriores para eliminar.\n");
+            }
+        }
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+
+    char primerNumeroStr[2] = {numeroStr[0], '\0'}; // Creamos un arreglo para el primer número
+    char segundoNumeroStr[2] = {numeroStr[1], '\0'}; // Creamos un arreglo para el segundo número
+    char tercerNumeroStr[2] = {numeroStr[2], '\0'}; // Creamos un arreglo para el tercer número
+    char cuartoNumeroStr[2] = {numeroStr[3], '\0'}; // Creamos un arreglo para el cuarto número
+
+    int primerNumero = atoi(primerNumeroStr); // Convertimos el primer número a entero
+    int segundoNumero = atoi(segundoNumeroStr); // Convertimos el segundo número a entero
+    int tercerNumero = atoi(tercerNumeroStr); // Convertimos el tercer número a entero
+    int cuartoNumero = atoi(cuartoNumeroStr); // Convertimos el cuarto número a entero
+
+    int resultado1 = primerNumero * 10 + segundoNumero; // Concatenamos el primer y segundo número
+    int resultado2 = tercerNumero * 10 + cuartoNumero; // Concatenamos el tercer y cuarto número
+
+    printf("Concatenación 1: %d\n", resultado1);
+    printf("Concatenación 2: %d\n", resultado2);
+
+    return 0;
+}
+
+
+
+
+
+
+
 Realizar una función para ingresar cuatro números por teclado, 
 para el ingreso de cada número debe haber un pulsador llamado siguiente 
 que permita ingresar el siguiente número y cuando presione un pulsador 
