@@ -47,9 +47,9 @@ TaskHandle_t ISR = NULL;
 SemaphoreHandle_t xSemaphore;
 
 /******************************** (3) DEFINES & MACROS *******************************************/
-#define CONFIG_LED_PIN       (2)//2
-#define ESP_INR_FLAG_DEFAULT (0)
-#define PUSH_BUTTON_PIN_0    (4)//0 // Boot button in the esp32
+//#define CONFIG_LED_PIN       (2)//2
+//#define ESP_INR_FLAG_DEFAULT (0)
+//#define PUSH_BUTTON_PIN_0    (4)//0 // Boot button in the esp32
 
 #include <memory.h>
 #include <time.h>
@@ -213,7 +213,7 @@ void IRAM_ATTR button_isr_handler(void* arg) {
 
     while(1){  
         vTaskSuspend(NULL); // Se suspende la tarea
-        gpio_set_level(CONFIG_LED_PIN,toggle^=1); // Para probar en debug
+        //----gpio_set_level(CONFIG_LED_PIN,toggle^=1); // Para probar en debug
         //BaseType_t xHigherPriorityTaskWoken = pdFALSE; 
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         // Set the binary semaphore to unblock the waiting task
@@ -227,20 +227,20 @@ void IRAM_ATTR button_isr_handler(void* arg) {
 void Button_Handler()
 {
 
-    gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Lo tengo para debugear
+    //----gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Lo tengo para debugear
     
     //Pulsadores
-    gpio_set_direction(PUSH_BUTTON_PIN_0, GPIO_MODE_INPUT);
+    //----gpio_set_direction(PUSH_BUTTON_PIN_0, GPIO_MODE_INPUT);
 
-    gpio_set_intr_type(PUSH_BUTTON_PIN_0, GPIO_INTR_NEGEDGE); // falling edge
+    //----gpio_set_intr_type(PUSH_BUTTON_PIN_0, GPIO_INTR_NEGEDGE); // falling edge
 
     xSemaphore = xSemaphoreCreateBinary(); // esto es para activar las alarmas
 
     // Install the driver's GPIO ISR handler service, which allows per-pin GPIO interrupt handler
     //Install ISR service with defautl configuration
-    gpio_install_isr_service(ESP_INR_FLAG_DEFAULT);
+    //----gpio_install_isr_service(ESP_INR_FLAG_DEFAULT);
 
-    gpio_isr_handler_add(PUSH_BUTTON_PIN_0, button_isr_handler, NULL);
+    //---gpio_isr_handler_add(PUSH_BUTTON_PIN_0, button_isr_handler, NULL);
 
     xTaskCreate( button_task, "button_task", 4096, NULL , 10,&ISR );
     

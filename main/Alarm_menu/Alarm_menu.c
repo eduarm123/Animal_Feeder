@@ -39,7 +39,7 @@
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
-#define CONFIG_LED_PIN       (2)//2
+//---#define CONFIG_LED_PIN       (2)//2
 /*********************************** (2) PUBLIC VARS *********************************************/
 
 typedef enum{
@@ -128,12 +128,12 @@ void Alarm_menu( void * pvParameters )
             for(int i=0; i<=4; i++)
             { 
                 /*Probar que si funcionan las 2 tareas al mismo tiempo*/
-                gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
+                /*gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
                 gpio_set_level(CONFIG_LED_PIN,true); 
                 vTaskDelay(pdMS_TO_TICKS(500));
-                gpio_set_level(CONFIG_LED_PIN,false); // Para probar en debug
+                gpio_set_level(CONFIG_LED_PIN,false); // Para probar en debug*/
                 printf("HOLA CAPULLO\n");
-                vTaskDelay(pdMS_TO_TICKS(500));  
+                vTaskDelay(pdMS_TO_TICKS(500));
                 /*-----------------------------------------------------*/
             }
         }

@@ -1,0 +1,25 @@
+1. Ingresar config la hora (Se config los 3 parámetros; hora, minutos, segundos)
+	-Titilar en el 1er parámetro (Pasar al 2do mediante boton "OK")
+	-Titilar en el 2do parámetro (Pasar al 3ero mediante boton "OK")
+		-Regresar al 1er mediante botón "atrás" 
+	-Titilar en el 3ero parámetro (Pasar a mostrar hora mediante boton "OK")
+		-Regresar al 2do mediante botón "atrás"   
+	*Mostrar hora indefinidamente
+
+2. Va a estar disponible 2 botones
+	*1. Alarma (Config la alarma)
+		*Automatico (Pasar al submenú mediante boton "OK")
+			-Cachorro (Pasar a grabar en memoria la hora preestablecida con "OK")
+			-Adulto (Pasar a grabar en memoria la hora preestablecida con "OK")
+			*Regresar al menú principal mediante botón "atrás"
+		*Manual
+			*Escoger el número de alarmas a configurar(mínimo 2 máximo 5)
+				-Configurar solo las horas a dar de comer y grabarlas en memoria
+			*Regresar al menú principal mediante botón "atrás"
+			
+	*2. Reloj (Volver a config la hora)
+		-Repetir todo lo del 1er paso
+
+3. Botón RESET
+	*Para resetear el micro y empezar todo de CERO
+	
