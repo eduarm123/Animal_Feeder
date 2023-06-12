@@ -89,7 +89,7 @@ void IRAM_ATTR button_isr_handler(void* arg) {
 void Button_Handler( void * pvParameters )
 {
 
-    gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Lo tengo para debugear
+  /*   gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Lo tengo para debugear
     gpio_set_direction(PUSH_BUTTON_PIN, GPIO_MODE_INPUT);
 
     gpio_set_intr_type(PUSH_BUTTON_PIN, GPIO_INTR_NEGEDGE); // falling edge
@@ -104,12 +104,7 @@ void Button_Handler( void * pvParameters )
 
     xTaskCreate( button_task, "button_task", 4096, NULL , 10,&ISR );
     
-    vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
+    vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen */
 
-
-    for (;;)
-    {      
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
 
 }

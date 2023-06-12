@@ -84,13 +84,6 @@ void app_main(void)
                 &ucParameterToPass,
                 10, //tskIDLE_PRIORITY (Prioridad)
                 &xHandle);
-
-	xTaskCreate(Button_Handler, 
-                "Button_Handler",
-                configMINIMAL_STACK_SIZE * 3,
-                &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle);
     
 }
 
