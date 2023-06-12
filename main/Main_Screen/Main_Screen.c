@@ -72,50 +72,39 @@ i2c_dev_t s_dev; // necessary for RTC_init()
 
 void Main_Screen( void * pvParameters )
 {
-    //xSemaphoreTake(LlaveGlobal, portMAX_DELAY);
-    ///                     R1  R2  R3  R4  C1  C2  C3  C4 
-    //gpio_num_t keypad[8] = {13, 12, 14, 27, 26, 25, 33, 32};
+   
     gpio_num_t keypad[8] = {16, 17, 5, 27, 26, 25, 33, 32};
     keypad_initalize(keypad); /// Inicializa keyboard
     RTC_init(&s_dev); // Inizializa el i2c
-    //Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
+    Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
+    
     for (;;)
     {
-        xSemaphoreTake(LlaveGlobal, portMAX_DELAY);
-        
-        //gpio_num_t keypad[8] = {13, 12, 14, 27, 26, 25, 33, 32};
-        //keypad_initalize(keypad); /// Inicializa keyboard
-        //RTC_init(&s_dev); // Inizializa el i2c
-        Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
+         
         ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
         //gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
         vTaskDelay(pdMS_TO_TICKS(100)); // espera de x tiempo para que las otras tareas se inicialicen 
-        //gpio_set_level(CONFIG_LED_PIN,1); // Para probar en debug
-        //if (xSemaphoreTake(LlaveGlobal, portMAX_DELAY))
-        //{
-            for(int i=0; i<=4; i++)
-            {    
-                printf("Presionar la tecla x para continuar\n");
-                //while(!ReadKey("2"));
-                printf("Well done\n"); 
+    
+        printf("Presionar la tecla x para continuar\n");
+        //while(!ReadKey("2"));
+        printf("Well done\n"); 
 
-                vTaskDelay(pdMS_TO_TICKS(250));
-                if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
-                {
-                    printf("Could not get time\n");
-                    continue;
-                }
+        vTaskDelay(pdMS_TO_TICKS(250));
+        if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
+        {
+            printf("Could not get time\n");
+            continue;
+        }
 
-                printf("1.--- Configurar alarmas ---\n");
-                printf("2.--- Configurar hora ------\n");
+        printf("1.--- Configurar alarmas ---\n");
+        printf("2.--- Configurar hora ------\n");
 
-                printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
-                vTaskDelay(pdMS_TO_TICKS(500));
-            }
-            printf("FIIIIIIIN\n");
-            //vTaskDelay(pdMS_TO_TICKS(2000));
-            xSemaphoreGive(LlaveGlobal);
-            vTaskDelay(pdMS_TO_TICKS(500));
+        printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
+            
+        printf("FIIIIIIIN\n");
+        //vTaskDelay(pdMS_TO_TICKS(2000));
+        xSemaphoreGive(LlaveGlobal);
+        vTaskDelay(pdMS_TO_TICKS(500));
         //}
     }
 }
