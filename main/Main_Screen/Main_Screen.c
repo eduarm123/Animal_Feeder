@@ -177,7 +177,15 @@ void Time_config(tm_t * const _time){
         if (num != '\0') {
             if (num == 'A') {
                 indice++;
-                // Si se presiona "B", ignorar y continuar esperando el siguiente número
+                // Si se presiona "A", ignorar y continuar esperando el siguiente número
+                continue;
+            }
+            if (num == 'B') {
+                for (size_t i = 0; i <= 3; i++)
+                {
+                    indice=0;
+                    numeroStr[i]=indice;
+                }
                 continue;
             }
             numeroStr[indice] = num;
