@@ -117,9 +117,10 @@ void Main_Screen( void * pvParameters )
         //gpio_set_level(CONFIG_LED_PIN,1); // Para probar en debug
         //if (xSemaphoreTake(LlaveGlobal, portMAX_DELAY))
         //{
-            for(int i=0; i<=5; i++)
+            //-----for(int i=0; i<=5; i++)
+            for(;;)
             {    
-                printf("Presionar la tecla x para continuar\n");
+                LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"HOLA",16,1);
                 //while(!ReadKey("2"));
                 printf("Well done\n"); 
 
@@ -180,65 +181,65 @@ void Time_config(tm_t * const _time){
 
 
     Resultados obtenerHora() 
-{
-    LCD_Clear(LGRAYBLUE);
-    char numeroStr[5] = "";
-    int indice = 0;
+    {
+        LCD_Clear(LGRAYBLUE);
+        char numeroStr[5] = "";
+        int indice = 0;
 
-    while (indice <= 3) {
-        num = keypad_getkey();
-        if (num != '\0') {
-            if (num == 'A') {
-                indice++;
-                // Si se presiona "A", ignorar y continuar esperando el siguiente número
-                continue;
-            }
-            if (num == 'B') {
-                for (size_t i = 0; i <= 3; i++)
-                {
-                    indice=0;
-                    numeroStr[i]=indice;
+        while (indice <= 3) {
+            num = keypad_getkey();
+            if (num != '\0') {
+                if (num == 'A') {
+                    indice++;
+                    // Si se presiona "A", ignorar y continuar esperando el siguiente número
+                    continue;
                 }
-                continue;
+                if (num == 'B') {
+                    for (size_t i = 0; i <= 3; i++)
+                    {
+                        indice=0;
+                        numeroStr[i]=indice;
+                    }
+                    continue;
+                }
+                numeroStr[indice] = num;
+                printf("Número actual: %s\n", numeroStr);
+                LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,numeroStr,32,1); // Mejorar
+                vTaskDelay(pdMS_TO_TICKS(500));
+                //indice++;
             }
-            numeroStr[indice] = num;
-            printf("Número actual: %s\n", numeroStr);
-            LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,numeroStr,32,1); // Mejorar
-            vTaskDelay(pdMS_TO_TICKS(500));
-            //indice++;
+            /*if (num == 'B') {
+                    if (indice > 0) {
+                        indice=indice-1;
+                        numeroStr[indice] = '\0';
+                        printf("Número anterior eliminado.\n");
+                        LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,numeroStr,32,1); //Mejorar
+                    } else {
+                        printf("No hay números anteriores para eliminar.\n");
+                    }
+            }*/
+            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
-        /*if (num == 'B') {
-                if (indice > 0) {
-                    indice=indice-1;
-                    numeroStr[indice] = '\0';
-                    printf("Número anterior eliminado.\n");
-                    LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,numeroStr,32,1); //Mejorar
-                } else {
-                    printf("No hay números anteriores para eliminar.\n");
-                }
-        }*/
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+
+        char primerNumeroStr[2] = {numeroStr[0], '\0'};
+        char segundoNumeroStr[2] = {numeroStr[1], '\0'};
+        char tercerNumeroStr[2] = {numeroStr[2], '\0'};
+        char cuartoNumeroStr[2] = {numeroStr[3], '\0'};
+
+        int primerNumero = atoi(primerNumeroStr);
+        int segundoNumero = atoi(segundoNumeroStr);
+        int tercerNumero = atoi(tercerNumeroStr);
+        int cuartoNumero = atoi(cuartoNumeroStr);
+
+        int resultado1 = primerNumero * 10 + segundoNumero;
+        int resultado2 = tercerNumero * 10 + cuartoNumero;
+
+        Resultados resultados;
+        resultados.resultado1 = resultado1;
+        resultados.resultado2 = resultado2;
+        LCD_Clear(LGRAYBLUE);
+        return resultados;
     }
-
-    char primerNumeroStr[2] = {numeroStr[0], '\0'};
-    char segundoNumeroStr[2] = {numeroStr[1], '\0'};
-    char tercerNumeroStr[2] = {numeroStr[2], '\0'};
-    char cuartoNumeroStr[2] = {numeroStr[3], '\0'};
-
-    int primerNumero = atoi(primerNumeroStr);
-    int segundoNumero = atoi(segundoNumeroStr);
-    int tercerNumero = atoi(tercerNumeroStr);
-    int cuartoNumero = atoi(cuartoNumeroStr);
-
-    int resultado1 = primerNumero * 10 + segundoNumero;
-    int resultado2 = tercerNumero * 10 + cuartoNumero;
-
-    Resultados resultados;
-    resultados.resultado1 = resultado1;
-    resultados.resultado2 = resultado2;
-    LCD_Clear(LGRAYBLUE);
-    return resultados;
-}
 
 
 

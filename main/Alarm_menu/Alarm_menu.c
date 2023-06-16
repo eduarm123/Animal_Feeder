@@ -124,7 +124,7 @@ void Alarm_menu( void * pvParameters )
     for (;;)
     {
         printf("Tarea Alarma OK\n");
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
         /*int mensaje;
         if (xQueueReceive(colaPulsador, &mensaje, portMAX_DELAY) == pdPASS) {
             if (mensaje == 1) {
