@@ -36,6 +36,7 @@ extern "C"
 #include "freertos/semphr.h"
 
 #include <freertos/task.h>
+#include "freertos/queue.h"
 #include <ds3231.h>
 #include <string.h>
 #include <time.h>
@@ -67,15 +68,18 @@ extern "C"
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 //extern SemaphoreHandle_t LlaveGlobal;
+//QueueHandle_t colaPulsador; // Cola para notificar a las tareas
 
 void app_main(void)
 {
     //extern SemaphoreHandle_t LlaveGlobal;
-    LlaveGlobal = xSemaphoreCreateBinary();
-    xSemaphoreGive(LlaveGlobal);
+    colaPulsador = xQueueCreate(1, sizeof(int));
+    //-----LlaveGlobal = xSemaphoreCreateBinary();
+    //-----xSemaphoreGive(LlaveGlobal);
 
 	static uint8_t ucParameterToPass;
-    TaskHandle_t xHandle = NULL;
+    //----TaskHandle_t xHandle = NULL;
+    //----TaskHandle_t xHandle1 = NULL;
 
     xTaskCreatePinnedToCore(Main_Screen,
                 "Main_Screen",
@@ -85,14 +89,16 @@ void app_main(void)
                 &xHandle,
                 0);
 
-    xTaskCreatePinnedToCore(Alarm_menu, 
+    xTaskCreatePinnedToCore(&Alarm_menu, 
                 "Alarm_menu",
                 configMINIMAL_STACK_SIZE * 3,
                 &ucParameterToPass,
                 1, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle,
+                &xHandle1,
                 0);
     
+
+    vTaskSuspend(xHandle1); // Suspender la tarea Reloj al inicio
 }
 
 #ifdef __cplusplus

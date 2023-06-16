@@ -87,8 +87,8 @@ tm_t s_alarmas_manual[]={
 extern tm_t time_tc;
 extern i2c_dev_t s_dev; // Configurado en Main_screen.c 
 //extern SemaphoreHandle_t xSemaphore;
-SemaphoreHandle_t LlaveGlobal;
-
+//-------SemaphoreHandle_t LlaveGlobal;
+QueueHandle_t colaPulsador; // Cola para notificar a las tareas
 /******************************** (3) DEFINES & MACROS *******************************************/
 #define ARRAY_SIZE(a) (sizeof(a)/ sizeof(a[0]))
 
@@ -123,22 +123,43 @@ void Alarm_menu( void * pvParameters )
     
     for (;;)
     {
-        if (xSemaphoreTake(LlaveGlobal, portMAX_DELAY))
-        {
-            for(int i=0; i<=4; i++)
-            { 
+        printf("Tarea Alarma OK\n");
+        vTaskDelay(10000 / portTICK_PERIOD_MS);
+        /*int mensaje;
+        if (xQueueReceive(colaPulsador, &mensaje, portMAX_DELAY) == pdPASS) {
+            if (mensaje == 1) {
+                printf("Tarea Alarma OK\n");
+                vTaskDelay(10000 / portTICK_PERIOD_MS);
+            }
+        }*/
+
+        //--------if (xSemaphoreTake(LlaveGlobal, portMAX_DELAY))
+        //------{
+            //-----for(int i=0; i<=4; i++)
+            //-----{ 
                 /*Probar que si funcionan las 2 tareas al mismo tiempo*/
                 /*gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT);
                 gpio_set_level(CONFIG_LED_PIN,true); 
                 vTaskDelay(pdMS_TO_TICKS(500));
                 gpio_set_level(CONFIG_LED_PIN,false); // Para probar en debug*/
-                printf("HOLA CAPULLO\n");
-                vTaskDelay(pdMS_TO_TICKS(500));
+                //------printf("HOLA CAPULLO\n");
+                //------vTaskDelay(pdMS_TO_TICKS(500));
                 /*-----------------------------------------------------*/
-            }
-        }
-        xSemaphoreGive(LlaveGlobal); 
-        vTaskDelay(pdMS_TO_TICKS(500));    
+            //-----}
+        //-------}
+        //---------xSemaphoreGive(LlaveGlobal); 
+        //---------vTaskDelay(pdMS_TO_TICKS(500));
+        num = keypad_getkey();
+        if (num=='D')
+        {
+            /*printf("Pulsador D presionado. Activando tarea Alarma...\n");
+            int mensaje = 1; // Mensaje para indicar que se presionó el pulsador A
+            
+            xQueueSend(colaPulsador, &mensaje, portMAX_DELAY);*/
+            
+            vTaskResume(xHandle);
+            vTaskSuspend(xHandle1);
+        }    
     }
 
     

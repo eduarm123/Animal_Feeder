@@ -44,6 +44,8 @@
 //int8_t num1;
 char m[1]; //Sirve para almacenar el número ingresado por teclado tipo char
 char seg_car[2],min_car[2];
+TaskHandle_t xHandle1 = NULL;
+TaskHandle_t xHandle = NULL;
 /********************************* (1) PUBLIC METHODS ********************************************/
 //#define CONFIG_LED_PIN       (2)//2
 
@@ -67,7 +69,7 @@ typedef struct {
 
 
 i2c_dev_t s_dev; // necessary for RTC_init()
-
+unsigned num;
 /******************************** (3) DEFINES & MACROS *******************************************/
 
 /*********************************** (4) PRIVATE VARS ********************************************/
@@ -106,7 +108,7 @@ void Main_Screen( void * pvParameters )
     
     for (;;)
     {
-        xSemaphoreTake(LlaveGlobal, portMAX_DELAY); //Tomar semáforo binario
+        //------xSemaphoreTake(LlaveGlobal, portMAX_DELAY); //Tomar semáforo binario
 
         Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
         ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
@@ -142,9 +144,20 @@ void Main_Screen( void * pvParameters )
                 /*--------------------------------------------------------------------*/
 
                 vTaskDelay(pdMS_TO_TICKS(500));
+                num = keypad_getkey();
+                if (num=='C')
+                {
+                    /*printf("Pulsador D presionado. Activando tarea Alarma...\n");
+                    int mensaje = 1; // Mensaje para indicar que se presionó el pulsador A
+                    
+                    xQueueSend(colaPulsador, &mensaje, portMAX_DELAY);*/
+                    
+                    vTaskResume(xHandle1);
+                    vTaskSuspend(xHandle);
+                }
             }
             printf("FIIIIIIIN\n");
-            xSemaphoreGive(LlaveGlobal);
+            //---------xSemaphoreGive(LlaveGlobal);
             vTaskDelay(pdMS_TO_TICKS(500));
         //}
     }
@@ -154,16 +167,16 @@ void Main_Screen( void * pvParameters )
 
 void Time_config(tm_t * const _time){
 
-    int hour_1; //Para ingresar el 1er dígito de la hora
+    //----int hour_1; //Para ingresar el 1er dígito de la hora
     //int hour_2; //Para ingresar el 2do dígito de la hora
     int hour_total; //Para ingresar el 2do dígito de la hora
-    unsigned num;
+    //----unsigned num;
     //unsigned num1;
-    int num1;
-    int min_1=0; //Para ingresaar el 1er dígito del minuto
+    //-----int num1;
+    //-----int min_1=0; //Para ingresaar el 1er dígito del minuto
     int min_total;
     //int min_2;  //Para ingresaar el 1er dígito del minuto
-    int cont=0;
+    //-----int cont=0;
 
 
     Resultados obtenerHora() 
@@ -231,7 +244,7 @@ void Time_config(tm_t * const _time){
 
 
 
-    int concatenarHoras(int numero1, float mult) 
+    /*int concatenarHoras(int numero1, float mult) 
     {
         printf("Concatenado.\n");
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -242,7 +255,7 @@ void Time_config(tm_t * const _time){
         int numeroConcatenado = numero1;
         //cont=0;
         return numeroConcatenado;
-    }
+    }*/
 
     while (1)
     {
