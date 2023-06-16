@@ -38,6 +38,11 @@ extern "C" {
 
 /*********************************** (2) PUBLIC VARS *********************************************/
 extern SemaphoreHandle_t LlaveGlobal;
+extern QueueHandle_t colaPulsador; // Cola para notificar a las tareas
+extern TaskHandle_t xHandle1;
+extern TaskHandle_t xHandle;
+extern unsigned num;
+
 typedef struct tm tm_t;
 
 /********************************* (1) PUBLIC METHODS ********************************************/
