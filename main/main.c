@@ -69,6 +69,8 @@ extern "C"
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 //extern SemaphoreHandle_t LlaveGlobal;
 //QueueHandle_t colaPulsador; // Cola para notificar a las tareas
+TaskHandle_t xTask1 = NULL;
+TaskHandle_t xTask2 = NULL;
 
 void app_main(void)
 {
@@ -86,7 +88,7 @@ void app_main(void)
                 configMINIMAL_STACK_SIZE * 3,
                 &ucParameterToPass,
                 1, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle,
+                &xTask1,
                 0);
 
     xTaskCreatePinnedToCore(&Alarm_menu, 
@@ -94,11 +96,9 @@ void app_main(void)
                 configMINIMAL_STACK_SIZE * 3,
                 &ucParameterToPass,
                 1, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle1,
+                &xTask2,
                 0);
     
-
-    vTaskSuspend(xHandle1); // Suspender la tarea Reloj al inicio
 }
 
 #ifdef __cplusplus
