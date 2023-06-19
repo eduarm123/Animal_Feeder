@@ -36,9 +36,8 @@
 #include "freertos/semphr.h"
 #include <time.h>
 #include "Button_Handler.h"
-
-//#include "easyio.h" //error si incluyo esto de nuevo
-
+#include "easyio.h" //error si incluyo esto de nuevo
+//#include "picture.h"
 /********************************* (1) PUBLIC METHODS ********************************************/
 
 //---#define CONFIG_LED_PIN       (2)//2
@@ -127,7 +126,7 @@ void Alarm_menu( void * pvParameters )
     uint8_t* manual_alarm_isr=(void*)0;
     num=-1; // Para que no entre al swithc
 
-    //LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",16,1);
+    LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",16,1);
     //LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"1. Configurar hora",24,1);
     //LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"2 Configurar alarmas",32,1);
 
@@ -144,9 +143,9 @@ void Alarm_menu( void * pvParameters )
                     ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
                     break;
                 case '2':
-                    //LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",16,1);
-                    //LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"1. Manual",24,1);
-                    //LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"2. Automatico",32,1);
+                    LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",16,1);
+                    LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"1. Manual",24,1);
+                    LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"2. Automatico",32,1);
                     select_option(); 
                     switch (num)
                     {
@@ -220,7 +219,7 @@ void Alarm_menu( void * pvParameters )
                     break;
             }
            
-
+            printf("CAPULLO MARICON\n"); 
             /* Send a notification to prvTask1(), bringing it out of the 
             Blocked state. */
             xTaskNotifyGive( xTask1 );  
@@ -329,8 +328,8 @@ void Activacion_motor()
 
 void select_option(void)
 {
-    uint8_t ret=0;
-
+    uint8_t ret=1;
+    printf("JODER\n");
     while(ret)
     {
         num = keypad_getkey();
@@ -338,7 +337,7 @@ void select_option(void)
         {
             break;
         }
-        
+        printf("TIOOO\n");
         //hay que poner un timeout. De momento probarlo asi, aunque creo q por el watchdog interno no se puede.
         //Si es asi, hay que desactivar ese WD
         vTaskDelay(pdMS_TO_TICKS(100)); // Esto evitario que salte el WD ya que da tiempo a que se ejecute la tarea que refresca el WD

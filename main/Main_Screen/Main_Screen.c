@@ -36,8 +36,8 @@
 #include "Main_Screen.h"
 #include "Button_Handler.h"
 #include "freertos/semphr.h"
-
-
+#include "easyio.h"
+#include "picture.h"
 #include <stdlib.h>
 
 
@@ -157,7 +157,7 @@ void Time_config(tm_t * const _time){
 
     Resultados obtenerHora() 
     {
-        LCD_Clear(LGRAYBLUE);
+        //LCD_Clear(LGRAYBLUE);
         char numeroStr[5] = "";
         int indice = 0;
 

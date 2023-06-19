@@ -34,7 +34,7 @@
 #include "spi_config.h"
 #include "spi_lcd.h"
 #include "simple_gui.h"
-#include "picture.h"
+//#include "picture.h"
 
 
 #endif
