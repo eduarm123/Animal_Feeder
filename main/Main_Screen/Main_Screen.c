@@ -76,7 +76,7 @@ unsigned num;
 /************************* (6)  STATIC METHODS IMPLEMENTATION ************************************/
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
-
+void Titilar();
 
 void Main_Screen( void * pvParameters )
 {
@@ -85,10 +85,11 @@ void Main_Screen( void * pvParameters )
     spi_lcd_init(SPI3_HOST, 40*1000*1000, LCD_SPI3_DEF_PIN_NUM_CS0);
     LCD_Display_Resolution(horizontal);
     LCD_Clear(LGRAYBLUE);
-
+    
     LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"HOLA",16,1);
     LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"EDWIN",24,1);
     LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"ORENSE!",32,1);
+    LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',32,1);
     LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
     /*----------------------------------------------*/
 
@@ -160,8 +161,19 @@ void Time_config(tm_t * const _time){
         //LCD_Clear(LGRAYBLUE);
         char numeroStr[5] = "";
         int indice = 0;
+        for (size_t i = 0; i <= 3; i++)
+        {
+            indice=0;
+            numeroStr[i]=' ';
+        }
 
         while (indice <= 3) {
+            Titilar(indice);
+            LCD_ShowChar(100-1,180-1,LGRAYBLUE,BLACK,numeroStr[0],32,1); // Mejorar
+            LCD_ShowChar(130-1,180-1,LGRAYBLUE,BLACK,numeroStr[1],32,1); // Mejorar
+            LCD_ShowChar(180-1,180-1,LGRAYBLUE,BLACK,numeroStr[2],32,1); // Mejorar
+            LCD_ShowChar(210-1,180-1,LGRAYBLUE,BLACK,numeroStr[3],32,1); // Mejorar
+            vTaskDelay(pdMS_TO_TICKS(500));
             num = keypad_getkey();
             if (num != '\0') {
                 if (num == 'A') {
@@ -173,18 +185,14 @@ void Time_config(tm_t * const _time){
                     for (size_t i = 0; i <= 3; i++)
                     {
                         indice=0;
-                        numeroStr[i]=indice;
+                        numeroStr[i]=' ';
                     }
                     continue;
                 }
                 numeroStr[indice] = num;
                 printf("Número actual: %s\n", numeroStr);
-                LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,numeroStr,32,1); // Mejorar
-                vTaskDelay(pdMS_TO_TICKS(500));
-                //indice++;
             }
-  
-            vTaskDelay(100 / portTICK_PERIOD_MS);
+            //vTaskDelay(500 / portTICK_PERIOD_MS);
         }
 
         char primerNumeroStr[2] = {numeroStr[0], '\0'};
@@ -214,4 +222,44 @@ void Time_config(tm_t * const _time){
     _time->tm_sec=0;
     _time->tm_hour=hour_total;
     _time->tm_min=min_total;
+}
+
+void Titilar(int indice)
+{
+
+    switch (indice)
+    {
+        case 0:
+            LCD_ShowChar(130,180,LGRAYBLUE,BLACK,'_',32,1);
+            LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
+            LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
+            LCD_ShowChar(100,180,LGRAYBLUE,BLACK,'_',32,1);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            LCD_ShowChar(100,180,LGRAYBLUE,BLACK,' ',32,1);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            break;
+        case 1:
+            LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
+            LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
+            LCD_ShowChar(130,180,LGRAYBLUE,BLACK,'_',32,1);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            LCD_ShowChar(130,180,LGRAYBLUE,BLACK,' ',32,1);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            break;
+        case 2:
+            LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
+            LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            LCD_ShowChar(180,180,LGRAYBLUE,BLACK,' ',32,1);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            break;
+        case 3:
+            LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            LCD_ShowChar(210,180,LGRAYBLUE,BLACK,' ',32,1);
+            vTaskDelay(pdMS_TO_TICKS(500));
+            break;
+        //default:
+            //break;
+    }
 }
