@@ -125,33 +125,39 @@ void Alarm_menu( void * pvParameters )
     static uint32_t alarm_state = Manual;
     uint8_t* manual_alarm_isr=(void*)0;
     num=-1; // Para que no entre al swithc
+    //LCD_Clear(LGRAYBLUE);
 
-    LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",16,1);
-    //LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"1. Configurar hora",24,1);
-    //LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"2 Configurar alarmas",32,1);
 
     vTaskDelay(pdMS_TO_TICKS(100)); // espera de x tiempo para que las otras tareas se inicialicen
     for (;;)
     {
         if(ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) ==pdTRUE ) // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN_0 0
         {
-           select_option();  
+            LCD_Clear(LGRAYBLUE);
+            LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",16,1);
+            LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"1. Configurar hora",24,1);
+            LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"2 Configurar alarmas",32,1);
+            select_option();  
             switch (num) 
             {
                 case '1':
+                    LCD_Clear(LGRAYBLUE);
+                    LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"CONFIG HORA",16,1);
                     Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto.
                     ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
                     break;
                 case '2':
+                    LCD_Clear(LGRAYBLUE);
                     LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",16,1);
                     LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"1. Manual",24,1);
                     LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"2. Automatico",32,1);
                     select_option(); 
                     switch (num)
                     {
-                        case Manual:
-
-                            //LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Numero de Alarmas",16,1);
+                        case '1': //MANUAL
+                            LCD_Clear(LGRAYBLUE);
+                            printf("ESTAS EN MANUAL 0.\n");
+                            LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Numero de Alarmas",16,1);
                             select_option(); // De momento solo se puede 3.TODO: hay que agregar mas valores
                             if (num > 0 && num <4 ) {
                                 break;
@@ -182,7 +188,7 @@ void Alarm_menu( void * pvParameters )
                             }
                             
                             break;
-                        case Automatico:
+                        case '2': //AUTOMATICO
                             printf("Select 1.Adulto o 2.Cachorro");
                             while (1) { // Esto se debe eliminar once we have the keyboard
                                 printf("Age: ");
@@ -226,9 +232,11 @@ void Alarm_menu( void * pvParameters )
         }
         else
         {
+            printf("ESTAS EN TAREA ALARMAS\n"); 
             switch (activar_alarma){
 
             case Manual_alarmas_3:
+                printf("ESTAS EN MANUAL ALARMAS3\n"); 
                 init_manual_alarm_3();
                 ds3231_get_alarm_flags(&s_dev,(ds3231_alarm_t *)manual_alarm_isr);
                 if (*manual_alarm_isr!=0){ // TODO: Comprobar si esto funciona. No estoy seguro si se guarda ahi el flag de la interrupcion
