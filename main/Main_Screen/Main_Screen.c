@@ -43,6 +43,7 @@
 
 char m[1]; //Sirve para almacenar el número ingresado por teclado tipo char
 char seg_car[2],min_car[2];
+int n=0;
 
 extern TaskHandle_t xTask1;
 extern TaskHandle_t xTask2;
@@ -161,6 +162,7 @@ void Time_config(tm_t * const _time){
         //LCD_Clear(LGRAYBLUE);
         char numeroStr[5] = "";
         int indice = 0;
+        
         for (size_t i = 0; i <= 3; i++)
         {
             indice=0;
@@ -191,6 +193,7 @@ void Time_config(tm_t * const _time){
                 }
                 numeroStr[indice] = num;
                 printf("Número actual: %s\n", numeroStr);
+                n=1;
             }
             //vTaskDelay(500 / portTICK_PERIOD_MS);
         }
@@ -230,13 +233,26 @@ void Titilar(int indice)
     switch (indice)
     {
         case 0:
-            LCD_ShowChar(130,180,LGRAYBLUE,BLACK,'_',32,1);
-            LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
-            LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
-            LCD_ShowChar(100,180,LGRAYBLUE,BLACK,'_',32,1);
-            vTaskDelay(pdMS_TO_TICKS(500));
-            LCD_ShowChar(100,180,LGRAYBLUE,BLACK,' ',32,1);
-            vTaskDelay(pdMS_TO_TICKS(500));
+            if (n==0)
+            {
+                LCD_ShowChar(130,180,LGRAYBLUE,BLACK,'_',32,1);
+                LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
+                LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
+                LCD_ShowChar(100,180,LGRAYBLUE,BLACK,'_',32,1);
+                vTaskDelay(pdMS_TO_TICKS(500));
+                LCD_ShowChar(100,180,LGRAYBLUE,BLACK,' ',32,1);
+                vTaskDelay(pdMS_TO_TICKS(500));
+                break;
+            }
+            if (n==1)
+            {
+                LCD_ShowChar(130,180,LGRAYBLUE,BLACK,'_',32,1);
+                LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
+                LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
+                LCD_ShowChar(100,180,LGRAYBLUE,BLACK,'_',32,1);
+                break;
+            }
+            
             break;
         case 1:
             LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
