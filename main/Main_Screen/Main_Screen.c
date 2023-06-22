@@ -77,7 +77,8 @@ unsigned num;
 /************************* (6)  STATIC METHODS IMPLEMENTATION ************************************/
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
-void Titilar();
+//void Titilar(int indice);
+void Titilar(int indice, char numeroStr[]);
 
 void Main_Screen( void * pvParameters )
 {
@@ -170,7 +171,8 @@ void Time_config(tm_t * const _time){
         }
 
         while (indice <= 3) {
-            Titilar(indice);
+            //Titilar(indice);
+            Titilar(indice, numeroStr);
             LCD_ShowChar(100-1,180-1,LGRAYBLUE,BLACK,numeroStr[0],32,1); // Mejorar
             LCD_ShowChar(130-1,180-1,LGRAYBLUE,BLACK,numeroStr[1],32,1); // Mejorar
             LCD_ShowChar(180-1,180-1,LGRAYBLUE,BLACK,numeroStr[2],32,1); // Mejorar
@@ -227,7 +229,7 @@ void Time_config(tm_t * const _time){
     _time->tm_min=min_total;
 }
 
-void Titilar(int indice)
+void Titilar(int indice, char numeroStr[])
 {
 
     switch (indice)
@@ -249,7 +251,9 @@ void Titilar(int indice)
                 LCD_ShowChar(130,180,LGRAYBLUE,BLACK,'_',32,1);
                 LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
                 LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
-                LCD_ShowChar(100,180,LGRAYBLUE,BLACK,'_',32,1);
+                //LCD_ShowChar(100,180,LGRAYBLUE,BLACK,'_',32,1);
+                LCD_ShowChar(100-1,180-1,LGRAYBLUE,BLACK,numeroStr[0],32,1);
+                vTaskDelay(pdMS_TO_TICKS(500));
                 break;
             }
             
