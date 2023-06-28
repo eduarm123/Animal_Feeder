@@ -126,6 +126,7 @@ void Main_Screen( void * pvParameters )
             printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
 
             /*---Conversión entero a caracter para imprimir en TFT sin problema---*/
+            LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',32,1);
             itoa(time_tc.tm_min, min_car, 10);
             itoa(time_tc.tm_sec, seg_car, 10);
 
@@ -182,6 +183,7 @@ void Time_config(tm_t * const _time){
             if (num != '\0') {
                 if (num == 'A') {
                     indice++;
+                    n=0;
                     // Si se presiona "A", ignorar y continuar esperando el siguiente número
                     continue;
                 }
@@ -189,6 +191,7 @@ void Time_config(tm_t * const _time){
                     for (size_t i = 0; i <= 3; i++)
                     {
                         indice=0;
+                        n=0;
                         numeroStr[i]=' ';
                     }
                     continue;
@@ -241,45 +244,71 @@ void Titilar(int indice, char numeroStr[])
                 LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
                 LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
                 LCD_ShowChar(100,180,LGRAYBLUE,BLACK,'_',32,1);
-                vTaskDelay(pdMS_TO_TICKS(500));
+                vTaskDelay(pdMS_TO_TICKS(250));
                 LCD_ShowChar(100,180,LGRAYBLUE,BLACK,' ',32,1);
-                vTaskDelay(pdMS_TO_TICKS(500));
+                vTaskDelay(pdMS_TO_TICKS(100));
                 break;
             }
             if (n==1)
             {
-                LCD_ShowChar(130,180,LGRAYBLUE,BLACK,'_',32,1);
-                LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
-                LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
-                //LCD_ShowChar(100,180,LGRAYBLUE,BLACK,'_',32,1);
-                LCD_ShowChar(100-1,180-1,LGRAYBLUE,BLACK,numeroStr[0],32,1);
+                LCD_ShowChar(100-1,180-1,LGRAYBLUE,BLACK,'_',32,1);
                 vTaskDelay(pdMS_TO_TICKS(500));
                 break;
             }
             
-            break;
-        case 1:
-            LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
-            LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
-            LCD_ShowChar(130,180,LGRAYBLUE,BLACK,'_',32,1);
-            vTaskDelay(pdMS_TO_TICKS(500));
-            LCD_ShowChar(130,180,LGRAYBLUE,BLACK,' ',32,1);
-            vTaskDelay(pdMS_TO_TICKS(500));
-            break;
-        case 2:
-            LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
-            LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
-            vTaskDelay(pdMS_TO_TICKS(500));
-            LCD_ShowChar(180,180,LGRAYBLUE,BLACK,' ',32,1);
-            vTaskDelay(pdMS_TO_TICKS(500));
-            break;
-        case 3:
-            LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
-            vTaskDelay(pdMS_TO_TICKS(500));
-            LCD_ShowChar(210,180,LGRAYBLUE,BLACK,' ',32,1);
-            vTaskDelay(pdMS_TO_TICKS(500));
-            break;
-        //default:
             //break;
+        case 1:
+            if (n==0)
+            {
+                LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
+                LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
+                LCD_ShowChar(130,180,LGRAYBLUE,BLACK,'_',32,1);
+                vTaskDelay(pdMS_TO_TICKS(250));
+                LCD_ShowChar(130,180,LGRAYBLUE,BLACK,' ',32,1);
+                vTaskDelay(pdMS_TO_TICKS(250));
+                break;
+            }
+            if (n==1)
+            {
+                LCD_ShowChar(130,180,LGRAYBLUE,BLACK,' ',32,1);
+                vTaskDelay(pdMS_TO_TICKS(500));
+                break;
+            }
+            
+        case 2:
+            if (n==0)
+            {
+                LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
+                LCD_ShowChar(180,180,LGRAYBLUE,BLACK,'_',32,1);
+                vTaskDelay(pdMS_TO_TICKS(250));
+                LCD_ShowChar(180,180,LGRAYBLUE,BLACK,' ',32,1);
+                vTaskDelay(pdMS_TO_TICKS(250));
+                break;
+            }
+            if (n==1)
+            {
+                LCD_ShowChar(180,180,LGRAYBLUE,BLACK,' ',32,1);
+                vTaskDelay(pdMS_TO_TICKS(500));
+                break;
+            }
+            
+        case 3:
+            if (n==0)
+            {
+                LCD_ShowChar(210,180,LGRAYBLUE,BLACK,'_',32,1);
+                vTaskDelay(pdMS_TO_TICKS(250));
+                LCD_ShowChar(210,180,LGRAYBLUE,BLACK,' ',32,1);
+                vTaskDelay(pdMS_TO_TICKS(250));
+                break;
+            }
+            if (n==1)
+            {
+                LCD_ShowChar(210,180,LGRAYBLUE,BLACK,' ',32,1);
+                vTaskDelay(pdMS_TO_TICKS(500));
+                break;
+            }
+            
+        default:
+            break;
     }
 }

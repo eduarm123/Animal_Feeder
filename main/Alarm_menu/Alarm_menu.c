@@ -134,30 +134,31 @@ void Alarm_menu( void * pvParameters )
         if(ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) ==pdTRUE ) // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN_0 0
         {
             LCD_Clear(LGRAYBLUE);
-            LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",16,1);
-            LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"1. Configurar hora",24,1);
-            LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"2 Configurar alarmas",32,1);
+            LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",24,1);
+            LCD_ShowString(10-1,70-1,LGRAYBLUE,BLACK,"1.Configurar hora",16,1);
+            LCD_ShowString(10-1,120-1,LGRAYBLUE,BLACK,"2.Configurar alarmas",16,1);
             select_option();  
             switch (num) 
             {
                 case '1':
                     LCD_Clear(LGRAYBLUE);
-                    LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"CONFIG HORA",16,1);
+                    LCD_ShowString(20,70,LGRAYBLUE,BLACK,"CONFIG HORA",24,1);
+                    LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',32,1);
                     Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto.
                     ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
                     break;
                 case '2':
                     LCD_Clear(LGRAYBLUE);
-                    LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",16,1);
-                    LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"1. Manual",24,1);
-                    LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"2. Automatico",32,1);
+                    LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",24,1);
+                    LCD_ShowString(20-1,70-1,LGRAYBLUE,BLACK,"1. Manual",16,1);
+                    LCD_ShowString(20-1,120-1,LGRAYBLUE,BLACK,"2. Automatico",16,1);
                     select_option(); 
                     switch (num)
                     {
                         case '1': //MANUAL
                             LCD_Clear(LGRAYBLUE);
                             printf("ESTAS EN MANUAL 0.\n");
-                            LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"Numero de Alarmas",16,1);
+                            LCD_ShowString(20-1,70-1,LGRAYBLUE,BLACK,"Numero de Alarmas",16,1);
                             select_option(); // De momento solo se puede 3.TODO: hay que agregar mas valores
                             if (num > 0 && num <4 ) {
                                 break;

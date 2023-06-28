@@ -26,13 +26,16 @@
 
 /**********************************INCLUDES ******************************************************/
 #include "Button_Handler.h"
-
+#include <memory.h>
+#include <time.h>
+#include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <driver/gpio.h>
+//#include <driver/gpio.h>
+//#include <freertos/queue.h>
 #include "freertos/semphr.h"
 #include <string.h>
-
+#include "easyio.h"
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 typedef volatile struct
@@ -45,19 +48,11 @@ typedef volatile struct
 /*********************************** (2) PUBLIC VARS *********************************************/
 TaskHandle_t ISR = NULL;
 SemaphoreHandle_t xSemaphore;
-
+bool keypad_processing = false;
 /******************************** (3) DEFINES & MACROS *******************************************/
 //#define CONFIG_LED_PIN       (2)//2
 //#define ESP_INR_FLAG_DEFAULT (0)
 //#define PUSH_BUTTON_PIN_0    (4)//0 // Boot button in the esp32
-
-#include <memory.h>
-#include <time.h>
-#include <esp_log.h>
-
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/queue.h>
 
 /** \brief Keypad mapping array*/
 const char keypad[] = { 
@@ -147,11 +142,35 @@ esp_err_t keypad_initalize(gpio_num_t keypad_pins[8])
 
 void intr_click_handler(void* args)
 {
-    int index = (int)(args);
+    /*int index = (int)(args);
+    time_t time_now_isr = time(NULL);
+    time_t time_isr = (time_now_isr - time_old_isr) * 1000L;
     
+    if (time_isr >= KEYPAD_DEBOUNCING && !keypad_processing)
+    {
+        keypad_processing = true;
+        
+        turnon_cols();
+        for (int j = 4; j < 8; j++)
+        {
+            if (!gpio_get_level(_keypad_pins[j]))
+            {
+                xQueueSendFromISR(keypad_queue, &keypad[index * 4 + j - 4], NULL);
+                break;
+            }
+        }
+        turnon_rows();
+        
+        keypad_processing = false;
+    }
+    time_old_isr = time_now_isr;*/
+
+
+    int index = (int)(args);
+    //unsigned num;
     time_t time_now_isr = time(NULL);
     time_t time_isr = (time_now_isr - time_old_isr)*1000L;
-    
+    //LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"HOLA111",16,1);
     if(time_isr >= KEYPAD_DEBOUNCING)
     {
         turnon_cols();
@@ -165,8 +184,8 @@ void intr_click_handler(void* args)
         }
         turnon_rows();
     }
-    time_old_isr = time_now_isr;
     
+    time_old_isr = time_now_isr;
 }
 
 char keypad_getkey()
