@@ -183,9 +183,11 @@ void intr_click_handler(void* args)
             }
         }
         turnon_rows();
+        //time_old_isr=0;
+        time_old_isr = time_now_isr;
     }
     
-    time_old_isr = time_now_isr;
+    //time_old_isr = time_now_isr;
 }
 
 char keypad_getkey()
