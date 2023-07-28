@@ -259,14 +259,14 @@ void spi_lcd_init(spi_host_device_t host_id, uint32_t clk_speed, gpio_num_t cs_i
     // 设置屏幕分辨率、扫描方向
     // 初始化 显示区域的大小，和扫描方向。（！！重要，必有，否则不能显示正常）
     // 来匹配屏幕的安装方向。或镜像安装方式（可用于镜面反射及棱镜的镜像显示）（提供了8中扫描方式，以便横竖屏、翻转和镜像的切换）
-    LCD_Display_Dir(LCD_DIR, LCD_INVERT, LCD_MIRROR);
+    //LCD_Display_Dir(LCD_DIR, LCD_INVERT, LCD_MIRROR);
     //LCD_Display_Dir(vertical, invert_dis, mirror_dis); // 竖屏、不倒置(正着摆放)、不镜像
     //LCD_Display_Dir(vertical, invert_dis, mirror_en); // 竖屏、不倒置(正着摆放)、镜像
     //LCD_Display_Dir(vertical, invert_en, mirror_dis); // 竖屏、倒置(倒立摆放)、不镜像
     //LCD_Display_Dir(vertical, invert_en, mirror_en); // 竖屏、倒置(倒立摆放)、镜像
     //LCD_Display_Dir(horizontal, invert_dis, mirror_dis); // 横屏、不倒置(正着摆放)、不镜像
     //LCD_Display_Dir(horizontal, invert_dis, mirror_en); // 横屏、不倒置(正着摆放)、镜像
-    //LCD_Display_Dir(horizontal, invert_en, mirror_dis); // 横屏、倒置(倒立摆放)、不镜像
+    LCD_Display_Dir(horizontal, invert_en, mirror_dis); // 横屏、倒置(倒立摆放)、不镜像
     //LCD_Display_Dir(horizontal, invert_en, mirror_en); // 横屏、倒置(倒立摆放)、镜像
 
     // 清屏，使用纯黑，避免之后点亮背光产生突兀的闪烁
