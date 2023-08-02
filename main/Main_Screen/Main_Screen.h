@@ -43,8 +43,8 @@ extern QueueHandle_t colaPulsador; // Cola para notificar a las tareas
 extern TaskHandle_t xHandle1;
 extern TaskHandle_t xHandle;
 extern unsigned num;
-typedef struct tm tm_t;
 
+typedef struct tm tm_t;
 /********************************* (1) PUBLIC METHODS ********************************************/
 
 /**

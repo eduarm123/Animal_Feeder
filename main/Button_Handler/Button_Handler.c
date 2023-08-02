@@ -142,29 +142,6 @@ esp_err_t keypad_initalize(gpio_num_t keypad_pins[8])
 
 void intr_click_handler(void* args)
 {
-    /*int index = (int)(args);
-    time_t time_now_isr = time(NULL);
-    time_t time_isr = (time_now_isr - time_old_isr) * 1000L;
-    
-    if (time_isr >= KEYPAD_DEBOUNCING && !keypad_processing)
-    {
-        keypad_processing = true;
-        
-        turnon_cols();
-        for (int j = 4; j < 8; j++)
-        {
-            if (!gpio_get_level(_keypad_pins[j]))
-            {
-                xQueueSendFromISR(keypad_queue, &keypad[index * 4 + j - 4], NULL);
-                break;
-            }
-        }
-        turnon_rows();
-        
-        keypad_processing = false;
-    }
-    time_old_isr = time_now_isr;*/
-
 
     int index = (int)(args);
     //unsigned num;
@@ -248,20 +225,8 @@ void IRAM_ATTR button_isr_handler(void* arg) {
 void Button_Handler()
 {
 
-    //----gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Lo tengo para debugear
-    
-    //Pulsadores
-    //----gpio_set_direction(PUSH_BUTTON_PIN_0, GPIO_MODE_INPUT);
-
-    //----gpio_set_intr_type(PUSH_BUTTON_PIN_0, GPIO_INTR_NEGEDGE); // falling edge
-
     xSemaphore = xSemaphoreCreateBinary(); // esto es para activar las alarmas
 
-    // Install the driver's GPIO ISR handler service, which allows per-pin GPIO interrupt handler
-    //Install ISR service with defautl configuration
-    //----gpio_install_isr_service(ESP_INR_FLAG_DEFAULT);
-
-    //---gpio_isr_handler_add(PUSH_BUTTON_PIN_0, button_isr_handler, NULL);
 
     xTaskCreate( button_task, "button_task", 4096, NULL , 10,&ISR );
     

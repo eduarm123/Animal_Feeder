@@ -807,7 +807,7 @@ void LCD_ShowChar(uint16_t x,uint16_t y,uint16_t bcolor,uint16_t fcolor,uint8_t 
  * @param  bcolor 背景色。background color
  * @param  fcolor 字体颜色。font color
  * @param  p 显示的字符串起始指针
- * @param  size 字体大小。12（1206） / 16（1608）
+ * @param  size it can be 16, 24 or 32
  * @param  mode 覆盖方式，显示背景色(0)；叠加方式，不显示背景色(1)
  * 
  * @return
