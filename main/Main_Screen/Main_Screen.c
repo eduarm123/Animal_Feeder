@@ -101,10 +101,8 @@ tm_t s_alarmas_manual[]={
 i2c_dev_t s_dev; // necessary for RTC_init()
 unsigned num;
 
-char m[1]; //Sirve para almacenar el número ingresado por teclado tipo char
-int n=0;
 
-uint8_t n_alarms;
+uint8_t n_alarms; // Se especifica las alarmas
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 
@@ -117,9 +115,8 @@ uint8_t n_alarms;
 static void select_option(void);
 static void Alarma_menu( void);
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
-//void Titilar(int indice);
 Resultados obtenerHora();
-void Titilar(int indice);
+void Titilar(int indice, int n);
 void convertTime2StringDisplay(tm_t *_time2Convert, char hour_car[], char min_car[], char seg_car[]);
 
 
@@ -169,11 +166,9 @@ void Main_Screen( void * pvParameters )
             printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
 
             /*---Conversión entero a caracter para imprimir en TFT sin problema---*/
+            convertTime2StringDisplay(&time_tc,hour_car,min_car,seg_car);
             LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',32,1);
             LCD_ShowChar(80,180,LGRAYBLUE,BLACK,':',32,1);
-
-            convertTime2StringDisplay(&time_tc,hour_car,min_car,seg_car);
-           
             LCD_ShowString(25-1,180-1,LGRAYBLUE,BLACK,hour_car,32,1);           
             LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,min_car,32,1);
             LCD_ShowString(180-1,180-1,LGRAYBLUE,BLACK,seg_car,32,1);
@@ -185,8 +180,6 @@ void Main_Screen( void * pvParameters )
                 Alarma_menu();
                 LCD_Clear(LGRAYBLUE);
             }
-
-
             vTaskDelay(pdMS_TO_TICKS(10));
         }
             
@@ -215,65 +208,74 @@ Resultados obtenerHora()
 {
     char numeroStr[5];
     int indice = 0;
+    int n=0;
+    uint8_t num_dec[4]={0};
     Resultados resultados;
     
     for (size_t i = 0; i <= 3; i++)
     {
-        indice=0;
-        numeroStr[i]=' ';
+        numeroStr[0]='_';
+        numeroStr[i+1]=' ';
     }
 
     while (indice <= 3) {
 
-        Titilar(indice);
+        //Titilar(indice);
         LCD_ShowChar(100-1,180-1,LGRAYBLUE,BLACK,numeroStr[0],32,1); // Mejorar
         LCD_ShowChar(130-1,180-1,LGRAYBLUE,BLACK,numeroStr[1],32,1); // Mejorar
         LCD_ShowChar(180-1,180-1,LGRAYBLUE,BLACK,numeroStr[2],32,1); // Mejorar
         LCD_ShowChar(210-1,180-1,LGRAYBLUE,BLACK,numeroStr[3],32,1); // Mejorar
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(10));
         num = keypad_getkey();
+
         if (num != '\0') {
-            if (num == 'A') {
-                indice++;                
-                // Si se presiona "A", ignorar y continuar esperando el siguiente número
+
+            if (num =='A'){
+                num ='_';
+                indice++; 
+                numeroStr[indice] = num;            
             }
-            if (num == 'B') {
+            else if (num == 'B') {
+                indice=0;
                 for (size_t i = 0; i <= 3; i++)
-                {
-                    indice=0;
-                    
-                    numeroStr[i]=' ';
-                }
-                continue;
+                {                                     
+                    numeroStr[0]='_';
+                    numeroStr[i+1]=' ';
+                }               
             }
-            numeroStr[indice] = num;
+            else{
+
+                num_dec[indice]= num - '0';
+
+                if(num_dec[0]>2 || (num_dec[0] == 2 && num_dec[1] > 3) || num_dec[2]>5 || num_dec[3]>9 ){
+
+                numeroStr[indice] = '0';
+                printf("ALgo pasa :");
+                }
+                else{
+                numeroStr[indice] = num;
+                }   
+
+            }            
+            vTaskDelay(pdMS_TO_TICKS(10));
             printf("Número actual: %s\n", numeroStr);
-            
-        }          
+        }
+              
     }
 
-    char primerNumeroStr[2] = {numeroStr[0], '\0'};
-    char segundoNumeroStr[2] = {numeroStr[1], '\0'};
-    char tercerNumeroStr[2] = {numeroStr[2], '\0'};
-    char cuartoNumeroStr[2] = {numeroStr[3], '\0'};
-
-    int primerNumero = atoi(primerNumeroStr);
-    int segundoNumero = atoi(segundoNumeroStr);
-    int tercerNumero = atoi(tercerNumeroStr);
-    int cuartoNumero = atoi(cuartoNumeroStr);
-
-    int resultado1 = primerNumero * 10 + segundoNumero;
-    int resultado2 = tercerNumero * 10 + cuartoNumero;
+    int resultado1 = (numeroStr[0]-'0') * 10 + (numeroStr[1]-'0');
+    int resultado2 = (numeroStr[2]-'0') * 10 + (numeroStr[3]-'0');
 
     
     resultados.resultado1 = resultado1;
     resultados.resultado2 = resultado2;
+
     LCD_Clear(LGRAYBLUE);
 
     return resultados;
 }
 
-void Titilar(int indice)
+void Titilar(int indice, int n)
 {
 
     switch (indice)
@@ -402,13 +404,8 @@ static void Alarma_menu( void)
                         is_alarm_set=false;  // Break out of the inner loop, so the alarmTask waits for the next alarm setting
                         q_AlarmMenu[0]=Manual;
                         n_alarms=Manual_alarmas_1;
-                        //q_AlarmMenu[1]=1;
-/*                         q_AlarmMenu[2]=s_alarmas_manual[0].tm_hour;
-                        q_AlarmMenu[3]=s_alarmas_manual[0].tm_min;
-                        q_AlarmMenu[4]=s_alarmas_manual[0].tm_sec; */
                         xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY);                       
-                        
-                        
+                                               
                     }
                     else if (num == '2')
                     {
@@ -418,13 +415,6 @@ static void Alarma_menu( void)
                         printf("Config alarma 2.\n");
                         q_AlarmMenu[0]=Manual;
                         n_alarms=Manual_alarmas_2;
-                        //q_AlarmMenu[1]=2;
-   /*                      q_AlarmMenu[2]=s_alarmas_manual[0].tm_hour;
-                        q_AlarmMenu[3]=s_alarmas_manual[0].tm_min;
-                        q_AlarmMenu[4]=s_alarmas_manual[0].tm_sec;
-                        q_AlarmMenu[5]=s_alarmas_manual[1].tm_hour;
-                        q_AlarmMenu[6]=s_alarmas_manual[1].tm_min;
-                        q_AlarmMenu[7]=s_alarmas_manual[1].tm_sec; */
                         xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY);                   
                     }
                     else if (num == '3')
@@ -435,16 +425,6 @@ static void Alarma_menu( void)
                         is_alarm_set=false;  // Break out of the inner loop, so the alarmTask waits for the next alarm setting
                         q_AlarmMenu[0]=Manual;
                         n_alarms=Manual_alarmas_3;
-                        //q_AlarmMenu[1]=3;
-/*                      q_AlarmMenu[2]=s_alarmas_manual[0].tm_hour;
-                        q_AlarmMenu[3]=s_alarmas_manual[0].tm_min;
-                        q_AlarmMenu[4]=s_alarmas_manual[0].tm_sec;
-                        q_AlarmMenu[5]=s_alarmas_manual[1].tm_hour;
-                        q_AlarmMenu[6]=s_alarmas_manual[1].tm_min;
-                        q_AlarmMenu[7]=s_alarmas_manual[1].tm_sec;
-                        q_AlarmMenu[8]=s_alarmas_manual[2].tm_hour;
-                        q_AlarmMenu[9]=s_alarmas_manual[2].tm_min;
-                        q_AlarmMenu[10]=s_alarmas_manual[2].tm_sec; */
                         xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY);
                     }
                     
@@ -457,18 +437,12 @@ static void Alarma_menu( void)
                     select_option();
                     if (num =='1')
                     {
-/*                         Time_config(&s_alarmas_auto[0]);
-                        Time_config(&s_alarmas_auto[1]);
-                        Time_config(&s_alarmas_auto[2]); */
                         q_AlarmMenu[0]=Automatico;
                         n_alarms=Adulto_alarmas;
                         xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY);             
                     }
                     else if (num =='2')
                     {
-/*                         Time_config(&s_alarmas_auto[3]);
-                        Time_config(&s_alarmas_auto[4]);
-                        Time_config(&s_alarmas_auto[5]);  */
                         q_AlarmMenu[0]=Automatico;
                         n_alarms=Cachorro_alarmas; 
                         xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY); 
@@ -492,10 +466,10 @@ static void Alarma_menu( void)
                         char  hour_car_1[3];                      
                         LCD_Clear(LGRAYBLUE);
                         LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"--Alarma set--",16,1); 
-                        LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Presione 1 para volver",16,1); 
+                        LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Presione 1 para volver",16,1);                        
+                        convertTime2StringDisplay(&s_alarmas_manual[0],hour_car_1,min_car_1,seg_car_1); 
                         LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',24,1);
-                        LCD_ShowChar(80,180,LGRAYBLUE,BLACK,':',24,1);
-                        convertTime2StringDisplay(&s_alarmas_manual[0],hour_car_1,min_car_1,seg_car_1);                       
+                        LCD_ShowChar(80,180,LGRAYBLUE,BLACK,':',24,1);                      
                         LCD_ShowString(25-1,180-1,LGRAYBLUE,BLACK,hour_car_1,24,1);           
                         LCD_ShowString(100-1,180-1,LGRAYBLUE,BLACK,min_car_1,24,1);
                         LCD_ShowString(180-1,180-1,LGRAYBLUE,BLACK,seg_car_1,24,1);
@@ -601,13 +575,29 @@ static void select_option(void)
             break;
         }
         printf("Seleccione una opcion\n");
-        //hay que poner un timeout. De momento probarlo asi, aunque creo q por el watchdog interno no se puede.
-        //Si es asi, hay que desactivar ese WD
         vTaskDelay(pdMS_TO_TICKS(100)); // Esto evitario que salte el WD ya que da tiempo a que se ejecute la tarea que refresca el WD
     }
                           
 }
 
+/**
+ * @brief Convert time components to strings with leading zeros if necessary.
+ *
+ * This function takes a pointer to a tm_t struct representing the time components and converts
+ * the hour, minute, and second values to strings with leading zeros if any of them are less
+ * than 10. The converted strings are stored in the respective char arrays passed as parameters.
+ *
+ * @param _time2Convert Pointer to the tm_t struct containing the time components to be converted.
+ * @param hour_car      Character array to store the converted hour with leading zeros if necessary.
+ * @param min_car       Character array to store the converted minute with leading zeros if necessary.
+ * @param seg_car       Character array to store the converted second with leading zeros if necessary.
+ *
+ * @note The character arrays 'hour_car', 'min_car', and 'seg_car' must have enough memory to store
+ * the converted time components as strings. Make sure to allocate at least 3 characters for each
+ * array (including the null terminator '\0').
+ *
+ * @see tm_t
+ */
 void convertTime2StringDisplay(tm_t *_time2Convert, char hour_car[], char min_car[], char seg_car[]){
 
 

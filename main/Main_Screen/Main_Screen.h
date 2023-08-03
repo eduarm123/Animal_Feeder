@@ -2,7 +2,7 @@
 /*! @file	Main_Screen.h
  *	@brief	Introducir breve descripcion del fichero
  *
- *	\b Descripciï¿½n: Introducir aquï¿½ descripciï¿½n de las funcionalidades del fichero \n
+ *	\b Descripcion: Introducir aquï¿½ descripciï¿½n de las funcionalidades del fichero \n
  *
  *
  *		Compiler  :  \n
@@ -35,8 +35,7 @@ extern "C" {
 #include <time.h>
 #include <freertos/FreeRTOS.h>
 #include "freertos/semphr.h"
-//#include "picture.h"
-//#include "easyio.h"
+
 /*********************************** (2) PUBLIC VARS *********************************************/
 extern SemaphoreHandle_t LlaveGlobal;
 extern QueueHandle_t colaPulsador; // Cola para notificar a las tareas
