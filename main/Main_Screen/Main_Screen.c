@@ -90,7 +90,7 @@ void Main_Screen( void * pvParameters )
     
     LCD_ShowString(120-1,20-1,LGRAYBLUE,BLACK,"HOLA",16,1);
     LCD_ShowString(100-1,50-1,LGRAYBLUE,BLACK,"EDWIN",24,1);
-    LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"ORENSE!",32,1);
+    LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"ORENSE!1",32,1);
     LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',32,1);
     LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
     /*----------------------------------------------*/
