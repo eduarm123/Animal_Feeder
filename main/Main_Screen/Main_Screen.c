@@ -95,6 +95,7 @@ void Main_Screen( void * pvParameters )
     LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
     /*----------------------------------------------*/
 
+    //gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 14, 12, 13}; //Pines para la otra version de ESP32
     gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 2, 16, 17}; //Pines a ocupar para teclado matricial
 
     keypad_initalize(keypad); /// Inicializa keyboard
