@@ -69,26 +69,26 @@ extern "C"
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 //extern SemaphoreHandle_t LlaveGlobal;
 //QueueHandle_t colaPulsador; // Cola para notificar a las tareas
-TaskHandle_t xTask1 = NULL;
-TaskHandle_t xTask2 = NULL;
+QueueHandle_t commandQueue;
+TaskHandle_t MainScreen_Handle = NULL;
+TaskHandle_t AlarmaMenu_Handle = NULL;
+
 
 void app_main(void)
 {
     //extern SemaphoreHandle_t LlaveGlobal;
     colaPulsador = xQueueCreate(1, sizeof(int));
-    //-----LlaveGlobal = xSemaphoreCreateBinary();
-    //-----xSemaphoreGive(LlaveGlobal);
+    commandQueue = xQueueCreate(12, sizeof(uint8_t));
 
 	static uint8_t ucParameterToPass;
-    //----TaskHandle_t xHandle = NULL;
-    //----TaskHandle_t xHandle1 = NULL;
+  
 
     xTaskCreatePinnedToCore(Main_Screen,
                 "Main_Screen",
                 configMINIMAL_STACK_SIZE * 3,
                 &ucParameterToPass,
                 1, //tskIDLE_PRIORITY (Prioridad)
-                &xTask1,
+                &MainScreen_Handle,
                 0);
 
     xTaskCreatePinnedToCore(&Alarm_menu, 
@@ -96,7 +96,7 @@ void app_main(void)
                 configMINIMAL_STACK_SIZE * 3,
                 &ucParameterToPass,
                 1, //tskIDLE_PRIORITY (Prioridad)
-                &xTask2,
+                &AlarmaMenu_Handle,
                 0);
     
 }
