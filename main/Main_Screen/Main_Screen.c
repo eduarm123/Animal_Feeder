@@ -528,22 +528,22 @@ static uint8_t select_option(void)
 }
 
 /**
- * @brief Convert time components to strings with leading zeros if necessary.
+ * @brief Convert time values to a character string in "HH:MM:SS" format with leading zeros.
  *
- * This function takes a pointer to a tm_t struct representing the time components and converts
- * the hour, minute, and second values to strings with leading zeros if any of them are less
- * than 10. The converted strings are stored in the respective char arrays passed as parameters.
- *
- * @param _time2Convert Pointer to the tm_t struct containing the time components to be converted.
- * @param hour_car      Character array to store the converted hour with leading zeros if necessary.
- * @param min_car       Character array to store the converted minute with leading zeros if necessary.
- * @param seg_car       Character array to store the converted second with leading zeros if necessary.
+ * This function takes a pointer to a tm_t structure _time2Convert containing the time values to convert,
+ * and stores the resulting character string in the timeconverted array. The resulting string will have the
+ * format "HH:MM:SS" with leading zeros for hours, minutes, and seconds if necessary.
+ * 
+ * @param[in] _time2Convert Pointer to the tm_t structure containing the time values to convert.
+ * @param[out] timeconverted Pointer to the character array where the resulting time string will be stored.
  *
  * @note The character arrays 'hour_car', 'min_car', and 'seg_car' must have enough memory to store
  * the converted time components as strings. Make sure to allocate at least 3 characters for each
  * array (including the null terminator '\0').
  *
  * @see tm_t
+ * 
+ * @note The timeconverted array must have enough space to store the entire time string "HH:MM:SS" along with the null-terminator.
  */
 void convertTime2StringDisplay(tm_t *_time2Convert, char timeconverted[]){
 

@@ -18,3 +18,4 @@
 *.a
 build/
 .vscode/
+FTF_display/spi_lcd.c
