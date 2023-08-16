@@ -120,9 +120,6 @@ void convertTime2StringDisplay(tm_t *_time2Convert, char timeconverted[]);
 void Main_Screen( void * pvParameters )
 {
     uint8_t u8_key=0;
-    char  seg_car[3];
-    char  min_car[3];
-    char  hour_car[3];
     char u8_timeconverted[9];
     /*------INICIALIZAR FTF-----*/
     spi_master_init(SPI3_HOST, LCD_DEF_DMA_CHAN, LCD_DMA_MAX_SIZE, SPI3_DEF_PIN_NUM_MISO, SPI3_DEF_PIN_NUM_MOSI, SPI3_DEF_PIN_NUM_CLK);
@@ -203,7 +200,6 @@ time_result_t obtenerHora()
     char numeroStr[5];
     uint8_t u8_key=0;
     int indice = 0;
-    int n=0;
     uint8_t num_dec[4]={0};
     time_result_t time_set;
     
@@ -288,7 +284,7 @@ void Titilar(int indice, int n)
                 break;
             }
             
-            //break;
+            break;
         case 1:
             if (n==0)
             {
@@ -306,6 +302,7 @@ void Titilar(int indice, int n)
                 vTaskDelay(pdMS_TO_TICKS(500));
                 break;
             }
+            break;
             
         case 2:
             if (n==0)
@@ -323,7 +320,7 @@ void Titilar(int indice, int n)
                 vTaskDelay(pdMS_TO_TICKS(500));
                 break;
             }
-            
+            break;
         case 3:
             if (n==0)
             {
@@ -339,7 +336,7 @@ void Titilar(int indice, int n)
                 vTaskDelay(pdMS_TO_TICKS(500));
                 break;
             }
-            
+            break;
         default:
             break;
     }
@@ -438,6 +435,7 @@ static void Alarma_menu( void)
                     LCD_Clear(LGRAYBLUE);
                     break;  
             }
+            break;    
         case '3': //Ver alarmas
             switch (n_alarms)
             {                                                     
