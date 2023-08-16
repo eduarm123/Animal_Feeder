@@ -108,61 +108,59 @@ void Alarm_menu( void * pvParameters )
     vTaskDelay(pdMS_TO_TICKS(100)); // espera de x tiempo para que las otras tareas se inicialicen
     for (;;)
     {
-    printf("--- tarea alarm_menu---\n");    
-    if (xQueueReceive(commandQueue, &command, portMAX_DELAY) == pdPASS) {
-        if (command[0] == Automatico) {
-            
-            is_manual_alarm = false;
-            is_alarm_set = true;
-            printf("--- paso por automatico %d ---\n",command[0]);
-        } 
-        else if (command[0] == Manual) {
+        printf("--- tarea alarm_menu---\n");    
+        if (xQueueReceive(commandQueue, &command, portMAX_DELAY) == pdPASS) {
+            if (command[0] == Automatico) {
+                
+                is_manual_alarm = false;
+                is_alarm_set = true;
+            } 
+            else if (command[0] == Manual) {
 
-            printf("--- paso por manual %d ---\n", command[0]);
-            is_manual_alarm = true;
-            is_alarm_set = true;
-        }
-    }    
-    // Alarm is set, start monitoring the time
-    while (is_alarm_set) {
-        
-        if (is_manual_alarm) {
-            
-            switch (n_alarms){
-
-                case Manual_alarmas_1: 
-                    printf("--- Manual_alarmas_1 ---\n");
-                    init_manual_alarm_1();
-                    break;
-                case Manual_alarmas_2: 
-                    printf("--- Manual_alarmas_2 ---\n");
-                    init_manual_alarm_2();
-                    break;
-                case Manual_alarmas_3: 
-                    printf("--- Manual_alarmas_3 ---\n");
-                    init_manual_alarm_3();
-                    break;         
-                default:
-                    printf("--- default ---\n");
-                    break;
+                is_manual_alarm = true;
+                is_alarm_set = true;
             }
-        } 
-        
-        else {
+        }    
+        // Alarm is set, start monitoring the time
+        while (is_alarm_set) {
+            
+            if (is_manual_alarm) {
+                
+                switch (n_alarms){
 
-            if (n_alarms == Adulto_alarmas){
-                printf("--- Automatico_Alarmas ---\n");
-                init_adulto_alarm();
+                    case Manual_alarmas_1: 
+                        printf("--- Manual_alarmas_1 ---\n");
+                        init_manual_alarm_1();
+                        break;
+                    case Manual_alarmas_2: 
+                        printf("--- Manual_alarmas_2 ---\n");
+                        init_manual_alarm_2();
+                        break;
+                    case Manual_alarmas_3: 
+                        printf("--- Manual_alarmas_3 ---\n");
+                        init_manual_alarm_3();
+                        break;         
+                    default:
+                        printf("--- default ---\n");
+                        break;
+                }
+            } 
+            
+            else {
 
+                if (n_alarms == Adulto_alarmas){
+                    printf("--- Automatico_Alarmas ---\n");
+                    init_adulto_alarm();
+
+                }
+                else if (n_alarms == Cachorro_alarmas){
+                    printf("--- Cachorro alarmas---\n");
+                    init_cachorro_alarm();
+                }
             }
-            else if (n_alarms == Cachorro_alarmas)
-            // Handle the automatic alarm trigger (e.g., get alarm details from a sensor, perform an action)
-            printf("--- Cachorro alarmas---\n");
-            init_cachorro_alarm();
-        }
 
-        vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 500 milliseconds or any desired interval
-    }
+            vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 500 milliseconds or any desired interval
+        }
     
     vTaskDelay(pdMS_TO_TICKS(100)); // espera de x tiempo para que las otras tareas se inicialicen
 
