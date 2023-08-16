@@ -34,7 +34,6 @@
 #include <time.h>
 #include "ds3231.h"
 
-
 #include "Main_Screen.h"
 #include "Button_Handler.h"
 #include "freertos/semphr.h"
@@ -46,10 +45,6 @@
 /********************************* (1) PUBLIC METHODS ********************************************/
 
 /*********************************** (2) PUBLIC VARS *********************************************/
-extern TaskHandle_t MainScreen_Handle;
-extern TaskHandle_t AlarmaMenu_Handle;
-extern bool is_alarm_set;
-extern QueueHandle_t commandQueue;
 extern TaskHandle_t MainScreen_Handle;
 extern TaskHandle_t AlarmaMenu_Handle;
 extern bool is_alarm_set;
@@ -133,21 +128,15 @@ void Main_Screen( void * pvParameters )
     LCD_Clear(LGRAYBLUE);
     /*----------------------------------------------*/
 
-    gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 2, 16, 17}; //Pines a ocupar para teclado matricial
+    gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 14, 12, 13}; //Pines a ocupar para teclado matricial
 
     keypad_initalize(keypad); /// Inicializa keyboard
 
     RTC_init(&s_dev); // Inicializa el i2c
 
-
     
     for (;;)
     {
-        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"*************",24,1);
-        LCD_ShowString(20-1,60-1,LGRAYBLUE,BLACK,"CAT Feeder",24,1);
-        LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"Welcome!",32,1);
-        LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',32,1);
-        LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
         LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"*************",24,1);
         LCD_ShowString(20-1,60-1,LGRAYBLUE,BLACK,"CAT Feeder",24,1);
         LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"Welcome!",32,1);
@@ -164,18 +153,11 @@ void Main_Screen( void * pvParameters )
             LCD_ShowString(50-1,50-1,LGRAYBLUE,BLACK,"CAT FEEDER",24,1);
             LCD_ShowString(1-1,80-1,LGRAYBLUE,BLACK,"*************",24,1);       
 
-        {  
-            
-            LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"*************",24,1);
-            LCD_ShowString(50-1,50-1,LGRAYBLUE,BLACK,"CAT FEEDER",24,1);
-            LCD_ShowString(1-1,80-1,LGRAYBLUE,BLACK,"*************",24,1);       
-
             if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
             {
                 printf("Could not get time\n");
             }
 
-            printf("--- main screen ---\n");
             printf("--- main screen ---\n");
             printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
 
@@ -189,10 +171,7 @@ void Main_Screen( void * pvParameters )
             {               
                 Alarma_menu();
                 LCD_Clear(LGRAYBLUE);
-                Alarma_menu();
-                LCD_Clear(LGRAYBLUE);
             }
-            vTaskDelay(pdMS_TO_TICKS(10));
             vTaskDelay(pdMS_TO_TICKS(10));
         }
                   

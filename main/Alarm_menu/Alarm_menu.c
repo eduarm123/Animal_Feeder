@@ -82,16 +82,10 @@ typedef enum{
     Manual_alarmas_1=1,
     Manual_alarmas_2,
     Manual_alarmas_3,
-    Manual_alarmas_1=1,
-    Manual_alarmas_2,
-    Manual_alarmas_3,
     Adulto_alarmas,
     Cachorro_alarmas
 }ACTIVAR_ALARM;
 
-bool is_manual_alarm = false;
-bool is_alarm_set = false;
-uint8_t command[10]; // tipo de alarmas configurado
 bool is_manual_alarm = false;
 bool is_alarm_set = false;
 uint8_t command[10]; // tipo de alarmas configurado
