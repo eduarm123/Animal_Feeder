@@ -58,6 +58,21 @@ extern uint8_t n_alarms;
 extern TaskHandle_t MainScreen_Handle;
 extern TaskHandle_t AlarmaMenu_Handle;
 
+
+extern unsigned num;
+// Esto se usa como flags para saber que se ha activado alguna de esas alarmas.
+
+extern QueueHandle_t commandQueue;
+extern tm_t time_tc;
+extern i2c_dev_t s_dev; // Configurado en Main_screen.c 
+
+extern tm_t s_alarmas_auto[];
+extern tm_t s_alarmas_manual[];
+extern uint8_t n_alarms;
+
+extern TaskHandle_t MainScreen_Handle;
+extern TaskHandle_t AlarmaMenu_Handle;
+
 typedef enum{
     Manual=1,
     Automatico
@@ -67,10 +82,16 @@ typedef enum{
     Manual_alarmas_1=1,
     Manual_alarmas_2,
     Manual_alarmas_3,
+    Manual_alarmas_1=1,
+    Manual_alarmas_2,
+    Manual_alarmas_3,
     Adulto_alarmas,
     Cachorro_alarmas
 }ACTIVAR_ALARM;
 
+bool is_manual_alarm = false;
+bool is_alarm_set = false;
+uint8_t command[10]; // tipo de alarmas configurado
 bool is_manual_alarm = false;
 bool is_alarm_set = false;
 uint8_t command[10]; // tipo de alarmas configurado
@@ -84,6 +105,8 @@ QueueHandle_t colaPulsador; // Cola para notificar a las tareas
 
 /**************************** (5) PRIVATE METHODS DEFINITION *************************************/
 void Activacion_motor();
+void init_manual_alarm_1();
+void init_manual_alarm_2();
 void init_manual_alarm_1();
 void init_manual_alarm_2();
 void init_manual_alarm_3();
@@ -215,7 +238,11 @@ void init_manual_alarm_2(){
 void init_manual_alarm_3(){
 
     printf("--- dentro de monitoreo alarma 3---\n");
+    printf("--- dentro de monitoreo alarma 3---\n");
     if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
+    {
+        printf("Could not get time\n");
+    }
     {
         printf("Could not get time\n");
     }
@@ -238,7 +265,28 @@ void init_manual_alarm_3(){
 
      if( time_tc.tm_hour ==s_alarmas_manual[2].tm_hour && time_tc.tm_min ==s_alarmas_manual[2].tm_min
     && time_tc.tm_sec ==s_alarmas_manual[2].tm_sec)
+    if( time_tc.tm_hour ==s_alarmas_manual[0].tm_hour && time_tc.tm_min ==s_alarmas_manual[0].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[0].tm_sec)
     {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
+    }
+
+    if( time_tc.tm_hour ==s_alarmas_manual[1].tm_hour && time_tc.tm_min ==s_alarmas_manual[1].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[1].tm_sec)
+    {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
+    }
+
+     if( time_tc.tm_hour ==s_alarmas_manual[2].tm_hour && time_tc.tm_min ==s_alarmas_manual[2].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[2].tm_sec)
+    {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
         /* Send notification to prvTask1() */     
         printf("--- Se ha activado la alarma---\n");             
         Activacion_motor();      
@@ -255,14 +303,20 @@ void init_adulto_alarm(){
 
     if( time_tc.tm_hour ==s_alarmas_auto[0].tm_hour && time_tc.tm_min ==s_alarmas_auto[0].tm_min
     && time_tc.tm_sec ==s_alarmas_auto[0].tm_sec)
+    if( time_tc.tm_hour ==s_alarmas_auto[0].tm_hour && time_tc.tm_min ==s_alarmas_auto[0].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[0].tm_sec)
     {
         Activacion_motor();
     }
     if( time_tc.tm_hour ==s_alarmas_auto[1].tm_hour && time_tc.tm_min ==s_alarmas_auto[1].tm_min
     && time_tc.tm_sec ==s_alarmas_auto[1].tm_sec)
+    if( time_tc.tm_hour ==s_alarmas_auto[1].tm_hour && time_tc.tm_min ==s_alarmas_auto[1].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[1].tm_sec)
     {
         Activacion_motor();
     }
+    if( time_tc.tm_hour ==s_alarmas_auto[2].tm_hour && time_tc.tm_min ==s_alarmas_auto[2].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[2].tm_sec)
     if( time_tc.tm_hour ==s_alarmas_auto[2].tm_hour && time_tc.tm_min ==s_alarmas_auto[2].tm_min
     && time_tc.tm_sec ==s_alarmas_auto[2].tm_sec)
     {
@@ -278,6 +332,8 @@ void init_cachorro_alarm(){
             printf("Could not get time\n");
         }
 
+   if( time_tc.tm_hour ==s_alarmas_auto[3].tm_hour && time_tc.tm_min ==s_alarmas_auto[3].tm_min
+   && time_tc.tm_sec ==s_alarmas_auto[3].tm_sec)
    if( time_tc.tm_hour ==s_alarmas_auto[3].tm_hour && time_tc.tm_min ==s_alarmas_auto[3].tm_min
    && time_tc.tm_sec ==s_alarmas_auto[3].tm_sec)
     {
@@ -311,4 +367,5 @@ void Activacion_motor()
     
 }
 
+ 
  

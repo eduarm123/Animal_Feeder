@@ -233,4 +233,3 @@ void Button_Handler()
     vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
 
 }
-
