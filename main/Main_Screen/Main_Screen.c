@@ -382,6 +382,8 @@ static void Alarma_menu( void)
                     
                     if (u8_key == '1')
                     {
+                        LCD_Clear(LGRAYBLUE);
+                        LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma",16,1);
                         Time_config(&s_alarmas_manual[0]);
                         is_alarm_set=false;  // Break out of the inner loop, so the alarmTask waits for the next alarm setting
                         q_AlarmMenu[0]=Manual;
@@ -391,7 +393,10 @@ static void Alarma_menu( void)
                     }
                     else if (u8_key == '2')
                     {
+                        LCD_Clear(LGRAYBLUE);
+                        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 1",16,1);
                         Time_config(&s_alarmas_manual[0]);
+                        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 2",16,1);
                         Time_config(&s_alarmas_manual[1]);
                         is_alarm_set=false;  // Break out of the inner loop, so the alarmTask waits for the next alarm setting
                         printf("Config alarma 2.\n");
@@ -401,8 +406,12 @@ static void Alarma_menu( void)
                     }
                     else if (u8_key == '3')
                     {
+                        LCD_Clear(LGRAYBLUE);
+                        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 1",16,1);
                         Time_config(&s_alarmas_manual[0]);
+                        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 2",16,2);
                         Time_config(&s_alarmas_manual[1]);
+                        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 3",16,2);
                         Time_config(&s_alarmas_manual[2]);
                         is_alarm_set=false;  // Break out of the inner loop, so the alarmTask waits for the next alarm setting
                         q_AlarmMenu[0]=Manual;
@@ -447,7 +456,7 @@ static void Alarma_menu( void)
                         LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"--Alarma set--",16,1); 
                         LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Presione 1 para volver",16,1);                        
                         convertTime2StringDisplay(&s_alarmas_manual[0],u8_timeconverted);            
-                        LCD_ShowString(180-1,180-1,LGRAYBLUE,BLACK,u8_timeconverted,24,1);
+                        LCD_ShowString(25-1,90-1,LGRAYBLUE,BLACK,u8_timeconverted,24,1);
 
                         u8_key=select_option();
                     }
