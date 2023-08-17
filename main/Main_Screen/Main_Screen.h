@@ -2,7 +2,7 @@
 /*! @file	Main_Screen.h
  *	@brief	Introducir breve descripcion del fichero
  *
- *	\b Descripciï¿½n: Introducir aquï¿½ descripciï¿½n de las funcionalidades del fichero \n
+ *	\b Descripcion: Introducir aquï¿½ descripciï¿½n de las funcionalidades del fichero \n
  *
  *
  *		Compiler  :  \n
@@ -33,11 +33,17 @@ extern "C" {
 
 /**********************************INCLUDES ******************************************************/
 #include <time.h>
+#include <freertos/FreeRTOS.h>
+#include "freertos/semphr.h"
 
 /*********************************** (2) PUBLIC VARS *********************************************/
+extern SemaphoreHandle_t LlaveGlobal;
+extern QueueHandle_t colaPulsador; // Cola para notificar a las tareas
+extern TaskHandle_t xHandle1;
+extern TaskHandle_t xHandle;
+extern unsigned num;
 
 typedef struct tm tm_t;
-
 /********************************* (1) PUBLIC METHODS ********************************************/
 
 /**

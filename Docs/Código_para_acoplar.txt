@@ -1,0 +1,492 @@
+CODIGO ANTES DE MODIFICACION
+
+    int obtenerHora() 
+    {
+        //int numeros[4] = {0};
+        char numeroStr[2] = "";
+        int indice = 0;
+
+        while (indice < 2) {
+            num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
+            if (num != '\0') {
+                numeroStr[indice] = num;
+                printf("Número actual: %s\n", numeroStr);
+                indice++;
+            }
+            if (num == 'B') {
+                if (indice > 0) {
+                    indice=indice-2;
+                    numeroStr[indice] = '0';
+                    //printf("Número actual: %s\n", numeroStr);
+                    printf("Número anterior eliminado.\n");
+                } else {
+                    printf("No hay números anteriores para eliminar.\n");
+                }
+            }
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+        }
+
+        num1 = atoi(numeroStr); //Conversion de caracter a entero
+        return num1;
+        /*printf("Números ingresados: ");
+        for (int i = 0; i < 4; i++) {
+            printf("%d ", numeroStr[i]);
+        }
+        printf("\n");
+
+        //vTaskDelete(NULL);*/
+
+        
+
+
+
+        //-------char numeroStr[2+1] = "";
+        //int cont=0;
+
+        //-------while (cont < 2) 
+        //-------{
+            //-----num = keypad_getkey(); //Almacenamos en "num" lo ingresado desde teclado
+
+            //----if (num != '\0') {
+                //-----numeroStr[cont] = num;
+                /*if (boton_atras && numeroStr[cont])//Si se presiona "Atrás" y está en la casilla 1 en adelante
+                {
+                    cont--; // retroceder a la casilla anterior
+                }*/
+                
+                //------cont++;
+                //-----printf("Número actual: %s\n", numeroStr);
+            //-----}
+            //printf("Nada impreso.\n");
+            //----vTaskDelay(pdMS_TO_TICKS(100));
+        //-----}
+        //-----num1 = atoi(numeroStr); //Conversion de caracter a entero
+        //------return num1;
+    }
+
+
+
+
+
+
+
+
+
+
+CONCATENAR UNA ARRAY DE 4 PARA INGRESAR HORAS Y MUNUTOS UNA SOLA
+
+    int obtenerHora() 
+{
+    char numeroStr[4] = ""; // Aumentamos el tamaño del arreglo para almacenar 3 caracteres
+    int indice = 0;
+
+    while (indice < 4) { // Cambiamos el límite del bucle a 4
+        num = keypad_getkey();
+        if (num != '\0') {
+            numeroStr[indice] = num;
+            printf("Número actual: %s\n", numeroStr);
+            indice++;
+        }
+        if (num == 'B') {
+            if (indice > 0) {
+                indice=indice-2;
+                numeroStr[indice] = '\0'; // Eliminamos el último caracter ingresado
+                printf("Número anterior eliminado.\n");
+            } else {
+                printf("No hay números anteriores para eliminar.\n");
+            }
+        }
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+
+    char primerNumeroStr[2] = {numeroStr[0], '\0'}; // Creamos un arreglo para el primer número
+    char segundoNumeroStr[2] = {numeroStr[1], '\0'}; // Creamos un arreglo para el segundo número
+    char tercerNumeroStr[2] = {numeroStr[2], '\0'}; // Creamos un arreglo para el tercer número
+    char cuartoNumeroStr[2] = {numeroStr[3], '\0'}; // Creamos un arreglo para el cuarto número
+
+    int primerNumero = atoi(primerNumeroStr); // Convertimos el primer número a entero
+    int segundoNumero = atoi(segundoNumeroStr); // Convertimos el segundo número a entero
+    int tercerNumero = atoi(tercerNumeroStr); // Convertimos el tercer número a entero
+    int cuartoNumero = atoi(cuartoNumeroStr); // Convertimos el cuarto número a entero
+
+    int resultado1 = primerNumero * 10 + segundoNumero; // Concatenamos el primer y segundo número
+    int resultado2 = tercerNumero * 10 + cuartoNumero; // Concatenamos el tercer y cuarto número
+
+    printf("Concatenación 1: %d\n", resultado1);
+    printf("Concatenación 2: %d\n", resultado2);
+
+    return 0;
+}
+
+
+
+
+
+
+
+Realizar una función para ingresar cuatro números por teclado, 
+para el ingreso de cada número debe haber un pulsador llamado siguiente 
+que permita ingresar el siguiente número y cuando presione un pulsador 
+llamado atrás me permita modificar el número anterior.
+
+
+
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+
+#define PIN_SIGUIENTE GPIO_NUM_4
+#define PIN_ATRAS GPIO_NUM_5
+
+void gpio_init() {
+    gpio_config_t config;
+
+    config.mode = GPIO_MODE_INPUT;
+    config.pull_up_en = GPIO_PULLUP_ENABLE;
+
+    gpio_config(&config);
+    gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
+}
+
+int obtener_numero() {
+    int numero;
+    printf("Ingrese el número: ");
+    scanf("%d", &numero);
+    return numero;
+}
+
+void tarea_principal(void *pvParameter) {
+    int numeros[4] = {0};
+    int indice = 0;
+
+    while (indice < 4) {
+        if (gpio_get_level(PIN_SIGUIENTE) == 0) {
+            numeros[indice] = obtener_numero();
+            indice++;
+        } else if (gpio_get_level(PIN_ATRAS) == 0) {
+            if (indice > 0) {
+                indice--;
+                numeros[indice] = 0;
+                printf("Número anterior eliminado.\n");
+            } else {
+                printf("No hay números anteriores para eliminar.\n");
+            }
+        }
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+
+    printf("Números ingresados: ");
+    for (int i = 0; i < 4; i++) {
+        printf("%d ", numeros[i]);
+    }
+    printf("\n");
+
+    vTaskDelete(NULL);
+}
+
+void app_main() {
+    gpio_init();
+    xTaskCreate(&tarea_principal, "tarea_principal", 2048, NULL, 5, NULL);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Realizar una función donde exista un menú principal y luego presionando
+un pulsador llamado OK ingrese a un submenú y cuando se esté en dicho submenú 
+y se presione un pulsador llamado ATRAS vuelva al menú principal. Realizar en espidf
+
+
+
+
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+
+#define PIN_OK GPIO_NUM_4
+#define PIN_ATRAS GPIO_NUM_5
+
+void gpio_init() {
+    gpio_config_t config;
+
+    config.mode = GPIO_MODE_INPUT;
+    config.pull_up_en = GPIO_PULLUP_ENABLE;
+
+    gpio_config(&config);
+    gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
+}
+
+void menu_principal() {
+    printf("\n----- Menú Principal -----\n");
+    printf("1. Opción 1\n");
+    printf("2. Opción 2\n");
+    printf("3. Opción 3\n");
+    printf("--------------------------\n");
+}
+
+void sub_menu() {
+    printf("\n----- Submenú -----\n");
+    printf("A. Acción 1\n");
+    printf("B. Acción 2\n");
+    printf("C. Acción 3\n");
+    printf("-------------------\n");
+}
+
+void tarea_principal(void *pvParameter) {
+    int en_sub_menu = 0;
+
+    while (1) {
+        if (gpio_get_level(PIN_OK) == 0) {
+            if (!en_sub_menu) {
+                printf("\nIngresando al Submenú...\n");
+                en_sub_menu = 1;
+                sub_menu();
+            }
+        } else if (gpio_get_level(PIN_ATRAS) == 0) {
+            if (en_sub_menu) {
+                printf("\nVolviendo al Menú Principal...\n");
+                en_sub_menu = 0;
+                menu_principal();
+            }
+        }
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+
+void app_main() {
+    gpio_init();
+    menu_principal();
+    xTaskCreate(&tarea_principal, "tarea_principal", 2048, NULL, 5, NULL);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+
+#define PIN_OK GPIO_NUM_4
+#define PIN_ATRAS GPIO_NUM_5
+#define PIN_RESET GPIO_NUM_18
+
+int hora = 0;
+int minutos = 0;
+int segundos = 0;
+
+void gpio_init() {
+    gpio_config_t config;
+
+    config.mode = GPIO_MODE_INPUT;
+    config.pull_up_en = GPIO_PULLUP_ENABLE;
+
+    gpio_config(&config);
+    gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
+}
+
+void titilar_parametro(int *parametro) {
+    int valor = 0;
+    while (1) {
+        printf("Configurar valor: %02d\n", valor);
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+        valor = !valor;
+        if (gpio_get_level(PIN_OK) == 0) {
+            *parametro = valor;
+            break;
+        }
+    }
+}
+
+void mostrar_hora() {
+    while (1) {
+        printf("Hora actual: %02d:%02d:%02d\n", hora, minutos, segundos);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
+void menu_principal() {
+    printf("\n----- Menú Principal -----\n");
+    printf("1. Configurar Hora\n");
+    printf("2. Alarma\n");
+    printf("3. Reloj\n");
+    printf("--------------------------\n");
+}
+
+void menu_alarma() {
+    printf("\n----- Menú Alarma -----\n");
+    printf("1. Automático\n");
+    printf("2. Manual\n");
+    printf("------------------------\n");
+}
+
+void menu_sub_alarma() {
+    printf("\n----- Submenú Alarma -----\n");
+    printf("1. Cachorro\n");
+    printf("2. Adulto\n");
+    printf("---------------------------\n");
+}
+
+void tarea_principal(void *pvParameter) {
+    int opcion = 0;
+
+    while (1) {
+        switch (opcion) {
+            case 0: {
+                printf("\nIngresando a Configurar Hora...\n");
+                titilar_parametro(&hora);
+                opcion = 1;
+                break;
+            }
+            case 1: {
+                printf("\nIngresando a Configurar Minutos...\n");
+                titilar_parametro(&minutos);
+                opcion = 2;
+                break;
+            }
+            case 2: {
+                printf("\nIngresando a Configurar Segundos...\n");
+                titilar_parametro(&segundos);
+                opcion = 3;
+                break;
+            }
+            case 3: {
+                printf("\nIngresando a Mostrar Hora...\n");
+                mostrar_hora();
+                opcion = 0;
+                break;
+            }
+        }
+
+        if (gpio_get_level(PIN_ATRAS) == 0) {
+            if (opcion > 0) {
+                opcion--;
+                printf("\nRegresando al Menú Principal...\n");
+            }
+        }
+
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+
+void tarea_alarma(void *pvParameter) {
+    int opcion = 0;
+
+    while (1) {
+        if (gpio_get_level(PIN_OK) == 0) {
+            switch (opcion) {
+                case 0: {
+                    printf("\nIngresando a Submenú Alarma Automático...\n");
+                    menu_sub_alarma();
+                    vTaskDelay(100 / portTICK_PERIOD_MS);
+                    while (gpio_get_level(PIN_OK) != 0) {
+                        if (gpio_get_level(PIN_ATRAS) == 0) {
+                            printf("\nRegresando al Menú Alarma...\n");
+                            opcion = 0;
+                            break;
+                        }
+                    }
+                    if (gpio_get_level(PIN_OK) == 0) {
+                        printf("\nGrabando hora preestablecida en memoria...\n");
+                        // Lógica para grabar la hora preestablecida en memoria
+                    }
+                    break;
+                }
+                case 1: {
+                    printf("\nIngresando a Configurar Alarmas Manuales...\n");
+                    int num_alarmas = 0;
+                    printf("Ingrese el número de alarmas (2-5): ");
+                    scanf("%d", &num_alarmas);
+                    vTaskDelay(100 / portTICK_PERIOD_MS);
+                    printf("\nConfigurando alarmas para las horas de comida...\n");
+                    for (int i = 0; i < num_alarmas; i++) {
+                        int hora_comida = 0;
+                        printf("Ingrese la hora de comida %d: ", i + 1);
+                        scanf("%d", &hora_comida);
+                        vTaskDelay(100 / portTICK_PERIOD_MS);
+                        printf("Grabando hora de comida %d en memoria...\n", i + 1);
+                        // Lógica para grabar la hora de comida en memoria
+                    }
+                    printf("\nRegresando al Menú Principal...\n");
+                    opcion = 0;
+                    break;
+                }
+            }
+        }
+
+        if (gpio_get_level(PIN_ATRAS) == 0) {
+            printf("\nRegresando al Menú Principal...\n");
+            opcion = 0;
+        }
+
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+
+void tarea_reloj(void *pvParameter) {
+    while (1) {
+        if (gpio_get_level(PIN_OK) == 0) {
+            printf("\nReiniciando la Configuración de Hora...\n");
+            hora = 0;
+            minutos = 0;
+            segundos = 0;
+            break;
+        }
+
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+
+void tarea_reset(void *pvParameter) {
+    while (1) {
+        if (gpio_get_level(PIN_RESET) == 0) {
+            printf("\nReiniciando el microcontrolador...\n");
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            esp_restart();
+        }
+
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+
+void app_main() {
+    gpio_init();
+    menu_principal();
+    xTaskCreate(&tarea_principal, "tarea_principal", 2048, NULL, 5, NULL);
+    xTaskCreate(&tarea_alarma, "tarea_alarma", 2048, NULL, 5, NULL);
+    xTaskCreate(&tarea_reloj, "tarea_reloj", 2048, NULL, 5, NULL);
+    xTaskCreate(&tarea_reset, "tarea_reset", 2048, NULL, 5, NULL);
+}
+
+

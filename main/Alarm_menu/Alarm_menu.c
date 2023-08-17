@@ -36,59 +36,61 @@
 #include "freertos/semphr.h"
 #include <time.h>
 #include "Button_Handler.h"
-
+#include "easyio.h" //error si incluyo esto de nuevo
+//#include "picture.h"
 /********************************* (1) PUBLIC METHODS ********************************************/
 
-
+#define CONFIG_LED_PIN       (2)//2
 /*********************************** (2) PUBLIC VARS *********************************************/
 
+
+extern unsigned num;
+// Esto se usa como flags para saber que se ha activado alguna de esas alarmas.
+
+extern QueueHandle_t commandQueue;
+extern tm_t time_tc;
+extern i2c_dev_t s_dev; // Configurado en Main_screen.c 
+
+extern tm_t s_alarmas_auto[];
+extern tm_t s_alarmas_manual[];
+extern uint8_t n_alarms;
+
+extern TaskHandle_t MainScreen_Handle;
+extern TaskHandle_t AlarmaMenu_Handle;
+
+
+extern unsigned num;
+// Esto se usa como flags para saber que se ha activado alguna de esas alarmas.
+
+extern QueueHandle_t commandQueue;
+extern tm_t time_tc;
+extern i2c_dev_t s_dev; // Configurado en Main_screen.c 
+
+extern tm_t s_alarmas_auto[];
+extern tm_t s_alarmas_manual[];
+extern uint8_t n_alarms;
+
+extern TaskHandle_t MainScreen_Handle;
+extern TaskHandle_t AlarmaMenu_Handle;
+
 typedef enum{
-    Manual,
+    Manual=1,
     Automatico
 }MENU_OPT;
 
 typedef enum{
-    Adulto=1,
-    Cachorro
-}AGE_t;
-
-typedef enum{
-    Manual_alarmas_3=1,
+    Manual_alarmas_1=1,
+    Manual_alarmas_2,
+    Manual_alarmas_3,
     Adulto_alarmas,
     Cachorro_alarmas
 }ACTIVAR_ALARM;
 
-tm_t s_alarmas_auto[]={
-    {.tm_hour=6,.tm_min=0,.tm_sec=0,}, // adulto
-    {.tm_hour=12,.tm_min=0,.tm_sec=0,}, // adulto
-    {.tm_hour=18,.tm_min=0,.tm_sec=0,}, // adulto 
-    {.tm_hour=7,.tm_min=0,.tm_sec=0,}, // cachorro 
-    {.tm_hour=12,.tm_min=0,.tm_sec=0,}, // cachorro 
-    {.tm_hour=17,.tm_min=0,.tm_sec=0,}, // cachorro 
-}; // Esta la implementamos por polling
+bool is_manual_alarm = false;
+bool is_alarm_set = false;
+uint8_t command[10]; // tipo de alarmas configurado
 
-tm_t s_alarmas_manual[]={
-    {0}, // Esta tiene interrupcion
-    {0}, // Esta tiene interrupcion
-    {0}, // Esta de aqui no tendra
-};
-
-// Esto se usa como flags para saber que se ha activado alguna de esas alarmas.
-// mirar si se puede hacer con bitfields
-// uint8_t manual_3     = 0;
-// uint8_t automatico_1 = 0;
-// uint8_t automatico_2 = 0;
-// uint8_t automatico_3 = 0;
-// uint8_t automatico_4 = 0;
-// uint8_t automatico_5 = 0;
-// uint8_t automatico_6 = 0;
-
-
-extern tm_t time_tc;
-extern i2c_dev_t s_dev; // Configurado en Main_screen.c 
-extern SemaphoreHandle_t xSemaphore;
-
-
+QueueHandle_t colaPulsador; // Cola para notificar a las tareas
 /******************************** (3) DEFINES & MACROS *******************************************/
 #define ARRAY_SIZE(a) (sizeof(a)/ sizeof(a[0]))
 
@@ -97,9 +99,14 @@ extern SemaphoreHandle_t xSemaphore;
 
 /**************************** (5) PRIVATE METHODS DEFINITION *************************************/
 void Activacion_motor();
+void init_manual_alarm_1();
+void init_manual_alarm_2();
+void init_manual_alarm_1();
+void init_manual_alarm_2();
 void init_manual_alarm_3();
 void init_adulto_alarm();
 void init_cachorro_alarm();
+
 
 /************************* (6)  STATIC METHODS IMPLEMENTATION ************************************/
 
@@ -113,126 +120,170 @@ void init_cachorro_alarm();
  */
 void Alarm_menu( void * pvParameters )
 {
-    int manual_alarm=-1; // utilizo esto de momento por la funcion scanf. Valor -1 por la UART. Se cambio cuando se utilice display
-    int age_option=-1;
-    int activar_alarma =0;
-    static uint32_t alarm_state = Manual;
-    uint8_t* manual_alarm_isr=(void*)0;
 
-    vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
-    
+    gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Para el motor
+    vTaskDelay(pdMS_TO_TICKS(100)); // espera de x tiempo para que las otras tareas se inicialicen
     for (;;)
     {
-        if(xSemaphoreTake(xSemaphore,portMAX_DELAY) ==pdTRUE ) // Aqui se espera la interrupcion del boton PUSH_BUTTON_PIN_0 0
-        {
-            switch (alarm_state) // TODO: cambiar esto. Ahora entra directo a Manual
-            {
-            case Manual:
+        printf("--- tarea alarm_menu---\n");    
+        if (xQueueReceive(commandQueue, &command, portMAX_DELAY) == pdPASS) {
+            if (command[0] == Automatico) {
                 
-                printf("Please slecte how many alarms you want");
-                while (1) {
-                    printf("Alarms: ");
-                    scanf("%d", &manual_alarm);
-                    if (manual_alarm > 0 && manual_alarm <3 ) {
-                        break;
-                    }
-                    printf("Invalid alarm value. Please enter a value greater than 0.\n");
-                    vTaskDelay(pdMS_TO_TICKS(1000));
-                }
-                if (manual_alarm ==1)
-                {
-                    Time_config(&s_alarmas_manual[0]);
-                    ds3231_set_alarm(&s_dev, DS3231_ALARM_1, &s_alarmas_manual[0], DS3231_ALARM1_MATCH_SECMINHOUR, 0, 0);
-                    ds3231_enable_alarm_ints(&s_dev, DS3231_ALARM_1); // Se activa las interrupciones de alarma
-                    // Esto deberia activar la funcion motor: TODO: Hacer Edwin. Utiliza esta senal para activar el motor 
-                }
-                else if (manual_alarm ==2)
-                {
-                    Time_config(&s_alarmas_manual[0]);
-                    Time_config(&s_alarmas_manual[1]);
-                    ds3231_set_alarm(&s_dev, DS3231_ALARM_1, &s_alarmas_manual[0], DS3231_ALARM1_MATCH_SECMINHOUR, &s_alarmas_manual[1],
-                    DS3231_ALARM2_MATCH_MINHOUR);
-                    ds3231_enable_alarm_ints(&s_dev, DS3231_ALARM_BOTH); // Se activa las interrupciones de alarma
-                    // Esto deberia activar la funcion motor.  TODO: Hacer Edwin. Utiliza esta senal para activar el motor 
-                }
-                else if (manual_alarm ==3)
-                {
-                    Time_config(&s_alarmas_manual[2]);
-                    activar_alarma=Manual_alarmas_3;
-                }
+                is_manual_alarm = false;
+                is_alarm_set = true;
+            } 
+            else if (command[0] == Manual) {
+
+                is_manual_alarm = true;
+                is_alarm_set = true;
+            }
+        }    
+        // Alarm is set, start monitoring the time
+        while (is_alarm_set) {
+            
+            if (is_manual_alarm) {
                 
-                break;
-            case Automatico:
-                printf("Select 1.Adulto o 2.Cachorro");
-                while (1) { // Esto se debe eliminar once we have the keyboard
-                    printf("Age: ");
-                    scanf("%d", &age_option);
-                    if (age_option > 0 && age_option <3 ) {
+                switch (n_alarms){
+
+                    case Manual_alarmas_1: 
+                        printf("--- Manual_alarmas_1 ---\n");
+                        init_manual_alarm_1();
                         break;
-                    }
-                    printf("Invalid alarm value. Please enter a value greater than 0.\n");
-                    vTaskDelay(pdMS_TO_TICKS(1000));
+                    case Manual_alarmas_2: 
+                        printf("--- Manual_alarmas_2 ---\n");
+                        init_manual_alarm_2();
+                        break;
+                    case Manual_alarmas_3: 
+                        printf("--- Manual_alarmas_3 ---\n");
+                        init_manual_alarm_3();
+                        break;         
+                    default:
+                        printf("--- default ---\n");
+                        break;
                 }
+            } 
+            
+            else {
 
-                if (age_option ==Adulto)
-                {
-                    Time_config(&s_alarmas_auto[0]);
-                    Time_config(&s_alarmas_auto[1]);
-                    Time_config(&s_alarmas_auto[2]);
-                    activar_alarma=Adulto_alarmas;
-                }
-                else if (age_option ==Cachorro)
-                {
-                    Time_config(&s_alarmas_auto[3]);
-                    Time_config(&s_alarmas_auto[4]);
-                    Time_config(&s_alarmas_auto[5]); 
-                    activar_alarma=Cachorro_alarmas;
-                }
+                if (n_alarms == Adulto_alarmas){
+                    printf("--- Automatico_Alarmas ---\n");
+                    init_adulto_alarm();
 
-                break;
-            default:
-                // TODO: Seria bueno poner un boton de cancelar
-                printf("Please select an option");
-                break;
+                }
+                else if (n_alarms == Cachorro_alarmas){
+                    printf("--- Cachorro alarmas---\n");
+                    init_cachorro_alarm();
+                }
             }
 
+            vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 500 milliseconds or any desired interval
         }
     
-        switch (activar_alarma){
-
-            case Manual_alarmas_3:
-                init_manual_alarm_3();
-                ds3231_get_alarm_flags(&s_dev,(ds3231_alarm_t *)manual_alarm_isr);
-                if (*manual_alarm_isr!=0){ // TODO: Comprobar si esto funciona. No estoy seguro si se guarda ahi el flag de la interrupcion
-                    Activacion_motor();
-                }
-                break;
-            case Adulto_alarmas:
-                init_adulto_alarm();
-                break;
-            case Cachorro_alarmas:
-                init_cachorro_alarm();
-             default:
-                break;
-
-        }
+    vTaskDelay(pdMS_TO_TICKS(100)); // espera de x tiempo para que las otras tareas se inicialicen
 
     }
-    vTaskDelay(pdMS_TO_TICKS(10));
+    
+}
 
+void init_manual_alarm_1(){
+
+    printf("--- dentro de monitoreo alarma 1---\n");
+    if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
+    {
+        printf("Could not get time\n");
+    }
+
+    if( time_tc.tm_hour ==s_alarmas_manual[0].tm_hour && time_tc.tm_min ==s_alarmas_manual[0].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[0].tm_sec)
+    {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
+    }
+     
+}
+
+void init_manual_alarm_2(){
+
+    printf("--- dentro de monitoreo alarma 2---\n");
+    if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
+    {
+        printf("Could not get time\n");
+    }
+
+    if( time_tc.tm_hour ==s_alarmas_manual[0].tm_hour && time_tc.tm_min ==s_alarmas_manual[0].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[0].tm_sec)
+    {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
+    }
+
+    if( time_tc.tm_hour ==s_alarmas_manual[1].tm_hour && time_tc.tm_min ==s_alarmas_manual[1].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[1].tm_sec)
+    {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
+    }
+     
 }
 
 void init_manual_alarm_3(){
 
-
+    printf("--- dentro de monitoreo alarma 3---\n");
+    printf("--- dentro de monitoreo alarma 3---\n");
     if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
-        {
-            printf("Could not get time\n");
-        }
-
-    if( time_tc.tm_hour ==s_alarmas_manual[2].tm_hour && time_tc.tm_min ==s_alarmas_manual[2].tm_min)
     {
-        Activacion_motor();
+        printf("Could not get time\n");
+    }
+    {
+        printf("Could not get time\n");
+    }
+
+    if( time_tc.tm_hour ==s_alarmas_manual[0].tm_hour && time_tc.tm_min ==s_alarmas_manual[0].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[0].tm_sec)
+    {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
+    }
+
+    if( time_tc.tm_hour ==s_alarmas_manual[1].tm_hour && time_tc.tm_min ==s_alarmas_manual[1].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[1].tm_sec)
+    {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
+    }
+
+     if( time_tc.tm_hour ==s_alarmas_manual[2].tm_hour && time_tc.tm_min ==s_alarmas_manual[2].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[2].tm_sec)
+    if( time_tc.tm_hour ==s_alarmas_manual[0].tm_hour && time_tc.tm_min ==s_alarmas_manual[0].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[0].tm_sec)
+    {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
+    }
+
+    if( time_tc.tm_hour ==s_alarmas_manual[1].tm_hour && time_tc.tm_min ==s_alarmas_manual[1].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[1].tm_sec)
+    {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
+    }
+
+     if( time_tc.tm_hour ==s_alarmas_manual[2].tm_hour && time_tc.tm_min ==s_alarmas_manual[2].tm_min
+    && time_tc.tm_sec ==s_alarmas_manual[2].tm_sec)
+    {
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
+        /* Send notification to prvTask1() */     
+        printf("--- Se ha activado la alarma---\n");             
+        Activacion_motor();      
     }
      
 }
@@ -244,15 +295,24 @@ void init_adulto_alarm(){
             printf("Could not get time\n");
         }
 
-    if( time_tc.tm_hour ==s_alarmas_auto[0].tm_hour && time_tc.tm_min ==s_alarmas_auto[0].tm_min)
+    if( time_tc.tm_hour ==s_alarmas_auto[0].tm_hour && time_tc.tm_min ==s_alarmas_auto[0].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[0].tm_sec)
+    if( time_tc.tm_hour ==s_alarmas_auto[0].tm_hour && time_tc.tm_min ==s_alarmas_auto[0].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[0].tm_sec)
     {
         Activacion_motor();
     }
-    if( time_tc.tm_hour ==s_alarmas_auto[1].tm_hour && time_tc.tm_min ==s_alarmas_auto[1].tm_min)
+    if( time_tc.tm_hour ==s_alarmas_auto[1].tm_hour && time_tc.tm_min ==s_alarmas_auto[1].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[1].tm_sec)
+    if( time_tc.tm_hour ==s_alarmas_auto[1].tm_hour && time_tc.tm_min ==s_alarmas_auto[1].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[1].tm_sec)
     {
         Activacion_motor();
     }
-    if( time_tc.tm_hour ==s_alarmas_auto[2].tm_hour && time_tc.tm_min ==s_alarmas_auto[2].tm_min)
+    if( time_tc.tm_hour ==s_alarmas_auto[2].tm_hour && time_tc.tm_min ==s_alarmas_auto[2].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[2].tm_sec)
+    if( time_tc.tm_hour ==s_alarmas_auto[2].tm_hour && time_tc.tm_min ==s_alarmas_auto[2].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[2].tm_sec)
     {
         Activacion_motor();
     }
@@ -266,15 +326,20 @@ void init_cachorro_alarm(){
             printf("Could not get time\n");
         }
 
-   if( time_tc.tm_hour ==s_alarmas_auto[3].tm_hour && time_tc.tm_min ==s_alarmas_auto[3].tm_min)
+   if( time_tc.tm_hour ==s_alarmas_auto[3].tm_hour && time_tc.tm_min ==s_alarmas_auto[3].tm_min
+   && time_tc.tm_sec ==s_alarmas_auto[3].tm_sec)
+   if( time_tc.tm_hour ==s_alarmas_auto[3].tm_hour && time_tc.tm_min ==s_alarmas_auto[3].tm_min
+   && time_tc.tm_sec ==s_alarmas_auto[3].tm_sec)
     {
         Activacion_motor();
     }
-    if( time_tc.tm_hour ==s_alarmas_auto[4].tm_hour && time_tc.tm_min ==s_alarmas_auto[4].tm_min)
+    if( time_tc.tm_hour ==s_alarmas_auto[4].tm_hour && time_tc.tm_min ==s_alarmas_auto[4].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[4].tm_sec)
     {
         Activacion_motor();
     }
-    if( time_tc.tm_hour ==s_alarmas_auto[5].tm_hour && time_tc.tm_min ==s_alarmas_auto[5].tm_min)
+    if( time_tc.tm_hour ==s_alarmas_auto[5].tm_hour && time_tc.tm_min ==s_alarmas_auto[5].tm_min
+    && time_tc.tm_sec ==s_alarmas_auto[5].tm_sec)
     {
         Activacion_motor();
     }
@@ -283,18 +348,18 @@ void init_cachorro_alarm(){
 
 void Activacion_motor()
 {
-    // Esto es para alarma de manual 1 y 2 
-    // if (ds3231_get_alarm_flags(&s_dev,(ds3231_alarm_t *)DS3231_ALARM_BOTH)
-    // &&manual_3 && automatico_1 && automatico_2 && automatico_3 && automatico_4
-    // && automatico_5 && automatico_6)  // Hay un warnig. tengo que mirarlo bien. creo que ahi tengo q
-    // //poner las alarmas que configure
-    
-        // Hay que poner mutex
-        WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_50);
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        // Hay que poner mutex
-        WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_0);
+
+    //LCD_Clear(LGRAYBLUE);
+    //LCD_ShowString(50-1,110-1,LGRAYBLUE,BLACK,"Moviendo motor",24,1);
+    // Hay que poner mutex
+    gpio_set_level(CONFIG_LED_PIN,1); // Para probar en debug
+    //WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_50);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+    // Hay que poner mutex
+    //WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_0);
+    gpio_set_level(CONFIG_LED_PIN,0);
     
 }
 
-
+ 
+ 

@@ -6,6 +6,13 @@
   "cmake.cmakePath": "cmake",
   "C_Cpp.errorSquiggles": "enabled",
   "files.associations": {
-    "esp_cpu.h": "c"
-  }
+    "esp_cpu.h": "c",
+    "semphr.h": "c",
+    "random": "c",
+    "picture.h": "c",
+    "freertos.h": "c"
+  },
+  "idf.openOcdConfigs": [
+    "board/esp32-bridge.cfg"
+  ]
 }

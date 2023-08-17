@@ -31,9 +31,12 @@ extern "C"
 /**********************************INCLUDES ******************************************************/
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <freertos/FreeRTOS.h>
+#include "freertos/semphr.h"
 
 #include <freertos/task.h>
+#include "freertos/queue.h"
 #include <ds3231.h>
 #include <string.h>
 #include <time.h>
@@ -43,8 +46,9 @@ extern "C"
 #include "Alarm_menu.h"
 #include "Button_Handler.h"
 
-#include "ili9341.h"
 #include "Pwm_motor.h"
+//#include "easyio.h"
+
 //#include "esp_err.h"
 
 /********************************* (1) PUBLIC METHODS ********************************************/
@@ -63,28 +67,37 @@ extern "C"
 /************************* (6)  STATIC METHODS IMPLEMENTATION ************************************/
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
+//extern SemaphoreHandle_t LlaveGlobal;
+//QueueHandle_t colaPulsador; // Cola para notificar a las tareas
+QueueHandle_t commandQueue;
+TaskHandle_t MainScreen_Handle = NULL;
+TaskHandle_t AlarmaMenu_Handle = NULL;
+
 
 void app_main(void)
 {
-	// Unlike Vanilla FreeRTOS, users of FreeRTOS in ESP-IDF must never call vTaskStartScheduler() and vTaskEndScheduler().
+    //extern SemaphoreHandle_t LlaveGlobal;
+    colaPulsador = xQueueCreate(1, sizeof(int));
+    commandQueue = xQueueCreate(12, sizeof(uint8_t));
 
 	static uint8_t ucParameterToPass;
-    TaskHandle_t xHandle = NULL;
+  
 
-    xTaskCreate(Main_Screen,
+    xTaskCreatePinnedToCore(Main_Screen,
                 "Main_Screen",
                 configMINIMAL_STACK_SIZE * 3,
                 &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle);
+                1, //tskIDLE_PRIORITY (Prioridad)
+                &MainScreen_Handle,
+                0);
 
-    xTaskCreate(Alarm_menu, 
+    xTaskCreatePinnedToCore(&Alarm_menu, 
                 "Alarm_menu",
                 configMINIMAL_STACK_SIZE * 3,
                 &ucParameterToPass,
-                10, //tskIDLE_PRIORITY (Prioridad)
-                &xHandle);
-
+                1, //tskIDLE_PRIORITY (Prioridad)
+                &AlarmaMenu_Handle,
+                0);
     
 }
 
