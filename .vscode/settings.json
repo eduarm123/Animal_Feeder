@@ -12,7 +12,8 @@
     "picture.h": "c",
     "freertos.h": "c",
     "nvs.h": "c",
-    "nvs_flash.h": "c"
+    "nvs_flash.h": "c",
+    "nvm_drivers.h": "c"
   },
   "idf.openOcdConfigs": [
     "board/esp32-bridge.cfg"

@@ -38,26 +38,14 @@
 #include "Button_Handler.h"
 #include "easyio.h" //error si incluyo esto de nuevo
 //#include "picture.h"
+
+#include "esp_system.h"
+#include "nvs_flash.h"
+#include "nvs.h"
 /********************************* (1) PUBLIC METHODS ********************************************/
 
 #define CONFIG_LED_PIN       (2)//2
 /*********************************** (2) PUBLIC VARS *********************************************/
-
-
-extern unsigned num;
-// Esto se usa como flags para saber que se ha activado alguna de esas alarmas.
-
-extern QueueHandle_t commandQueue;
-extern tm_t time_tc;
-extern i2c_dev_t s_dev; // Configurado en Main_screen.c 
-
-extern tm_t s_alarmas_auto[];
-extern tm_t s_alarmas_manual[];
-extern uint8_t n_alarms;
-
-extern TaskHandle_t MainScreen_Handle;
-extern TaskHandle_t AlarmaMenu_Handle;
-
 
 extern unsigned num;
 // Esto se usa como flags para saber que se ha activado alguna de esas alarmas.
@@ -199,8 +187,7 @@ void init_manual_alarm_1(){
         /* Send notification to prvTask1() */     
         printf("--- Se ha activado la alarma---\n");             
         Activacion_motor();      
-    }
-     
+    }   
 }
 
 void init_manual_alarm_2(){
@@ -357,9 +344,9 @@ void Activacion_motor()
     vTaskDelay(500 / portTICK_PERIOD_MS);
     // Hay que poner mutex
     //WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_0);
-    gpio_set_level(CONFIG_LED_PIN,0);
-    
+    gpio_set_level(CONFIG_LED_PIN,0);   
 }
+
 
  
  

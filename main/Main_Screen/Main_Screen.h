@@ -66,7 +66,7 @@ void Main_Screen( void * pvParameters );
  */
 void Time_config(tm_t *_time);
 
-
+void convertTime2StringDisplay(tm_t *_time2Convert, char timeconverted[]);
 /******************************** (3) DEFINES & MACROS *******************************************/
 
 /*********************************** (4) PRIVATE VARS ********************************************/

@@ -41,9 +41,8 @@
 #include "picture.h"
 #include <stdlib.h>
 
-#include "esp_system.h"
-#include "nvs_flash.h"
-#include "nvs.h"
+
+#include "NVM_drivers/NVM_drivers.h"
 
 
 /********************************* (1) PUBLIC METHODS ********************************************/
@@ -120,14 +119,12 @@ static void Alarma_menu(void);
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 time_result_t obtenerHora();
 void Titilar(int indice, int n);
-void convertTime2StringDisplay(tm_t *_time2Convert, char timeconverted[]);
 
 
 void Main_Screen( void * pvParameters )
 {
     uint8_t u8_key=0;
     char u8_timeconverted[9];
-    int32_t restart_counter = 0;
     /*------INICIALIZAR FTF-----*/
     spi_master_init(SPI3_HOST, LCD_DEF_DMA_CHAN, LCD_DMA_MAX_SIZE, SPI3_DEF_PIN_NUM_MISO, SPI3_DEF_PIN_NUM_MOSI, SPI3_DEF_PIN_NUM_CLK);
     spi_lcd_init(SPI3_HOST, 40*1000*1000, LCD_SPI3_DEF_PIN_NUM_CS0);
@@ -143,69 +140,28 @@ void Main_Screen( void * pvParameters )
 
     for (;;)
     {
-               // Initialize NVS
-        esp_err_t err = nvs_flash_init();
-        if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-            // NVS partition was truncated and needs to be erased
-            // Retry nvs_flash_init
-            ESP_ERROR_CHECK(nvs_flash_erase());
-            err = nvs_flash_init();
-        }
-        ESP_ERROR_CHECK( err );
-      
-        // Open
-        printf("\n");
-        printf("Opening Non-Volatile Storage (NVS) handle... ");
-        nvs_handle_t my_handle;
-        err = nvs_open("storage", NVS_READWRITE, &my_handle);
-        if (err != ESP_OK) {
-            printf("Error (%s) opening NVS handle!\n", esp_err_to_name(err));
-        } else {
-            printf("Done\n");
-
-            // Read
-            printf("Reading restart counter from NVS ... ");
-            int32_t restart_counter = 0; // value will default to 0, if not set yet in NVS
-            err = nvs_get_i32(my_handle, "restart_counter", &restart_counter);
-            switch (err) {
-                case ESP_OK:
-                    printf("Done\n");
-                    printf("Restart counter = %d\n", (int)restart_counter);
-                    break;
-                case ESP_ERR_NVS_NOT_FOUND:
-                    printf("The value is not initialized yet!\n");
-                    break;
-                default :
-                    printf("Error (%s) reading!\n", esp_err_to_name(err));
-            }
-
-            // Write
-            printf("Updating restart counter in NVS ... ");
-            
-            if(restart_counter==0){
-                restart_counter++;
-                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"*************",24,1);
-                LCD_ShowString(20-1,60-1,LGRAYBLUE,BLACK,"CAT Feeder",24,1);
-                LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"Welcome!",32,1);
-                LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',32,1);
-                LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
-                Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto
-                printf("hroa configurada... ");
-                ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc));          
-            }
-
-            LCD_Clear(LGRAYBLUE);
-            err = nvs_set_i32(my_handle, "restart_counter", restart_counter);
-            printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
-
-            printf("Committing updates in NVS ... ");
-            err = nvs_commit(my_handle);
-            printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
-            // Close
-            nvs_close(my_handle);
-        }
-
+        uint16_t restart_counter = 0; // value will default to 0, if not set yet in NVS
         
+        NNVM_read_memory_u16("restart_counter", &restart_counter);
+
+        // Write
+        printf("Updating restart counter in NVS ... ");
+        
+        if(restart_counter==0){
+            restart_counter=1;
+            LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"*************",24,1);
+            LCD_ShowString(20-1,60-1,LGRAYBLUE,BLACK,"CAT Feeder",24,1);
+            LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"Welcome!",32,1);
+            LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',32,1);
+            LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
+            Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto
+            printf("hora configurada... ");
+            ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc));
+            LCD_Clear(LGRAYBLUE); 
+            
+            NNVM_write_memory_u16("restart_counter",restart_counter);         
+        }
+                
           
         for(;;)
         {  
@@ -442,13 +398,15 @@ static void Alarma_menu( void)
                     }
                     
                     if (u8_key == '1')
-                    {
+                    {       
                         LCD_Clear(LGRAYBLUE);
                         LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma",16,1);
                         Time_config(&s_alarmas_manual[0]);
                         is_alarm_set=false;  // Break out of the inner loop, so the alarmTask waits for the next alarm setting
                         q_AlarmMenu[0]=Manual;
                         n_alarms=Manual_alarmas_1;
+                        uint16_t alarm1_NVM = ((uint16_t)s_alarmas_manual[0].tm_hour << 8) | s_alarmas_manual[0].tm_min;
+                        NNVM_write_memory_u16("alarm1_NVM",alarm1_NVM);
                         xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY);                       
                                                
                     }
@@ -506,7 +464,7 @@ static void Alarma_menu( void)
                     break;  
             }
             break;    
-        case '3': //Ver alarmas
+        case '3': //Mirar alarmas
             switch (n_alarms)
             {                                                     
                 case Manual_alarmas_1:
