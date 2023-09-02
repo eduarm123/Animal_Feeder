@@ -46,17 +46,9 @@
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 
 
-void NNVM_write_memory_u16(const char * _keynamewrite,uint16_t _writeStorageu16)
+void NNVM_write_memory_u32(const char * _keynamewrite,uint32_t _writeStorageu32)
 {
-        esp_err_t err = nvs_flash_init();
-        if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-            // NVS partition was truncated and needs to be erased
-            // Retry nvs_flash_init
-            ESP_ERROR_CHECK(nvs_flash_erase());
-            err = nvs_flash_init();
-        }
-        ESP_ERROR_CHECK( err );
-
+        esp_err_t err = ESP_OK;
         // Open   
         printf("Opening Non-Volatile Storage (NVS) handle... ");
         nvs_handle_t my_handle;
@@ -67,7 +59,7 @@ void NNVM_write_memory_u16(const char * _keynamewrite,uint16_t _writeStorageu16)
         } else {
 
             printf("Done\n");
-            err = nvs_set_u16(my_handle, "restart_counter", _writeStorageu16);
+            err = nvs_set_u32(my_handle, _keynamewrite, _writeStorageu32);
             printf((err != ESP_OK) ? "Failed!\n" : "Done\n");
 
             printf("Committing updates in NVS ... ");
@@ -79,32 +71,25 @@ void NNVM_write_memory_u16(const char * _keynamewrite,uint16_t _writeStorageu16)
 
 }
 
-void NNVM_read_memory_u16(const char * _keyname,uint16_t *_storageu16)
+void NNVM_read_memory_u32(const char * _keyname,uint32_t *_storageu32)
 {
-        esp_err_t err = nvs_flash_init();
-        if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-            // NVS partition was truncated and needs to be erased
-            // Retry nvs_flash_init
-            ESP_ERROR_CHECK(nvs_flash_erase());
-            err = nvs_flash_init();
-        }
-        ESP_ERROR_CHECK( err );
+        esp_err_t err = ESP_OK;
         // Open   
         printf("Opening Non-Volatile Storage (NVS) handle... ");
         nvs_handle_t my_handle;
 
-            err = nvs_open(_keyname, NVS_READONLY, &my_handle);
+        err = nvs_open(_keyname, NVS_READONLY, &my_handle);
         if (err != ESP_OK) {
             printf("Error (%s) opening NVS handle!\n", esp_err_to_name(err));
         } else {
 
             // Read
-            printf("Reading restart counter from NVS ... ");
-            err = nvs_get_u16(my_handle, _keyname, _storageu16);
+            printf("Reading value from NVS ... ");
+            err = nvs_get_u32(my_handle, _keyname, _storageu32);
             switch (err) {
                 case ESP_OK:
                     printf("Done\n");
-                    printf("Restart counter = %d\n", (int)*_storageu16);
+                    printf("Value = %d\n", (int)*_storageu32);
                     break;
                 case ESP_ERR_NVS_NOT_FOUND:
                     printf("The value is not initialized yet!\n");

@@ -80,33 +80,27 @@ typedef enum{
     Manual_alarmas_1=1,
     Manual_alarmas_2,
     Manual_alarmas_3,
-    Adulto_alarmas,
-    Cachorro_alarmas
+    Manual_alarmas_4,
+    Manual_alarmas_5
 }ACTIVAR_ALARM;
 
-tm_t s_alarmas_auto[]={
-    {.tm_hour=6,.tm_min=0,.tm_sec=0,}, // adulto
-    {.tm_hour=12,.tm_min=0,.tm_sec=0,}, // adulto
-    {.tm_hour=18,.tm_min=0,.tm_sec=0,}, // adulto 
-    {.tm_hour=7,.tm_min=0,.tm_sec=0,}, // cachorro 
-    {.tm_hour=12,.tm_min=0,.tm_sec=0,}, // cachorro 
-    {.tm_hour=17,.tm_min=0,.tm_sec=0,}, // cachorro 
-}; // Esta la implementamos por polling
 
 tm_t s_alarmas_manual[]={
     {0}, // Esta tiene interrupcion
     {0}, // Esta tiene interrupcion
-    {0}, // Esta de aqui no tendra
+    {0},
+    {0},
+    {0},
 };
 
 
 i2c_dev_t s_dev; // necessary for RTC_init()
 
 uint8_t n_alarms; // Se guarda la configuracion las alarmas que estan declaradas en ACTIVAR_ALARM
-
-
+uint32_t alarm_type;
 
 /******************************** (3) DEFINES & MACROS *******************************************/
+
 
 /*********************************** (4) PRIVATE VARS ********************************************/
 
@@ -125,12 +119,22 @@ void Main_Screen( void * pvParameters )
 {
     uint8_t u8_key=0;
     char u8_timeconverted[9];
+    /*------INICIALIZAR FLASH-----*/
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        // NVS partition was truncated and needs to be erased
+        // Retry nvs_flash_init
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK( err );
+    /*-----------------------------*/
     /*------INICIALIZAR FTF-----*/
     spi_master_init(SPI3_HOST, LCD_DEF_DMA_CHAN, LCD_DMA_MAX_SIZE, SPI3_DEF_PIN_NUM_MISO, SPI3_DEF_PIN_NUM_MOSI, SPI3_DEF_PIN_NUM_CLK);
     spi_lcd_init(SPI3_HOST, 40*1000*1000, LCD_SPI3_DEF_PIN_NUM_CS0);
     LCD_Display_Resolution(horizontal);
     LCD_Clear(LGRAYBLUE);
-    /*----------------------------------------------*/
+    /*-----------------------------*/
 
     gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 14, 12, 13}; //Pines a ocupar para teclado matricial
 
@@ -140,9 +144,9 @@ void Main_Screen( void * pvParameters )
 
     for (;;)
     {
-        uint16_t restart_counter = 0; // value will default to 0, if not set yet in NVS
+        uint32_t restart_counter = 0; // value will default to 0, if not set yet in NVS
         
-        NNVM_read_memory_u16("restart_counter", &restart_counter);
+        NNVM_read_memory_u32("restart_counter", &restart_counter);
 
         // Write
         printf("Updating restart counter in NVS ... ");
@@ -159,7 +163,7 @@ void Main_Screen( void * pvParameters )
             ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc));
             LCD_Clear(LGRAYBLUE); 
             
-            NNVM_write_memory_u16("restart_counter",restart_counter);         
+            NNVM_write_memory_u32("restart_counter",restart_counter);         
         }
                 
           
@@ -180,7 +184,8 @@ void Main_Screen( void * pvParameters )
 
             /*---Conversión entero a caracter para imprimir en TFT sin problema---*/
             convertTime2StringDisplay(&time_tc,u8_timeconverted);
-            LCD_ShowString(25-1,180-1,LGRAYBLUE,BLACK,u8_timeconverted,32,1);           
+            LCD_ShowString(25-1,180-1,LGRAYBLUE,BLACK,u8_timeconverted,32,1);  
+                   
             /*--------------------------------------------------------------------*/
             
             u8_key = keypad_getkey();
@@ -361,8 +366,12 @@ void Titilar(int indice, int n)
 
 static void Alarma_menu( void)
 {
-    uint8_t u8_key=10;
-    uint8_t q_AlarmMenu[10]={0};
+    uint8_t u8_key=10; // on porpuse
+    uint32_t alarm1_NVM=0;
+    uint32_t alarm2_NVM=0;
+    uint32_t alarm3_NVM=0;
+    uint32_t alarm4_NVM=0;
+    uint32_t alarm5_NVM=0;  
 
     LCD_Clear(LGRAYBLUE);
     LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",24,1);
@@ -381,91 +390,125 @@ static void Alarma_menu( void)
             ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
             break;
         case '2':
+        {
             LCD_Clear(LGRAYBLUE);
-            LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",24,1);
-            LCD_ShowString(20-1,70-1,LGRAYBLUE,BLACK,"1. Manual",16,1);
-            LCD_ShowString(20-1,120-1,LGRAYBLUE,BLACK,"2. Automatico",16,1);
-            u8_key=select_option(); 
+            printf("ESTAS EN MANUAL.\n");
+            LCD_ShowString(20-1,70-1,LGRAYBLUE,BLACK,"Numero de Alarmas",16,1);
+            u8_key=select_option(); // TODO: se extiende a 5 alarmas
             switch (u8_key)
             {
-                case '1': //MANUAL
-                    LCD_Clear(LGRAYBLUE);
-                    printf("ESTAS EN MANUAL.\n");
-                    LCD_ShowString(20-1,70-1,LGRAYBLUE,BLACK,"Numero de Alarmas",16,1);
-                    u8_key=select_option(); // De momento solo se puede 3.TODO: hay que agregar mas valores
-                    if (u8_key > 0 && u8_key <4 ) {
-                        break;
-                    }
-                    
-                    if (u8_key == '1')
-                    {       
-                        LCD_Clear(LGRAYBLUE);
-                        LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma",16,1);
-                        Time_config(&s_alarmas_manual[0]);
-                        is_alarm_set=false;  // Break out of the inner loop, so the alarmTask waits for the next alarm setting
-                        q_AlarmMenu[0]=Manual;
-                        n_alarms=Manual_alarmas_1;
-                        uint16_t alarm1_NVM = ((uint16_t)s_alarmas_manual[0].tm_hour << 8) | s_alarmas_manual[0].tm_min;
-                        NNVM_write_memory_u16("alarm1_NVM",alarm1_NVM);
-                        xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY);                       
-                                               
-                    }
-                    else if (u8_key == '2')
-                    {
-                        LCD_Clear(LGRAYBLUE);
-                        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 1",16,1);
-                        Time_config(&s_alarmas_manual[0]);
-                        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 2",16,1);
-                        Time_config(&s_alarmas_manual[1]);
-                        is_alarm_set=false;  // Break out of the inner loop, so the alarmTask waits for the next alarm setting
-                        printf("Config alarma 2.\n");
-                        q_AlarmMenu[0]=Manual;
-                        n_alarms=Manual_alarmas_2;
-                        xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY);                   
-                    }
-                    else if (u8_key == '3')
-                    {
-                        LCD_Clear(LGRAYBLUE);
-                        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 1",16,1);
-                        Time_config(&s_alarmas_manual[0]);
-                        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 2",16,2);
-                        Time_config(&s_alarmas_manual[1]);
-                        LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 3",16,2);
-                        Time_config(&s_alarmas_manual[2]);
-                        is_alarm_set=false;  // Break out of the inner loop, so the alarmTask waits for the next alarm setting
-                        q_AlarmMenu[0]=Manual;
-                        n_alarms=Manual_alarmas_3;
-                        xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY);
-                    }
-                    
-                    break;
-                case '2': //AUTOMATICO
-                    LCD_Clear(LGRAYBLUE);
-                    LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"Seleccione una opcion",24,1);
-                    LCD_ShowString(20-1,70-1,LGRAYBLUE,BLACK,"1. Adulto",16,1);
-                    LCD_ShowString(20-1,120-1,LGRAYBLUE,BLACK,"2. Cachorro",16,1);
-                    u8_key=select_option();
-                    if (u8_key =='1')
-                    {
-                        q_AlarmMenu[0]=Automatico;
-                        n_alarms=Adulto_alarmas;
-                        xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY);             
-                    }
-                    else if (u8_key =='2')
-                    {
-                        q_AlarmMenu[0]=Automatico;
-                        n_alarms=Cachorro_alarmas; 
-                        xQueueSendToBack(commandQueue, &q_AlarmMenu, portMAX_DELAY); 
-                    }                   
-                    break;               
-                default:
-                // TODO: Seria bueno poner un boton de cancelar
-                    LCD_Clear(LGRAYBLUE);
-                    break;  
+            case '1':
+                LCD_Clear(LGRAYBLUE);
+                LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma",16,1);
+                Time_config(&s_alarmas_manual[0]);
+
+                alarm1_NVM = ((uint32_t)s_alarmas_manual[0].tm_hour << 8)| s_alarmas_manual[0].tm_min;
+                NNVM_write_memory_u32("alarm1_NVM",alarm1_NVM);                       
+                alarm_type = 1;
+                NNVM_write_memory_u32(ALARM_NAMESPACE,alarm_type);
+                break;
+            case '2':
+                LCD_Clear(LGRAYBLUE);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 1",16,1);
+                Time_config(&s_alarmas_manual[0]);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 2",16,1);
+                Time_config(&s_alarmas_manual[1]);
+                
+                alarm1_NVM = ((uint32_t)s_alarmas_manual[0].tm_hour << 8)| s_alarmas_manual[0].tm_min;
+                NNVM_write_memory_u32("alarm1_NVM",alarm1_NVM);  
+                
+                alarm2_NVM = ((uint32_t)s_alarmas_manual[1].tm_hour << 8)| s_alarmas_manual[1].tm_min;
+                NNVM_write_memory_u32("alarm2_NVM",alarm2_NVM);             
+
+                alarm_type = 2;
+                NNVM_write_memory_u32(ALARM_NAMESPACE,alarm_type);               
+                break;
+            case '3':
+                LCD_Clear(LGRAYBLUE);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 1",16,1);
+                Time_config(&s_alarmas_manual[0]);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 2",16,2);
+                Time_config(&s_alarmas_manual[1]);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 3",16,2);
+                Time_config(&s_alarmas_manual[2]);
+
+                alarm1_NVM = ((uint32_t)s_alarmas_manual[0].tm_hour << 8)| s_alarmas_manual[0].tm_min;
+                NNVM_write_memory_u32("alarm1_NVM",alarm1_NVM);  
+                
+                alarm2_NVM = ((uint32_t)s_alarmas_manual[1].tm_hour << 8)| s_alarmas_manual[1].tm_min;
+                NNVM_write_memory_u32("alarm2_NVM",alarm2_NVM);
+
+                alarm3_NVM = ((uint32_t)s_alarmas_manual[2].tm_hour << 8)| s_alarmas_manual[2].tm_min;
+                NNVM_write_memory_u32("alarm3_NVM",alarm3_NVM);              
+
+                alarm_type = 3;
+                NNVM_write_memory_u32(ALARM_NAMESPACE,alarm_type);                       
+                break;
+            case '4':
+                LCD_Clear(LGRAYBLUE);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 1",16,1);
+                Time_config(&s_alarmas_manual[0]);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 2",16,2);
+                Time_config(&s_alarmas_manual[1]);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 3",16,2);
+                Time_config(&s_alarmas_manual[2]);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 4",16,2);
+                Time_config(&s_alarmas_manual[3]);
+
+                alarm1_NVM = ((uint32_t)s_alarmas_manual[0].tm_hour << 8)| s_alarmas_manual[0].tm_min;
+                NNVM_write_memory_u32("alarm1_NVM",alarm1_NVM);  
+                
+                alarm2_NVM = ((uint32_t)s_alarmas_manual[1].tm_hour << 8)| s_alarmas_manual[1].tm_min;
+                NNVM_write_memory_u32("alarm2_NVM",alarm2_NVM);
+
+                alarm3_NVM = ((uint32_t)s_alarmas_manual[2].tm_hour << 8)| s_alarmas_manual[2].tm_min;
+                NNVM_write_memory_u32("alarm3_NVM",alarm3_NVM);
+
+                alarm4_NVM = ((uint32_t)s_alarmas_manual[3].tm_hour << 8)| s_alarmas_manual[3].tm_min;
+                NNVM_write_memory_u32("alarm4_NVM",alarm4_NVM);                
+
+                alarm_type = 4;
+                NNVM_write_memory_u32(ALARM_NAMESPACE,alarm_type);                       
+                break;
+            case '5':
+                LCD_Clear(LGRAYBLUE);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 1",16,1);
+                Time_config(&s_alarmas_manual[0]);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 2",16,2);
+                Time_config(&s_alarmas_manual[1]);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 3",16,2);
+                Time_config(&s_alarmas_manual[2]);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 4",16,2);
+                Time_config(&s_alarmas_manual[3]);
+                LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"Ingrese la alarma 5",16,2);
+                Time_config(&s_alarmas_manual[4]);
+
+                alarm1_NVM = ((uint32_t)s_alarmas_manual[0].tm_hour << 8)| s_alarmas_manual[0].tm_min;
+                NNVM_write_memory_u32("alarm1_NVM",alarm1_NVM);  
+                
+                alarm2_NVM = ((uint32_t)s_alarmas_manual[1].tm_hour << 8)| s_alarmas_manual[1].tm_min;
+                NNVM_write_memory_u32("alarm2_NVM",alarm2_NVM);
+
+                alarm3_NVM = ((uint32_t)s_alarmas_manual[2].tm_hour << 8)| s_alarmas_manual[2].tm_min;
+                NNVM_write_memory_u32("alarm3_NVM",alarm3_NVM);
+
+                alarm4_NVM = ((uint32_t)s_alarmas_manual[3].tm_hour << 8)| s_alarmas_manual[3].tm_min;
+                NNVM_write_memory_u32("alarm4_NVM",alarm4_NVM);
+
+                alarm5_NVM = ((uint32_t)s_alarmas_manual[4].tm_hour << 8)| s_alarmas_manual[4].tm_min;
+                NNVM_write_memory_u32("alarm5_NVM",alarm5_NVM); 
+
+                alarm_type = 5;
+                NNVM_write_memory_u32(ALARM_NAMESPACE,alarm_type);                       
+                break;    
+            default:
+                break;
             }
-            break;    
-        case '3': //Mirar alarmas
-            switch (n_alarms)
+            
+            break;
+        }                               
+        case '3': //See alarms
+            switch (alarm_type) // variable guardada en flash
             {                                                     
                 case Manual_alarmas_1:
                     while(u8_key != '1' )
@@ -473,7 +516,7 @@ static void Alarma_menu( void)
                         char u8_timeconverted[9];                      
                         LCD_Clear(LGRAYBLUE);
                         LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"--Alarma set--",16,1); 
-                        LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Presione 1 para volver",16,1);                        
+                        LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Press 1 to come back",16,1);                        
                         convertTime2StringDisplay(&s_alarmas_manual[0],u8_timeconverted);            
                         LCD_ShowString(25-1,90-1,LGRAYBLUE,BLACK,u8_timeconverted,24,1);
 
@@ -488,7 +531,7 @@ static void Alarma_menu( void)
 
                         LCD_Clear(LGRAYBLUE);
                         LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"--Alarma set--",16,1); 
-                        LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Press 1 para volver",16,1); 
+                        LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Press 1 to come back",16,1); 
 
                         convertTime2StringDisplay(&s_alarmas_manual[0],u8_timeconverted_1);                       
                         LCD_ShowString(25-1,90-1,LGRAYBLUE,BLACK,u8_timeconverted_1,24,1);                       
@@ -507,7 +550,7 @@ static void Alarma_menu( void)
 
                         LCD_Clear(LGRAYBLUE);
                         LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"--Alarma set--",16,1); 
-                        LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Presione 1 para volver",16,1); 
+                        LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Press 1 to come back",16,1); 
 
                         convertTime2StringDisplay(&s_alarmas_manual[0],u8_timeconverted_1);                       
                         LCD_ShowString(25-1,90-1,LGRAYBLUE,BLACK,u8_timeconverted_1,24,1);           
@@ -521,6 +564,64 @@ static void Alarma_menu( void)
                         u8_key=select_option();
                     }
                     break;
+                case Manual_alarmas_4:
+                    while(u8_key != '1' )
+                    {
+                        char u8_timeconverted_1[9];  
+                        char u8_timeconverted_2[9];
+                        char u8_timeconverted_3[9];
+                        char u8_timeconverted_4[9];
+
+                        LCD_Clear(LGRAYBLUE);
+                        LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"--Alarma set--",16,1); 
+                        LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Press 1 to come back",16,1); 
+
+                        convertTime2StringDisplay(&s_alarmas_manual[0],u8_timeconverted_1);                       
+                        LCD_ShowString(25-1,90-1,LGRAYBLUE,BLACK,u8_timeconverted_1,24,1);           
+                             
+                        convertTime2StringDisplay(&s_alarmas_manual[1],u8_timeconverted_2);                       
+                        LCD_ShowString(25-1,120-1,LGRAYBLUE,BLACK,u8_timeconverted_2,24,1);           
+ 
+                        convertTime2StringDisplay(&s_alarmas_manual[2],u8_timeconverted_3);                       
+                        LCD_ShowString(25-1,150-1,LGRAYBLUE,BLACK,u8_timeconverted_3,24,1);
+                        
+                        convertTime2StringDisplay(&s_alarmas_manual[3],u8_timeconverted_4);                       
+                        LCD_ShowString(25-1,180-1,LGRAYBLUE,BLACK,u8_timeconverted_4,24,1);            
+
+                        u8_key=select_option();
+                    }
+                    break;
+                case Manual_alarmas_5:
+                    while(u8_key != '1' )
+                    {
+                        char u8_timeconverted_1[9];  
+                        char u8_timeconverted_2[9];
+                        char u8_timeconverted_3[9];
+                        char u8_timeconverted_4[9];
+                        char u8_timeconverted_5[9];
+
+                        LCD_Clear(LGRAYBLUE);
+                        LCD_ShowString(50-1,20-1,LGRAYBLUE,BLACK,"--Alarma set--",16,1); 
+                        LCD_ShowString(1-1,60-1,LGRAYBLUE,BLACK,"Press 1 to come back",16,1); 
+
+                        convertTime2StringDisplay(&s_alarmas_manual[0],u8_timeconverted_1);                       
+                        LCD_ShowString(25-1,90-1,LGRAYBLUE,BLACK,u8_timeconverted_1,24,1);           
+                             
+                        convertTime2StringDisplay(&s_alarmas_manual[1],u8_timeconverted_2);                       
+                        LCD_ShowString(25-1,120-1,LGRAYBLUE,BLACK,u8_timeconverted_2,24,1);           
+ 
+                        convertTime2StringDisplay(&s_alarmas_manual[2],u8_timeconverted_3);                       
+                        LCD_ShowString(25-1,150-1,LGRAYBLUE,BLACK,u8_timeconverted_3,24,1);
+                        
+                        convertTime2StringDisplay(&s_alarmas_manual[3],u8_timeconverted_4);                       
+                        LCD_ShowString(25-1,180-1,LGRAYBLUE,BLACK,u8_timeconverted_4,24,1);
+
+                        convertTime2StringDisplay(&s_alarmas_manual[4],u8_timeconverted_5);                       
+                        LCD_ShowString(25-1,210-1,LGRAYBLUE,BLACK,u8_timeconverted_5,24,1);             
+
+                        u8_key=select_option();
+                    }
+                    break;
                 default:
                     printf("---------default de Mirar alarmas-------.\n");
                     vTaskDelay(pdMS_TO_TICKS(100));
@@ -529,9 +630,7 @@ static void Alarma_menu( void)
             break;    
         default:
             break;
-    }
-     
-         
+    }        
 }
 
 static uint8_t select_option(void)
@@ -542,12 +641,12 @@ static uint8_t select_option(void)
     while(ret)
     {
         _u8_key = keypad_getkey();
-        if (_u8_key =='1' || _u8_key =='2' || _u8_key =='3' || _u8_key =='4' )
+        if (_u8_key =='1' || _u8_key =='2' || _u8_key =='3' || _u8_key =='4' || _u8_key =='5' )
         {
             break;
         }
         printf("Seleccione una opcion\n");
-        vTaskDelay(pdMS_TO_TICKS(100)); // Esto evitario que salte el WD ya que da tiempo a que se ejecute la tarea que refresca el WD
+        vTaskDelay(pdMS_TO_TICKS(100)); // Esto evita que salte el WD ya que da tiempo a que se ejecute la tarea que refresca el WD
     }
 
     return (_u8_key);                         

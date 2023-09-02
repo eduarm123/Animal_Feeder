@@ -67,8 +67,7 @@ extern "C"
 /************************* (6)  STATIC METHODS IMPLEMENTATION ************************************/
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
-//extern SemaphoreHandle_t LlaveGlobal;
-//QueueHandle_t colaPulsador; // Cola para notificar a las tareas
+
 QueueHandle_t commandQueue;
 TaskHandle_t MainScreen_Handle = NULL;
 TaskHandle_t AlarmaMenu_Handle = NULL;

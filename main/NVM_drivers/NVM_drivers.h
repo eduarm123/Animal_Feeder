@@ -32,9 +32,9 @@ extern "C" {
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 
-void NNVM_write_memory_u16(const char * _keynamewrite,uint16_t _writeStorageu16);
+void NNVM_write_memory_u32(const char * _keynamewrite,uint32_t _writeStorageu32);
 
-void NNVM_read_memory_u16(const char * _keyname, uint16_t *_storageu16);
+void NNVM_read_memory_u32(const char * _keyname, uint32_t *_storageu32);
 
 
 

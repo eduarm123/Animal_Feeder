@@ -36,6 +36,8 @@ extern "C" {
 #include <freertos/FreeRTOS.h>
 #include "freertos/semphr.h"
 
+#define ALARM_NAMESPACE "alarm_type"
+
 /*********************************** (2) PUBLIC VARS *********************************************/
 extern SemaphoreHandle_t LlaveGlobal;
 extern QueueHandle_t colaPulsador; // Cola para notificar a las tareas
@@ -68,6 +70,7 @@ void Time_config(tm_t *_time);
 
 void convertTime2StringDisplay(tm_t *_time2Convert, char timeconverted[]);
 /******************************** (3) DEFINES & MACROS *******************************************/
+
 
 /*********************************** (4) PRIVATE VARS ********************************************/
 
