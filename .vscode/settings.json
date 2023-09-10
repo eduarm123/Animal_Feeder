@@ -13,7 +13,11 @@
     "freertos.h": "c",
     "nvs.h": "c",
     "nvs_flash.h": "c",
-    "nvm_drivers.h": "c"
+    "nvm_drivers.h": "c",
+    "button_handler.h": "c",
+    "string.h": "c",
+    "corecrt_wstring.h": "c",
+    "vcruntime_string.h": "c"
   },
   "idf.openOcdConfigs": [
     "board/esp32-bridge.cfg"

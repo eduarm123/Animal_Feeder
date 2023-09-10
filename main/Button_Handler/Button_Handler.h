@@ -51,13 +51,16 @@ extern "C" {
   * @return void
   *     
   */
-esp_err_t keypad_initalize(gpio_num_t keypad_pins[8]);
+esp_err_t keypad_initalize(gpio_num_t keypad_pins[8]); // interrupt mode
 
-char keypad_getkey();
+char keypad_getkey(); // interrupt mode
 
-void keypad_delete(void);
+void keypad_delete(void); // interrupt mode
 
-void Button_Handler();
+
+void keypadInit(); // pulling mode
+
+char readKeypad(); // pulling mode
 
 
 //bool ReadKey(const char *const _c_key);
