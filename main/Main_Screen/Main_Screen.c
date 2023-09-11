@@ -41,6 +41,11 @@
 #include "picture.h"
 #include <stdlib.h>
 
+/*#include "esp_system.h"
+#include "driver/spi_master.h"
+#include "pretty_effect.h"
+#include "spi_lcd.h"*/
+
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
@@ -117,8 +122,11 @@ void Titilar(int indice, int n);
 void convertTime2StringDisplay(tm_t *_time2Convert, char timeconverted[]);
 
 
+
 void Main_Screen( void * pvParameters )
 {
+    esp_err_t ret;
+    //spi_device_handle_t spi;
     uint8_t u8_key=0;
     char u8_timeconverted[9];
     /*------INICIALIZAR FTF-----*/
@@ -133,7 +141,6 @@ void Main_Screen( void * pvParameters )
     keypad_initalize(keypad); /// Inicializa keyboard
 
     RTC_init(&s_dev); // Inicializa el i2c
-
     
     for (;;)
     {
@@ -141,7 +148,17 @@ void Main_Screen( void * pvParameters )
         LCD_ShowString(20-1,60-1,LGRAYBLUE,BLACK,"CAT Feeder",24,1);
         LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"Welcome!",32,1);
         LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',32,1);
-        LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
+        //LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
+        //---LCD_ShowPicture_16b(0, 0, 40, 40, gImage_qq);
+        //LCD_ShowPicture_16b(0, 0, 240, 320, gImage_qq);
+        
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        //Initialize the effect displayed
+        ret=pretty_effect_init();
+        ESP_ERROR_CHECK(ret);
+
+        //Go do nice stuff.
+        display_pretty_colors(LCD_SPI);
 
         Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto. TODO: hay que reemplazar por teclado.
         ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
@@ -151,7 +168,7 @@ void Main_Screen( void * pvParameters )
             
             LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"*************",24,1);
             LCD_ShowString(50-1,50-1,LGRAYBLUE,BLACK,"CAT FEEDER",24,1);
-            LCD_ShowString(1-1,80-1,LGRAYBLUE,BLACK,"*************",24,1);       
+            LCD_ShowString(1-1,80-1,LGRAYBLUE,BLACK,"*************",24,1);   
 
             if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
             {

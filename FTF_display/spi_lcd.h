@@ -6,6 +6,7 @@
 #include "driver/gpio.h"
 #include "freertos/task.h"
 #include "simple_gui.h"
+#include "pretty_effect.h"
 
 /**
  * @brief LCD驱动IC型号定义。（需要用户手动配置，不要使用自动识别会出错）
@@ -74,7 +75,7 @@
     #define LINE_PIXEL_MAX_SIZE 480
 #endif
 
-#define LCD_DEF_DMA_CHAN         2   // LCD默认使用的SPI-DMA通道
+#define LCD_DEF_DMA_CHAN         3   // LCD默认使用的SPI-DMA通道
 // 为了加快传输速度，每个SPI传输都会发送一堆线。 此定义指定了几行线。 更多意味着更多的内存使用，但设置/完成转帐的开销较小。 确保240可被此整除。
 #define PARALLEL_LINES           16
 //#define PARALLEL_LINES           3
@@ -96,10 +97,10 @@ typedef struct {
  LCD的驱动IC型号定义。
 */
 typedef enum {
-    LCD_TYPE_ST_7735 = 1,
+    LCD_TYPE_ST_7735,
     LCD_TYPE_ST_7735S,
     LCD_TYPE_ST_7789V,
-    LCD_TYPE_ILI_9341,
+    LCD_TYPE_ILI_9341 = 1,
     LCD_TYPE_ILI_9488,
     LCD_TYPE_ILI_9481,
     LCD_TYPE_HX_8357C,
@@ -496,7 +497,7 @@ DRAM_ATTR static const lcd_init_cmd_t hx_8357c_init_cmds[]={
  * @return
  *     - none
  */
-void lcd_cmd(spi_device_handle_t spi, const uint8_t cmd);
+void lcd_cmd(spi_device_handle_t spi, const uint8_t cmd, bool keep_cs_active);
 
 /**
  * @brief  向LCD发送长度为len个字节的数据（D/C线电平为1）
@@ -540,5 +541,8 @@ void lcd_data16(spi_device_handle_t spi, uint16_t data);
  */
 void spi_lcd_init(spi_host_device_t host_id, uint32_t clk_speed, gpio_num_t cs_io_num);
 
+void send_line_finish(spi_device_handle_t spi);
+void send_lines(spi_device_handle_t spi, int ypos, uint16_t *linedata);
+void display_pretty_colors(spi_device_handle_t spi);
 
 #endif

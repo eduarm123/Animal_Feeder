@@ -15,7 +15,7 @@ spi_device_handle_t LCD_SPI = NULL;
  * @return
  *     - none
  */
-void lcd_cmd(spi_device_handle_t spi, const uint8_t cmd)
+void lcd_cmd(spi_device_handle_t spi, const uint8_t cmd, bool keep_cs_active)
 {
     esp_err_t ret;
     spi_transaction_t t;
@@ -23,6 +23,9 @@ void lcd_cmd(spi_device_handle_t spi, const uint8_t cmd)
     t.length=8;                     // SPI传输lcd命令的长度：8Bit。1个字节。（lcd的命令都是单字节的）
     t.tx_buffer=&cmd;               // 数据是cmd本身
     t.user=(void*)0;                // D/C 线电平为0，传输命令
+    /*if (keep_cs_active) {
+      t.flags = SPI_TRANS_CS_KEEP_ACTIVE;   //Keep CS active after data transfer
+    }*/
     ret=spi_device_polling_transmit(spi, &t);  // 开始传输
     assert(ret==ESP_OK);            // 应该没有问题
 }
@@ -108,8 +111,11 @@ void lcd_data16(spi_device_handle_t spi, uint16_t data)
  */
 static uint32_t lcd_get_id(spi_device_handle_t spi)
 {
+    // When using SPI_TRANS_CS_KEEP_ACTIVE, bus must be locked/acquired
+    spi_device_acquire_bus(spi, portMAX_DELAY);
+
     //get_id cmd
-    lcd_cmd(spi, 0x04);
+    lcd_cmd(spi, 0x04, true);
 
     spi_transaction_t t;
     memset(&t, 0, sizeof(t));
@@ -119,6 +125,9 @@ static uint32_t lcd_get_id(spi_device_handle_t spi)
 
     esp_err_t ret = spi_device_polling_transmit(spi, &t);
     assert( ret == ESP_OK );
+
+    // Release bus
+    spi_device_release_bus(spi);
 
     return *(uint32_t*)t.rx_data;
 }
@@ -149,12 +158,12 @@ static void lcd_ic_init(spi_device_handle_t spi)
     gpio_set_level(PIN_NUM_RST, 1);
     vTaskDelay(100 / portTICK_PERIOD_MS);*/
 
-    /*// 检测LCD的驱动IC型号，以作驱动适配
+    // 检测LCD的驱动IC型号，以作驱动适配
     uint32_t lcd_id = lcd_get_id(spi);
     int lcd_detected_type = 0;
     int lcd_type;
 
-    printf("LCD ID: %08X\n", lcd_id);
+    //printf("LCD ID: %08"PRIx32"\n", lcd_id);
     if ( lcd_id == 0 ) {
         //zero, ili
         lcd_detected_type = LCD_TYPE_ILI_9341;
@@ -163,10 +172,10 @@ static void lcd_ic_init(spi_device_handle_t spi)
         // none-zero, ST
         lcd_detected_type = LCD_TYPE_ST_7789V;
         printf("ST7789V detected.\n");
-    }*/
+    }
 
-    int lcd_detected_type = 0;
-    int lcd_type;
+    //int lcd_detected_type = 0;
+    //int lcd_type;
 
 #ifdef CONFIG_LCD_TYPE_AUTO
     lcd_type = lcd_detected_type;
@@ -204,7 +213,7 @@ static void lcd_ic_init(spi_device_handle_t spi)
     //lcd_init_cmds = ili_9341_init_cmds;
     // 将spi_lcd.h 中的参数写入LCD驱动IC
     while (lcd_init_cmds[cmd].databytes!=0xff) {
-        lcd_cmd(spi, lcd_init_cmds[cmd].cmd);
+        lcd_cmd(spi, lcd_init_cmds[cmd].cmd, false);
         lcd_data(spi, lcd_init_cmds[cmd].data, lcd_init_cmds[cmd].databytes&0x1F);
         if (lcd_init_cmds[cmd].databytes&0x80) {
             vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -219,6 +228,111 @@ static void lcd_spi_pre_transfer_callback(spi_transaction_t *t)
     int dc=(int)t->user;
     gpio_set_level(PIN_NUM_DC, dc);
 }
+
+
+
+
+void send_lines(spi_device_handle_t spi, int ypos, uint16_t *linedata)
+{
+    esp_err_t ret;
+    int x;
+    //Transaction descriptors. Declared static so they're not allocated on the stack; we need this memory even when this
+    //function is finished because the SPI driver needs access to it even while we're already calculating the next line.
+    static spi_transaction_t trans[6];
+
+    //In theory, it's better to initialize trans and data only once and hang on to the initialized
+    //variables. We allocate them on the stack, so we need to re-init them each call.
+    for (x=0; x<6; x++) {
+        memset(&trans[x], 0, sizeof(spi_transaction_t));
+        if ((x&1)==0) {
+            //Even transfers are commands
+            trans[x].length=8;
+            trans[x].user=(void*)0;
+        } else {
+            //Odd transfers are data
+            trans[x].length=8*4;
+            trans[x].user=(void*)1;
+        }
+        trans[x].flags=SPI_TRANS_USE_TXDATA;
+    }
+    trans[0].tx_data[0]=0x2A;           //Column Address Set
+    trans[1].tx_data[0]=0;              //Start Col High
+    trans[1].tx_data[1]=0;              //Start Col Low
+    trans[1].tx_data[2]=(320)>>8;       //End Col High
+    trans[1].tx_data[3]=(320)&0xff;     //End Col Low
+    trans[2].tx_data[0]=0x2B;           //Page address set
+    trans[3].tx_data[0]=ypos>>8;        //Start page high
+    trans[3].tx_data[1]=ypos&0xff;      //start page low
+    trans[3].tx_data[2]=(ypos+PARALLEL_LINES)>>8;    //end page high
+    trans[3].tx_data[3]=(ypos+PARALLEL_LINES)&0xff;  //end page low
+    trans[4].tx_data[0]=0x2C;           //memory write
+    trans[5].tx_buffer=linedata;        //finally send the line data
+    trans[5].length=320*2*8*PARALLEL_LINES;          //Data length, in bits
+    trans[5].flags=0; //undo SPI_TRANS_USE_TXDATA flag
+
+    //Queue all transactions.
+    for (x=0; x<6; x++) {
+        ret=spi_device_queue_trans(spi, &trans[x], portMAX_DELAY);
+        assert(ret==ESP_OK);
+    }
+
+    //When we are here, the SPI driver is busy (in the background) getting the transactions sent. That happens
+    //mostly using DMA, so the CPU doesn't have much to do here. We're not going to wait for the transaction to
+    //finish because we may as well spend the time calculating the next line. When that is done, we can call
+    //send_line_finish, which will wait for the transfers to be done and check their status.
+}
+
+
+void send_line_finish(spi_device_handle_t spi)
+{
+    spi_transaction_t *rtrans;
+    esp_err_t ret;
+    //Wait for all 6 transactions to be done and get back the results.
+    for (int x=0; x<6; x++) {
+        ret=spi_device_get_trans_result(spi, &rtrans, portMAX_DELAY);
+        assert(ret==ESP_OK);
+        //We could inspect rtrans now if we received any info back. The LCD is treated as write-only, though.
+    }
+}
+
+
+//Simple routine to generate some patterns and send them to the LCD. Don't expect anything too
+//impressive. Because the SPI driver handles transactions in the background, we can calculate the next line
+//while the previous one is being sent.
+void display_pretty_colors(spi_device_handle_t spi)
+{
+    uint16_t *lines[2];
+    //Allocate memory for the pixel buffers
+    for (int i=0; i<2; i++) {
+        lines[i]=heap_caps_malloc(320*PARALLEL_LINES*sizeof(uint16_t), MALLOC_CAP_DMA);
+        assert(lines[i]!=NULL);
+    }
+    int frame=0;
+    //Indexes of the line currently being sent to the LCD and the line we're calculating.
+    int sending_line=-1;
+    int calc_line=0;
+
+    while(1) {
+        frame++;
+        for (int y=0; y<240; y+=PARALLEL_LINES) {
+            //Calculate a line.
+            pretty_effect_calc_lines(lines[calc_line], y, frame, PARALLEL_LINES);
+            //Finish up the sending process of the previous line, if any
+            if (sending_line!=-1) send_line_finish(spi);
+            //Swap sending_line and calc_line
+            sending_line=calc_line;
+            calc_line=(calc_line==1)?0:1;
+            //Send the line we currently calculated.
+            send_lines(spi, y, lines[sending_line]);
+            //The line set is queued up for sending now; the actual sending happens in the
+            //background. We can go on to calculate the next line set as long as we do not
+            //touch line[sending_line]; the SPI sending process is still reading from that.
+        }
+    }
+}
+
+
+
 
 /**
  * @brief  以SPI方式驱动LCD初始化函数
@@ -259,14 +373,14 @@ void spi_lcd_init(spi_host_device_t host_id, uint32_t clk_speed, gpio_num_t cs_i
     // 设置屏幕分辨率、扫描方向
     // 初始化 显示区域的大小，和扫描方向。（！！重要，必有，否则不能显示正常）
     // 来匹配屏幕的安装方向。或镜像安装方式（可用于镜面反射及棱镜的镜像显示）（提供了8中扫描方式，以便横竖屏、翻转和镜像的切换）
-    //LCD_Display_Dir(LCD_DIR, LCD_INVERT, LCD_MIRROR);
+    LCD_Display_Dir(LCD_DIR, LCD_INVERT, LCD_MIRROR);
     //LCD_Display_Dir(vertical, invert_dis, mirror_dis); // 竖屏、不倒置(正着摆放)、不镜像
     //LCD_Display_Dir(vertical, invert_dis, mirror_en); // 竖屏、不倒置(正着摆放)、镜像
     //LCD_Display_Dir(vertical, invert_en, mirror_dis); // 竖屏、倒置(倒立摆放)、不镜像
     //LCD_Display_Dir(vertical, invert_en, mirror_en); // 竖屏、倒置(倒立摆放)、镜像
     //LCD_Display_Dir(horizontal, invert_dis, mirror_dis); // 横屏、不倒置(正着摆放)、不镜像
     //LCD_Display_Dir(horizontal, invert_dis, mirror_en); // 横屏、不倒置(正着摆放)、镜像
-    LCD_Display_Dir(horizontal, invert_en, mirror_dis); // 横屏、倒置(倒立摆放)、不镜像
+    //LCD_Display_Dir(horizontal, invert_en, mirror_dis); // 横屏、倒置(倒立摆放)、不镜像
     //LCD_Display_Dir(horizontal, invert_en, mirror_en); // 横屏、倒置(倒立摆放)、镜像
 
     // 清屏，使用纯黑，避免之后点亮背光产生突兀的闪烁

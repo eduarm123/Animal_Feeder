@@ -11,7 +11,7 @@ _lcd_dev lcddev;
 // 原型为 "spi_lcd.c" 中 void lcd_cmd(spi_device_handle_t spi, const uint8_t cmd)
 static void LCD_WR_REG(uint8_t reg_addr)
 {
-    lcd_cmd(LCD_SPI, reg_addr);
+    lcd_cmd(LCD_SPI, reg_addr, true);
 }
 
 // SPI写LCD数据函数，写数据（可变长度）

@@ -1,0 +1,1 @@
+https://github.com/lvgl/lv_lib_split_jpg/blob/master/tjpgdcnf.h

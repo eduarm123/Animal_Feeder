@@ -19,6 +19,7 @@
 void spi_master_init(spi_host_device_t host_id, int dma_chan, uint32_t max_tran_size, gpio_num_t miso_io_num, gpio_num_t mosi_io_num, gpio_num_t clk_io_num)
 {
     esp_err_t ret;
+    spi_device_handle_t spi;
     // 配置 MISO、MOSI、CLK、CS 的引脚，和DMA最大传输字节数
     spi_bus_config_t buscfg={
         .miso_io_num=miso_io_num,              // MISO引脚定义
