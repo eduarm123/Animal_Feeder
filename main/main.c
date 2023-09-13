@@ -68,16 +68,13 @@ extern "C"
 
 /***************************** (7) PUBLIC METHODS IMPLEMENTATION *********************************/
 
-QueueHandle_t commandQueue;
 TaskHandle_t MainScreen_Handle = NULL;
 TaskHandle_t AlarmaMenu_Handle = NULL;
 
 
 void app_main(void)
 {
-    //extern SemaphoreHandle_t LlaveGlobal;
-    colaPulsador = xQueueCreate(1, sizeof(int));
-    commandQueue = xQueueCreate(12, sizeof(uint8_t));
+
 
 	static uint8_t ucParameterToPass;
   

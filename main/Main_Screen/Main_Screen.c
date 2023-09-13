@@ -136,11 +136,11 @@ void Main_Screen( void * pvParameters )
     LCD_Clear(LGRAYBLUE);
     /*-------INICIALIZAR teclado------------*/
 
-    //keypadInit(); @Edwin descomenta esto y comenta keypad_initalize para inicializar teclado modo polling
+    keypadInit();// @Edwin descomenta esto y comenta keypad_initalize para inicializar teclado modo polling
 
-    gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 14, 12, 13}; //Pines a ocupar para teclado matricial
+    //gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 14, 12, 13}; //Pines a ocupar para teclado matricial
 
-    keypad_initalize(keypad); /// Inicializa keyboard
+    //keypad_initalize(keypad); /// Inicializa keyboard
 
     RTC_init(&s_dev); // Inicializa el i2c
 
@@ -189,9 +189,9 @@ void Main_Screen( void * pvParameters )
             LCD_ShowString(25-1,180-1,LGRAYBLUE,BLACK,u8_timeconverted,32,1);  
                    
             /*--------------------------------------------------------------------*/
-            // u8_key = readKeypad(); @Edwin descomenta esto y comenta u8_key = keypad_getkey();
-            // Nota hay que reemplazar todos los keypad_getkey() 
-            u8_key = keypad_getkey();
+            // u8_key = readKeypad(); @Edwin descomenta esto y comenta u8_key = readKeypad();
+            // Nota hay que reemplazar todos los readKeypad() 
+            u8_key = readKeypad();
             if (u8_key=='C')
             {               
                 Alarma_menu();
@@ -242,7 +242,7 @@ time_result_t obtenerHora()
         LCD_ShowChar(180-1,180-1,LGRAYBLUE,BLACK,numeroStr[2],32,1); // Mejorar
         LCD_ShowChar(210-1,180-1,LGRAYBLUE,BLACK,numeroStr[3],32,1); // Mejorar
         vTaskDelay(pdMS_TO_TICKS(10));
-        u8_key = keypad_getkey();
+        u8_key = readKeypad();
 
         if (u8_key != '\0') {
 
@@ -643,7 +643,7 @@ static uint8_t select_option(void)
 
     while(ret)
     {
-        _u8_key = keypad_getkey();
+        _u8_key = readKeypad();
         if (_u8_key =='1' || _u8_key =='2' || _u8_key =='3' || _u8_key =='4' || _u8_key =='5' )
         {
             break;

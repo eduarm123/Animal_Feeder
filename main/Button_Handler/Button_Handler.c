@@ -64,15 +64,15 @@ const char keypad[] = {
 
 // Define the GPIO pins for rows and columns
 s_gpio_t colPins[] = {
-    {GPIO_NUM_18, GPIO_MODE_OUTPUT},
-    {GPIO_NUM_23, GPIO_MODE_OUTPUT},
-    {GPIO_NUM_4, GPIO_MODE_OUTPUT},
-    {GPIO_NUM_22, GPIO_MODE_OUTPUT}
+    {GPIO_NUM_32, GPIO_MODE_OUTPUT},
+    {GPIO_NUM_16, GPIO_MODE_OUTPUT},
+    {GPIO_NUM_17, GPIO_MODE_OUTPUT},
+    {GPIO_NUM_27, GPIO_MODE_OUTPUT}
 };
 
 
 s_gpio_t rowPins[] = {   
-    {GPIO_NUM_27, GPIO_MODE_INPUT},
+    {GPIO_NUM_34, GPIO_MODE_INPUT},
     {GPIO_NUM_26, GPIO_MODE_INPUT},
     {GPIO_NUM_25, GPIO_MODE_INPUT},
     {GPIO_NUM_33, GPIO_MODE_INPUT}

@@ -4,6 +4,21 @@
 
 4-5-6-7
 
+s_gpio_t colPins[] = {
+    {GPIO_NUM_32, GPIO_MODE_OUTPUT}, siguiente 5
+    {GPIO_NUM_16, GPIO_MODE_OUTPUT}, RX2 siguiente 6 
+    {GPIO_NUM_17, GPIO_MODE_OUTPUT}, TX2 siguiente 7
+    {GPIO_NUM_27, GPIO_MODE_OUTPUT}  siguiente 8 (El mas cerca a la D)
+};
+
+
+s_gpio_t rowPins[] = {   
+    {GPIO_NUM_34, GPIO_MODE_INPUT}, este es el primera empezando desde la izquierda (El que esta mas cerda de *)
+    {GPIO_NUM_26, GPIO_MODE_INPUT}, siguiente 2
+    {GPIO_NUM_25, GPIO_MODE_INPUT}, siguiente 3
+    {GPIO_NUM_33, GPIO_MODE_INPUT} siguiente 4
+};
+
 
 Tutorial tareas
 https://esp32tutorials.com/esp32-esp-idf-freertos-semaphore-tutorial/
