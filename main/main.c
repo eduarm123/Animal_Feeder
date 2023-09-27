@@ -47,9 +47,7 @@ extern "C"
 #include "Button_Handler.h"
 
 #include "Pwm_motor.h"
-//#include "easyio.h"
 
-//#include "esp_err.h"
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
@@ -81,7 +79,7 @@ void app_main(void)
 
     xTaskCreatePinnedToCore(Main_Screen,
                 "Main_Screen",
-                configMINIMAL_STACK_SIZE * 3,
+                configMINIMAL_STACK_SIZE * 10,
                 &ucParameterToPass,
                 1, //tskIDLE_PRIORITY (Prioridad)
                 &MainScreen_Handle,

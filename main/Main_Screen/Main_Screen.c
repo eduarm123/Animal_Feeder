@@ -28,18 +28,21 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <freertos/FreeRTOS.h>
-
 #include <freertos/task.h>
+#include "freertos/semphr.h"
+
 #include <string.h>
 #include <time.h>
 #include "ds3231.h"
 
 #include "Main_Screen.h"
 #include "Button_Handler.h"
-#include "freertos/semphr.h"
+
+
 #include "easyio.h"
 #include "picture.h"
 #include <stdlib.h>
+
 
 
 #include "NVM_drivers/NVM_drivers.h"
@@ -101,11 +104,11 @@ uint32_t alarm_type;
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 
-
 /*********************************** (4) PRIVATE VARS ********************************************/
 
 
 /**************************** (5) PRIVATE METHODS DEFINITION *************************************/
+
 
 /************************* (6)  STATIC METHODS IMPLEMENTATION ************************************/
 static uint8_t select_option(void);
@@ -136,11 +139,8 @@ void Main_Screen( void * pvParameters )
     LCD_Clear(LGRAYBLUE);
     /*-------INICIALIZAR teclado------------*/
 
-    keypadInit();// @Edwin descomenta esto y comenta keypad_initalize para inicializar teclado modo polling
+    keypadInit();// 
 
-    //gpio_num_t keypad[8] = {27, 26, 25, 33, 32, 14, 12, 13}; //Pines a ocupar para teclado matricial
-
-    //keypad_initalize(keypad); /// Inicializa keyboard
 
     RTC_init(&s_dev); // Inicializa el i2c
 

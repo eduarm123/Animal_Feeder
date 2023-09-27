@@ -17,7 +17,9 @@
     "button_handler.h": "c",
     "string.h": "c",
     "corecrt_wstring.h": "c",
-    "vcruntime_string.h": "c"
+    "vcruntime_string.h": "c",
+    "esp_system.h": "c",
+    "esp_timer.h": "c"
   },
   "idf.openOcdConfigs": [
     "board/esp32-bridge.cfg"
