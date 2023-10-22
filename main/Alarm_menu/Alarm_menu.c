@@ -103,43 +103,48 @@ void init_manual_alarm_5();
  */
 void Alarm_menu( void * pvParameters )
 {
-    gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Para el motor
-    vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
-    for (;;)
-    {   
-        printf("--- tarea alarm_menu---\n");    
-        // Alarm is set, start monitoring the time                        
-        NNVM_read_memory_u32(ALARM_NAMESPACE, &alarm_type);
-        vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 500 milliseconds or any desired interval            
-        switch (alarm_type){
+    //gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Para el motor
+    vTaskDelay(pdMS_TO_TICKS(1)); // espera de x tiempo para que las otras tareas se inicialicen
+    // for (;;)
+    // {   
+    //     printf("--- tarea alarm_menu---\n");    
+    //     // Alarm is set, start monitoring the time                        
+    //     NNVM_read_memory_u32(ALARM_NAMESPACE, &alarm_type);
+    //     vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 500 milliseconds or any desired interval            
+    //     switch (alarm_type){
 
-            case Manual_alarmas_1: 
-                printf("--- Manual_alarmas_1 ---\n");
-                init_manual_alarm_1();
-                break;
-            case Manual_alarmas_2: 
-                printf("--- Manual_alarmas_2 ---\n");
-                init_manual_alarm_2();
-                break;
-            case Manual_alarmas_3: 
-                printf("--- Manual_alarmas_3 ---\n");
-                init_manual_alarm_3();
-                break;
-            case Manual_alarmas_4: 
-                printf("--- Manual_alarmas_4 ---\n");
-                init_manual_alarm_4();
-                break;
-            case Manual_alarmas_5: 
-                printf("--- Manual_alarmas_5 ---\n");
-                init_manual_alarm_5();
-                break;          
-            default:
-                printf("--- No alarm configured---\n");
-                vTaskDelay(pdMS_TO_TICKS(5000));
-                break;
-        }
+    //         case Manual_alarmas_1: 
+    //             printf("--- Manual_alarmas_1 ---\n");
+    //             init_manual_alarm_1();
+    //             break;
+    //         case Manual_alarmas_2: 
+    //             printf("--- Manual_alarmas_2 ---\n");
+    //             init_manual_alarm_2();
+    //             break;
+    //         case Manual_alarmas_3: 
+    //             printf("--- Manual_alarmas_3 ---\n");
+    //             init_manual_alarm_3();
+    //             break;
+    //         case Manual_alarmas_4: 
+    //             printf("--- Manual_alarmas_4 ---\n");
+    //             init_manual_alarm_4();
+    //             break;
+    //         case Manual_alarmas_5: 
+    //             printf("--- Manual_alarmas_5 ---\n");
+    //             init_manual_alarm_5();
+    //             break;          
+    //         default:
+    //             printf("--- No alarm configured---\n");
+    //             vTaskDelay(pdMS_TO_TICKS(5000));
+    //             break;
+    //     }
          
+    // }
+
+    while(1){
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
+
     
 }
 
