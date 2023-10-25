@@ -8,7 +8,6 @@
 *.bin
 *.elf 
 
-*.cmake
 *.bin_timestamp
 #*.json
 *.map
