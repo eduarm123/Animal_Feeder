@@ -4,7 +4,6 @@
 *.exe
 *.lib
 *.pdb
-*.yml
 
 *.bin
 *.elf 
