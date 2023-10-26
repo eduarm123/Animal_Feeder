@@ -42,7 +42,7 @@
 
 
 #include "easyio.h"
-#include "picture.h"
+//#include "picture.h"
 #include <stdlib.h>
 
 #include "NVM_drivers/NVM_drivers.h"
@@ -55,7 +55,9 @@
 #endif
  
 #include "lvgl_helpers.h"
+#include "ui_helpers.h"
 
+#include "ui.h"
 
 /********************************* (1) PUBLIC METHODS ********************************************/
 
@@ -105,22 +107,24 @@ tm_t s_alarmas_manual[]={
     {0},
 };
 
-lv_obj_t *roller;
+/*lv_obj_t *roller;
 lv_obj_t *roller1;
 lv_obj_t *button;
 lv_obj_t *ui_Screen1;
 lv_obj_t *ui_Label1;
 lv_obj_t *ui_Panel1;
-lv_obj_t *ui____initial_actions0;
+lv_obj_t *ui____initial_actions0;*/
 
-char buf[2];
-char buf1[2];
+//char buf[2];
+//char buf1[2];
 uint8_t u8_TimeConfigDone=0;
+
 
 i2c_dev_t s_dev; // necessary for RTC_init()
 
 uint8_t n_alarms; // Se guarda la configuracion las alarmas que estan declaradas en ACTIVAR_ALARM
 uint32_t alarm_type;
+
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 
@@ -147,7 +151,8 @@ static void example_increase_lvgl_tick(void *arg)
     lv_tick_inc(EXAMPLE_LVGL_TICK_PERIOD_MS);
 }
 
-static void Config_time(void)
+
+/*static void Config_time(void)
 {
     // Crea el objeto "rodillo"
     roller = lv_roller_create(lv_scr_act());
@@ -200,7 +205,7 @@ static void ok_button_event_cb(lv_event_t * e)
 
         u8_TimeConfigDone=1;
     }
-}
+}*/
 
  
 
@@ -308,13 +313,14 @@ void Main_Screen( void * pvParameters )
         
     //     NNVM_write_memory_u32("restart_counter",restart_counter);         
     // }
-    Config_time();
+    //Config_time();
+    ui_init();
     while(!u8_TimeConfigDone){
        vTaskDelay(pdMS_TO_TICKS(10));
        lv_timer_handler();
         
     }
-    ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
+    //ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
     
                         
     while(1)
@@ -326,7 +332,7 @@ void Main_Screen( void * pvParameters )
 
         if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
         {
-            printf("Could not get time\n");
+           printf("Could not get time\n");
         }
 
         // printf("--- main screen ---\n");

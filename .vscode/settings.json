@@ -19,7 +19,9 @@
     "corecrt_wstring.h": "c",
     "vcruntime_string.h": "c",
     "esp_system.h": "c",
-    "esp_timer.h": "c"
+    "esp_timer.h": "c",
+    "ui_events.h": "c",
+    "numbers": "c"
   },
   "idf.openOcdConfigs": [
     "board/esp32-bridge.cfg"

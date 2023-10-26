@@ -7,7 +7,17 @@ idf_component_register(SRCS "main.c" "C:/Repos/Animal_Feeder/RCT/i2cdev/i2cdev.c
                             "C:/Repos/Animal_Feeder/FTF_display/simple_gui.c" 
                             "C:/Repos/Animal_Feeder/FTF_display/spi_config.c" 
                             "C:/Repos/Animal_Feeder/FTF_display/spi_lcd.c"
-                            "C:/Repos/Animal_Feeder/main/Pwm_motor/Pwm_motor.c"               
+                            "C:/Repos/Animal_Feeder/main/Pwm_motor/Pwm_motor.c"
+
+                            "C:/Repos/Animal_Feeder/main/Screens/ui_helpers.c"
+                            "C:/Repos/Animal_Feeder/main/Screens/ui_Pantalla1Bienvenido.c"
+                            "C:/Repos/Animal_Feeder/main/Screens/ui_Pantalla2IngHora.c"
+                            "C:/Repos/Animal_Feeder/main/Screens/ui_Pantalla3VisuHora.c"
+                            "C:/Repos/Animal_Feeder/main/Screens/ui_Pantalla4Menu.c"
+                            "C:/Repos/Animal_Feeder/main/Screens/ui_Pantalla5ConfigAlarmas.c"
+                            "C:/Repos/Animal_Feeder/main/Screens/ui_Pantalla6VisuAlarm.c"
+                            "C:/Repos/Animal_Feeder/main/Screens/ui.c"
+
                     INCLUDE_DIRS "." "C:/Repos/Animal_Feeder/RCT/ds3231"
                     "C:/Repos/Animal_Feeder/RCT/i2cdev"
                     "C:/Repos/Animal_Feeder/RCT/esp_idf_lib_helpers"
@@ -15,4 +25,5 @@ idf_component_register(SRCS "main.c" "C:/Repos/Animal_Feeder/RCT/i2cdev/i2cdev.c
                     "C:/Repos/Animal_Feeder/main/Alarm_menu"
                     "C:/Repos/Animal_Feeder/main/Button_Handler"
                     "C:/Repos/Animal_Feeder/FTF_display"
-                    "C:/Repos/Animal_Feeder/main/Pwm_motor" )
+                    "C:/Repos/Animal_Feeder/main/Pwm_motor"
+                    "C:/Repos/Animal_Feeder/main/Screens" )
