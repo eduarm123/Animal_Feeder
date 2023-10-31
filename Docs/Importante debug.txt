@@ -61,4 +61,4 @@ openocd -c 'set ESP_RTOS none' -f interface/ftdi/esp32_devkitj_v1.cfg
 
 
 Para ILI9341 Cambiar de portrait  a landscape y también poner el display que está en LVGL ESP DRIVERS 
-Además marcar Swap XY e Invert Y coordinate value
+Además desmarcar Swap XY e Invert Y coordinate value y marcar invert x y invert y y poner pressure only

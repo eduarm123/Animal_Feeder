@@ -202,11 +202,11 @@ void ui_init(void)
                                                false, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
     ui_Pantalla1Bienvenido_screen_init();
-    ui_Pantalla2IngHora_screen_init();
-    ui_Pantalla3VisuHora_screen_init();
-    ui_Pantalla4Menu_screen_init();
-    ui_Pantalla5ConfigAlarmas_screen_init();
-    ui_Pantalla6VisuAlarm_screen_init();
+    // ui_Pantalla2IngHora_screen_init();
+    // ui_Pantalla3VisuHora_screen_init();
+    // ui_Pantalla4Menu_screen_init();
+    // ui_Pantalla5ConfigAlarmas_screen_init();
+    // ui_Pantalla6VisuAlarm_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_Pantalla1Bienvenido);
 }

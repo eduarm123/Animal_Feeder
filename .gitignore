@@ -13,6 +13,9 @@
 *.map
 *.ninja
 
+sdkconfig
+sdkconfig.defaults
+
 *.a
 build/
 .vscode/

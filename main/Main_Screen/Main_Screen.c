@@ -135,6 +135,8 @@ char contador_str1[4];
 
 /*********************************** (4) PRIVATE VARS ********************************************/
 
+//static mutex_t lvgl_mutex;
+
 
 /**************************** (5) PRIVATE METHODS DEFINITION *************************************/
 static void example_increase_lvgl_tick(void *arg);
@@ -220,6 +222,7 @@ void Main_Screen( void * pvParameters )
 {
     uint8_t u8_key=0;
     char u8_timeconverted[9];
+    uint32_t time_till_next;
     uint32_t size_in_px = DISP_BUF_SIZE;
 
     static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
@@ -349,17 +352,25 @@ void Main_Screen( void * pvParameters )
         //     Alarma_menu();
         //     LCD_Clear(LGRAYBLUE);
         // }
-        vTaskDelay(pdMS_TO_TICKS(10));
-        lv_timer_handler();
+
+        //mutex_lock(&lvgl_mutex);
+        time_till_next = lv_timer_handler();
+        //mutex_unlock(&lvgl_mutex);
+
+        vTaskDelay(pdMS_TO_TICKS(time_till_next));
+        
         //printf("--- main screen ---\n");
         //printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
 
         // Suponemos un valor máximo de 999 para el contador
-        snprintf(contador_str, sizeof(contador_str), "%d", time_tc.tm_min);
-        snprintf(contador_str1, sizeof(contador_str1), "%d", time_tc.tm_sec); //Reemplazar por los minutos
 
-        lv_label_set_text(ui_Hora, contador_str);
-        lv_label_set_text(ui_Min, contador_str1);
+        convertTime2StringDisplay(&time_tc,u8_timeconverted);
+
+        // snprintf(contador_str, sizeof(contador_str), "%d", time_tc.tm_min);
+        // snprintf(contador_str1, sizeof(contador_str1), "%d", time_tc.tm_sec); //Reemplazar por los minutos
+
+        lv_label_set_text(ui_Hora, u8_timeconverted);
+        //lv_label_set_text(ui_Min, contador_str1);
     }
 
     /* A task should NEVER return */
