@@ -75,12 +75,13 @@ extern lv_obj_t * ui_LabelOK;
 // SCREEN: ui_Pantalla6VisuAlarm
 void ui_Pantalla6VisuAlarm_screen_init(void);
 extern lv_obj_t * ui_Pantalla6VisuAlarm;
-extern lv_obj_t * ui_LabAlarSel;
+extern lv_obj_t * ui_LabAlarSel[5];
 extern lv_obj_t * ui_TextArea3;
 void ui_event_AtrasAlarm(lv_event_t * e);
 extern lv_obj_t * ui_AtrasAlarm;
 extern lv_obj_t * ui_Label4;
 extern lv_obj_t * ui____initial_actions0;
+extern lv_obj_t *tabla;
 //extern lv_obj_t *pestanas[10]; //Para el número de pestañas de las alarmas
 //extern lv_obj_t *rollerS[3]; //1er Rodillo del tabview
 //extern lv_obj_t *rollerS1[3]; //2do Rodillo del tabview

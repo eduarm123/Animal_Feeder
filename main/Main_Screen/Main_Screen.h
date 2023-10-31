@@ -76,6 +76,7 @@ void Time_config(tm_t *_time);
 void convertTime2StringDisplay(tm_t *_time2Convert, char timeconverted[]);
 
 extern void Time_config_touch(tm_t * const _time, uint8_t _hour,uint8_t _minute );
+
 /******************************** (3) DEFINES & MACROS *******************************************/
 
 

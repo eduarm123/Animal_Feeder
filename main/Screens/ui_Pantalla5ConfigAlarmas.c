@@ -14,9 +14,15 @@ int valor_rodillo=1;
 char buf[32];
 char buf1[32];
 
+uint8_t conv;
+uint8_t conv1;
+
+char row_name[16]; //Nombre de las filas
+char row_name1[16]; //Nombre de las filas
+
 
 void ui_event_OkAlarm(lv_obj_t *e)
-{
+{         
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     //lv_obj_t * button = lv_event_get_target(e);
@@ -30,16 +36,24 @@ void ui_event_OkAlarm(lv_obj_t *e)
             printf("Valor del rodillo %d: %s\n", i, buf);
             printf("Valor del rodillo %d: %s\n", i, buf1);
 
+            conv = (uint8_t)atoi(buf);
+            conv1 = (uint8_t)atoi(buf1);
+
+             // Establecemos las alarmas en las filas en la tabla de la pantalla 6
+            snprintf(row_name, sizeof(row_name), "%d : %d", conv, conv1);
+            lv_table_set_cell_value(tabla, i, 1, row_name); //Colocamos en la columna 1 lo concerniente a las alarmas
+
+            snprintf(row_name1, sizeof(row_name1), "%s %d", "Alarma", i+1);
+            lv_table_set_cell_value(tabla, i, 0, row_name1); //Colocamos en la columna 0 lo concerniente al nombre alarma "X"
+
             _ui_screen_delete(&ui_Pantalla5ConfigAlarmas);
             _ui_screen_change(&ui_Pantalla6VisuAlarm, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Pantalla6VisuAlarm_screen_init);
-
-            //printf("Número seleccionado: %s\n", buf);
-            //printf("Número seleccionado 2: %s\n", buf1);
-        }
+        }        
     }
 }
 
 void actualizar_pantalla(int num_pestanas) {
+
     // Eliminar las pestañas existentes
     for (int i = 0; i < 5; i++) {
         if (pestanas[i]) {
@@ -56,13 +70,13 @@ void actualizar_pantalla(int num_pestanas) {
 
 
         rollerS[i] = lv_roller_create(pestanas[i]);
-        lv_roller_set_options(rollerS[i], "0\n1\n2\n3\n4\n5\n6\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23", LV_ROLLER_MODE_INFINITE);
+        lv_roller_set_options(rollerS[i], "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23", LV_ROLLER_MODE_INFINITE);
         lv_roller_set_visible_row_count(rollerS[i], 3);
         lv_obj_set_width(rollerS[i], 50);
         lv_obj_align(rollerS[i], LV_ALIGN_OUT_BOTTOM_LEFT, 20, 5);
 
         rollerS1[i] = lv_roller_create(pestanas[i]);
-        lv_roller_set_options(rollerS1[i], "0\n1\n2\n3\n4\n5\n6\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50\n51\n52\n53\n54\n55\n56\n57\n58\n59", LV_ROLLER_MODE_INFINITE);
+        lv_roller_set_options(rollerS1[i], "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50\n51\n52\n53\n54\n55\n56\n57\n58\n59", LV_ROLLER_MODE_INFINITE);
         lv_roller_set_visible_row_count(rollerS1[i], 3);
         lv_obj_set_width(rollerS1[i], 50);
         lv_obj_align(rollerS1[i], LV_ALIGN_OUT_BOTTOM_LEFT, 100, 5);
@@ -70,6 +84,17 @@ void actualizar_pantalla(int num_pestanas) {
         // Personaliza el contenido de la pestaña según tus necesidades
         /*lv_obj_t *label = lv_label_create(pestanas[i]);
         lv_label_set_text(label, "Contenido de la pestaña");*/
+
+
+        /*ui_LabAlarSel[i] = lv_label_create(ui_Pantalla6VisuAlarm);
+        lv_obj_set_width(ui_LabAlarSel[i], LV_SIZE_CONTENT);   /// 1
+        lv_obj_set_height(ui_LabAlarSel[i], LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_x(ui_LabAlarSel[i], 0);
+        lv_obj_set_y(ui_LabAlarSel[i], -75);
+        lv_obj_set_align(ui_LabAlarSel[i], LV_ALIGN_CENTER);*/
+
+
+
     }
 }
 
@@ -83,6 +108,8 @@ void ui_event_RodAlarm(lv_event_t * e)
         printf("Número seleccionado: %s\n", buf);
         valor_rodillo = atoi(buf);
         actualizar_pantalla(valor_rodillo);
+
+        lv_table_set_row_cnt(tabla, valor_rodillo); //Establecemos el # de las filas de la tabla de la pantalla 6 en función del rodillo
     }
 }
 

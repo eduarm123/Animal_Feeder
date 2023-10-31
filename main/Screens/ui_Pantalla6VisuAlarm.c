@@ -4,7 +4,6 @@
 // Project name: Pantalla1
 
 #include "ui.h"
-
 void ui_Pantalla6VisuAlarm_screen_init(void)
 {
     ui_Pantalla6VisuAlarm = lv_obj_create(NULL);
@@ -13,29 +12,29 @@ void ui_Pantalla6VisuAlarm_screen_init(void)
     lv_obj_set_style_border_opa(ui_Pantalla6VisuAlarm, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_Pantalla6VisuAlarm, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_LabAlarSel = lv_label_create(ui_Pantalla6VisuAlarm);
-    lv_obj_set_width(ui_LabAlarSel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_LabAlarSel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabAlarSel, 0);
-    lv_obj_set_y(ui_LabAlarSel, -75);
-    lv_obj_set_align(ui_LabAlarSel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LabAlarSel, "ALARMAS SELECCIONADAS");
+    /*ui_LabAlarSel[5] = lv_label_create(ui_Pantalla6VisuAlarm);
+    lv_obj_set_width(ui_LabAlarSel[5], LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabAlarSel[5], LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LabAlarSel[5], 0);
+    lv_obj_set_y(ui_LabAlarSel[5], -75);*/
+    //lv_obj_set_align(ui_LabAlarSel, LV_ALIGN_CENTER);
+    //lv_label_set_text(ui_LabAlarSel, "ALARMAS SELECCIONADAS");
 
-    ui_TextArea3 = lv_textarea_create(ui_Pantalla6VisuAlarm);
+    /*ui_TextArea3 = lv_textarea_create(ui_Pantalla6VisuAlarm);
     lv_obj_set_width(ui_TextArea3, 167);
     lv_obj_set_height(ui_TextArea3, 41);
     lv_obj_set_x(ui_TextArea3, -3);
     lv_obj_set_y(ui_TextArea3, -10);
-    lv_obj_set_align(ui_TextArea3, LV_ALIGN_CENTER);
-    lv_textarea_set_text(ui_TextArea3, "COLOCAR ALARMAS");
-    lv_textarea_set_placeholder_text(ui_TextArea3, "Placeholder...");
+    lv_obj_set_align(ui_TextArea3, LV_ALIGN_CENTER);*/
+    //lv_textarea_set_text(ui_TextArea3, "COLOCAR ALARMAS");
+    //lv_textarea_set_placeholder_text(ui_TextArea3, "Placeholder...");
 
     ui_AtrasAlarm = lv_btn_create(ui_Pantalla6VisuAlarm);
     lv_obj_set_width(ui_AtrasAlarm, 63);
     lv_obj_set_height(ui_AtrasAlarm, 41);
     lv_obj_set_x(ui_AtrasAlarm, 0);
     lv_obj_set_y(ui_AtrasAlarm, 75);
-    lv_obj_set_align(ui_AtrasAlarm, LV_ALIGN_CENTER);
+    lv_obj_set_align(ui_AtrasAlarm, LV_ALIGN_LEFT_MID);
     lv_obj_add_flag(ui_AtrasAlarm, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_AtrasAlarm, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
@@ -44,6 +43,17 @@ void ui_Pantalla6VisuAlarm_screen_init(void)
     lv_obj_set_height(ui_Label4, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_Label4, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Label4, "ATRAS");
+
+
+    // Crear una tabla inicial con una fila
+    tabla = lv_table_create(ui_Pantalla6VisuAlarm);
+    //lv_table_set_row_cnt(tabla, 0);
+    lv_obj_align(tabla, LV_ALIGN_CENTER, 0, 0);
+    // Establecer títulos de fila inicial
+    //lv_table_set_cell_value(tabla, 0, 0, "ALARMAS");
+    lv_table_set_row_cnt(tabla, 1);
+    lv_table_set_col_width(tabla, 0, 100);
+    lv_table_set_col_width(tabla, 1, 80);
 
     lv_obj_add_event_cb(ui_AtrasAlarm, ui_event_AtrasAlarm, LV_EVENT_ALL, NULL);
 

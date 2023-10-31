@@ -17,6 +17,7 @@ uint8_t u8_hour;
 uint8_t u8_min;
 extern i2c_dev_t s_dev; // necessary for RTC_init()
 
+
 void ui_event_BotonOK(lv_event_t * e)
 {
     

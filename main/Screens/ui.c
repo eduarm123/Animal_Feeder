@@ -73,12 +73,13 @@ lv_obj_t * ui_LabelOK;
 // SCREEN: ui_Pantalla6VisuAlarm
 void ui_Pantalla6VisuAlarm_screen_init(void);
 lv_obj_t * ui_Pantalla6VisuAlarm;
-lv_obj_t * ui_LabAlarSel;
+lv_obj_t * ui_LabAlarSel[5];
 lv_obj_t * ui_TextArea3;
 void ui_event_AtrasAlarm(lv_event_t * e);
 lv_obj_t * ui_AtrasAlarm;
 lv_obj_t * ui_Label4;
 lv_obj_t * ui____initial_actions0;
+lv_obj_t *tabla; 
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
@@ -133,7 +134,7 @@ void ui_event_Alarm(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         _ui_screen_delete(&ui_Pantalla3VisuHora);
-        _ui_screen_change(&ui_Pantalla6VisuAlarm, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Pantalla6VisuAlarm_screen_init);
+        _ui_screen_change(&ui_Pantalla6VisuAlarm, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Pantalla6VisuAlarm_screen_init);        
     }
 }
 void ui_event_ConfigHora(lv_event_t * e)

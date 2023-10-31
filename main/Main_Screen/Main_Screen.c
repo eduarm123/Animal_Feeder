@@ -124,7 +124,8 @@ i2c_dev_t s_dev; // necessary for RTC_init()
 
 uint8_t n_alarms; // Se guarda la configuracion las alarmas que estan declaradas en ACTIVAR_ALARM
 uint32_t alarm_type;
-
+char contador_str[4];
+char contador_str1[4];
 
 /******************************** (3) DEFINES & MACROS *******************************************/
 
@@ -350,9 +351,15 @@ void Main_Screen( void * pvParameters )
         // }
         vTaskDelay(pdMS_TO_TICKS(10));
         lv_timer_handler();
-        printf("--- main screen ---\n");
-        printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
-        
+        //printf("--- main screen ---\n");
+        //printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
+
+        // Suponemos un valor máximo de 999 para el contador
+        snprintf(contador_str, sizeof(contador_str), "%d", time_tc.tm_min);
+        snprintf(contador_str1, sizeof(contador_str1), "%d", time_tc.tm_sec); //Reemplazar por los minutos
+
+        lv_label_set_text(ui_Hora, contador_str);
+        lv_label_set_text(ui_Min, contador_str1);
     }
 
     /* A task should NEVER return */
