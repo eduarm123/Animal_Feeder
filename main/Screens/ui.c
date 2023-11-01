@@ -119,13 +119,60 @@ void ui_event_Pantalla1Bienvenido(lv_event_t * e)
             _ui_screen_change(&ui_Pantalla3VisuHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 2000, &ui_Pantalla3VisuHora_screen_init);
         }
     }
+    
     NNVM_read_memory_u32(ALARM_NAMESPACE, &alarm_type);
-    //if (alarm_type!=0){
+    if (alarm_type!=0){
+
+        uint32_t alarm1_NVM = 0;                     
+        NNVM_read_memory_u32("alarm1_NVM",&alarm1_NVM);
+        
+        uint32_t alarm2_NVM = 0;                     
+        NNVM_read_memory_u32("alarm2_NVM",&alarm2_NVM);
+
+        uint32_t alarm3_NVM = 0;                     
+        NNVM_read_memory_u32("alarm3_NVM",&alarm3_NVM);
+
+        uint32_t alarm4_NVM = 0;                     
+        NNVM_read_memory_u32("alarm4_NVM",&alarm4_NVM);
+
+        uint32_t alarm5_NVM = 0;                     
+        NNVM_read_memory_u32("alarm5_NVM",&alarm5_NVM);
+
+        uint8_t hour1 = (alarm1_NVM >> 8) & 0xFF;
+        uint8_t minute1 = alarm1_NVM & 0xFF;
+
+        uint8_t hour2 = (alarm2_NVM >> 8) & 0xFF;
+        uint8_t minute2 = alarm2_NVM & 0xFF;
+
+        uint8_t hour3 = (alarm3_NVM >> 8) & 0xFF;
+        uint8_t minute3 = alarm3_NVM & 0xFF;
+
+        uint8_t hour4 = (alarm4_NVM >> 8) & 0xFF;
+        uint8_t minute4 = alarm4_NVM & 0xFF;
+
+        uint8_t hour5 = (alarm5_NVM >> 8) & 0xFF;
+        uint8_t minute5 = alarm5_NVM & 0xFF;
+
+        s_alarmas_manual[0].tm_hour = hour1;
+        s_alarmas_manual[0].tm_min = minute1;
+
+        s_alarmas_manual[1].tm_hour = hour2;
+        s_alarmas_manual[1].tm_min = minute2;
+
+        s_alarmas_manual[2].tm_hour = hour3;
+        s_alarmas_manual[2].tm_min = minute3;
+
+        s_alarmas_manual[3].tm_hour = hour4;
+        s_alarmas_manual[3].tm_min = minute4;
+
+        s_alarmas_manual[4].tm_hour = hour5;
+        s_alarmas_manual[4].tm_min = minute5;
+
         for (size_t i = 0; i < alarm_type; i++){
             convertTime2StringDisplay(&s_alarmas_manual[i],u8_timeconverted_1);
             lv_table_set_cell_value(tabla, i, 1, u8_timeconverted_1); //Colocamos en la columna 1 lo concerniente a las alarmas hora
         }
-    //}
+    }
 }
 void ui_event_TextoBienvenido(lv_event_t * e)
 {
