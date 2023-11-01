@@ -6,6 +6,7 @@
 #include "ui.h"
 #include "ui_helpers.h"
 #include "Main_Screen.h"
+#include "NVM_drivers/NVM_drivers.h"
 
 
 lv_obj_t *rollerS[5]; //1er Rodillo del tabview
@@ -14,6 +15,7 @@ lv_obj_t *pestanas[10]; //Para el número de pestañas de las alarmas
 int valor_rodillo=1;
 char buf[32];
 char buf1[32];
+uint32_t alarm_type;
 
 uint8_t u8_hour_A;
 uint8_t u8_min_A;
@@ -26,7 +28,13 @@ char row_name1[16]; //Nombre de las filas
 void ui_event_OkAlarm(lv_obj_t *e)
 {       
     char u8_timeconverted_1[9];  
-    char u8_timeconverted_2[9];    
+    char u8_timeconverted_2[9]; 
+    uint32_t alarm1_NVM=0;
+    uint32_t alarm2_NVM=0;
+    uint32_t alarm3_NVM=0;
+    uint32_t alarm4_NVM=0;
+    uint32_t alarm5_NVM=0;
+
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     //lv_obj_t * button = lv_event_get_target(e);
@@ -47,6 +55,8 @@ void ui_event_OkAlarm(lv_obj_t *e)
 
             convertTime2StringDisplay(&s_alarmas_manual[i],u8_timeconverted_1);
 
+            
+
              // Establecemos las alarmas en las filas en la tabla de la pantalla 6
             //snprintf(row_name, sizeof(row_name), "%d : %d", u8_hour_A, u8_min_A);
             lv_table_set_cell_value(tabla, i, 1, u8_timeconverted_1); //Colocamos en la columna 1 lo concerniente a las alarmas hora
@@ -56,7 +66,87 @@ void ui_event_OkAlarm(lv_obj_t *e)
 
             _ui_screen_delete(&ui_Pantalla5ConfigAlarmas);
             _ui_screen_change(&ui_Pantalla6VisuAlarm, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Pantalla6VisuAlarm_screen_init);
-        }        
+        } 
+
+        switch(valor_rodillo){
+            case 1:
+            {
+                alarm1_NVM = ((uint32_t)s_alarmas_manual[0].tm_hour << 8)| s_alarmas_manual[0].tm_min;
+                NNVM_write_memory_u32("alarm1_NVM",alarm1_NVM);                       
+                alarm_type = 1;
+                NNVM_write_memory_u32(ALARM_NAMESPACE,alarm_type);
+            }
+                break;
+            case 2:
+            {
+                alarm1_NVM = ((uint32_t)s_alarmas_manual[0].tm_hour << 8)| s_alarmas_manual[0].tm_min;
+                NNVM_write_memory_u32("alarm1_NVM",alarm1_NVM);  
+                
+                alarm2_NVM = ((uint32_t)s_alarmas_manual[1].tm_hour << 8)| s_alarmas_manual[1].tm_min;
+                NNVM_write_memory_u32("alarm2_NVM",alarm2_NVM);             
+
+                alarm_type = 2;
+                NNVM_write_memory_u32(ALARM_NAMESPACE,alarm_type); 
+            }
+                break;
+            case 3:
+            {
+                alarm1_NVM = ((uint32_t)s_alarmas_manual[0].tm_hour << 8)| s_alarmas_manual[0].tm_min;
+                NNVM_write_memory_u32("alarm1_NVM",alarm1_NVM);  
+                
+                alarm2_NVM = ((uint32_t)s_alarmas_manual[1].tm_hour << 8)| s_alarmas_manual[1].tm_min;
+                NNVM_write_memory_u32("alarm2_NVM",alarm2_NVM);
+
+                alarm3_NVM = ((uint32_t)s_alarmas_manual[2].tm_hour << 8)| s_alarmas_manual[2].tm_min;
+                NNVM_write_memory_u32("alarm3_NVM",alarm3_NVM);              
+
+                alarm_type = 3;
+                NNVM_write_memory_u32(ALARM_NAMESPACE,alarm_type); 
+            }
+                break;
+            case 4:
+            {
+                alarm1_NVM = ((uint32_t)s_alarmas_manual[0].tm_hour << 8)| s_alarmas_manual[0].tm_min;
+                NNVM_write_memory_u32("alarm1_NVM",alarm1_NVM);  
+                
+                alarm2_NVM = ((uint32_t)s_alarmas_manual[1].tm_hour << 8)| s_alarmas_manual[1].tm_min;
+                NNVM_write_memory_u32("alarm2_NVM",alarm2_NVM);
+
+                alarm3_NVM = ((uint32_t)s_alarmas_manual[2].tm_hour << 8)| s_alarmas_manual[2].tm_min;
+                NNVM_write_memory_u32("alarm3_NVM",alarm3_NVM);
+
+                alarm4_NVM = ((uint32_t)s_alarmas_manual[3].tm_hour << 8)| s_alarmas_manual[3].tm_min;
+                NNVM_write_memory_u32("alarm4_NVM",alarm4_NVM);                
+
+                alarm_type = 4;
+                NNVM_write_memory_u32(ALARM_NAMESPACE,alarm_type);
+            }
+                break;
+            case 5:
+            {
+                alarm1_NVM = ((uint32_t)s_alarmas_manual[0].tm_hour << 8)| s_alarmas_manual[0].tm_min;
+                NNVM_write_memory_u32("alarm1_NVM",alarm1_NVM);  
+                
+                alarm2_NVM = ((uint32_t)s_alarmas_manual[1].tm_hour << 8)| s_alarmas_manual[1].tm_min;
+                NNVM_write_memory_u32("alarm2_NVM",alarm2_NVM);
+
+                alarm3_NVM = ((uint32_t)s_alarmas_manual[2].tm_hour << 8)| s_alarmas_manual[2].tm_min;
+                NNVM_write_memory_u32("alarm3_NVM",alarm3_NVM);
+
+                alarm4_NVM = ((uint32_t)s_alarmas_manual[3].tm_hour << 8)| s_alarmas_manual[3].tm_min;
+                NNVM_write_memory_u32("alarm4_NVM",alarm4_NVM);
+
+                alarm5_NVM = ((uint32_t)s_alarmas_manual[4].tm_hour << 8)| s_alarmas_manual[4].tm_min;
+                NNVM_write_memory_u32("alarm5_NVM",alarm5_NVM); 
+
+                alarm_type = 5;
+                NNVM_write_memory_u32(ALARM_NAMESPACE,alarm_type);                       
+                 
+            }
+                break;
+            default:
+                break;       
+        }       
     }
 }
 

@@ -107,23 +107,13 @@ tm_t s_alarmas_manual[]={
     {0},
 };
 
-/*lv_obj_t *roller;
-lv_obj_t *roller1;
-lv_obj_t *button;
-lv_obj_t *ui_Screen1;
-lv_obj_t *ui_Label1;
-lv_obj_t *ui_Panel1;
-lv_obj_t *ui____initial_actions0;*/
-
-//char buf[2];
-//char buf1[2];
 uint8_t u8_TimeConfigDone=0;
 
 
 i2c_dev_t s_dev; // necessary for RTC_init()
 
 uint8_t n_alarms; // Se guarda la configuracion las alarmas que estan declaradas en ACTIVAR_ALARM
-uint32_t alarm_type;
+//uint32_t alarm_type;
 char contador_str[4];
 char contador_str1[4];
 
@@ -153,62 +143,6 @@ static void example_increase_lvgl_tick(void *arg)
     /* Tell LVGL how many milliseconds has elapsed */
     lv_tick_inc(EXAMPLE_LVGL_TICK_PERIOD_MS);
 }
-
-
-/*static void Config_time(void)
-{
-    // Crea el objeto "rodillo"
-    roller = lv_roller_create(lv_scr_act());
-    lv_roller_set_options(roller, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10", LV_ROLLER_MODE_INFINITE);
-    lv_roller_set_visible_row_count(roller, 3); // Configura el número de filas visibles
-    lv_obj_set_width(roller, 100); // Establece el ancho del rodillo
-    lv_obj_align(roller, LV_ALIGN_LEFT_MID, 0, 0); // Alinea el rodillo en el centro
-    //----lv_obj_add_event_cb(roller, ok_button_event_cb, LV_EVENT_ALL, NULL);
-    lv_roller_set_selected(roller, 2, LV_ANIM_OFF);
-
-    roller1 = lv_roller_create(lv_scr_act());
-    lv_roller_set_options(roller1, "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10", LV_ROLLER_MODE_INFINITE);
-    lv_roller_set_visible_row_count(roller1, 3); // Configura el número de filas visibles
-    lv_obj_set_width(roller1, 100); // Establece el ancho del rodillo
-    lv_obj_set_style_text_align(roller1, LV_TEXT_ALIGN_RIGHT, 0);
-    lv_obj_align(roller1, LV_ALIGN_RIGHT_MID, 0, 0); // Alinea el rodillo en el centro
-    //----lv_obj_add_event_cb(roller1, ok_button_event_cb, LV_EVENT_ALL, NULL);
-    lv_roller_set_selected(roller1, 5, LV_ANIM_OFF);
-
-    // Crea el botón "OK"
-    button = lv_btn_create(lv_scr_act());
-    lv_obj_align(button, LV_ALIGN_OUT_BOTTOM_MID, 0, 10); // Alinea el botón debajo del rodillo
-    lv_obj_t *label = lv_label_create(button);
-    lv_label_set_text(label, "OK");
-
-    // Configura la función de control de eventos para el botón OK
-    lv_obj_add_event_cb(button, ok_button_event_cb, LV_EVENT_ALL, NULL);
-}
-
-static void ok_button_event_cb(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    uint8_t u8_hour;
-    uint8_t u8_min;
-
-    if (code == LV_EVENT_CLICKED) {
-        
-        // Obtiene el valor actual del rodillo
-        lv_roller_get_selected_str(roller, buf, sizeof(buf));
-        lv_roller_get_selected_str(roller1, buf1, sizeof(buf1));
-
-        u8_hour = (uint8_t)atoi(buf);
-        u8_min = (uint8_t)atoi(buf1); 
-  
-
-        Time_config_touch(&time_tc,u8_hour, u8_min ); //Aqui se rellena la estructura time con la hora
-        // Imprime el valor actual en pantalla (puedes personalizar cómo lo haces)
-        printf("Hora: %d\n", time_tc.tm_hour);
-        printf("minuto: %d\n", time_tc.tm_min);
-
-        u8_TimeConfigDone=1;
-    }
-}*/
 
  
 
@@ -286,8 +220,6 @@ void Main_Screen( void * pvParameters )
     ESP_ERROR_CHECK( err );
  
     RTC_init(&s_dev); // Inicializa el i2c
-
-    
 
     ui_init();
  

@@ -12,19 +12,7 @@ extern i2c_dev_t s_dev; // necessary for RTC_init()
 
 
 void ui_Pantalla3VisuHora_screen_init(void)
-{
-    /*while (1)
-    {
-        if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
-        {
-             printf("Could not get time\n");
-        }
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        lv_timer_handler();
-        printf("--- VISUALIZAR ---\n");
-        printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
-    }*/
-    
+{   
     ui_Pantalla3VisuHora = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_Pantalla3VisuHora, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_img_src( ui_Pantalla3VisuHora, &ui_img_mushu3_5_png, LV_PART_MAIN | LV_STATE_DEFAULT );
@@ -45,21 +33,6 @@ void ui_Pantalla3VisuHora_screen_init(void)
     //lv_label_set_text(ui_Hora, "10");  Esto lo estoy imprimiendo en el main principal
     lv_obj_set_style_text_font(ui_Hora, &lv_font_montserrat_48, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    // ui_Min = lv_label_create(ui_Pantalla3VisuHora);
-    // lv_obj_set_width(ui_Min, LV_SIZE_CONTENT);   /// 1
-    // lv_obj_set_height(ui_Min, LV_SIZE_CONTENT);    /// 1
-    // lv_obj_set_x(ui_Min, 45);
-    // lv_obj_set_y(ui_Min, -11);
-    // lv_obj_set_align(ui_Min, LV_ALIGN_CENTER);
-    // //lv_label_set_text(ui_Min, "59");  Esto lo estoy imprimiendo en el main principal
-
-    // ui_Puntos = lv_label_create(ui_Pantalla3VisuHora);
-    // lv_obj_set_width(ui_Puntos, LV_SIZE_CONTENT);   /// 1
-    // lv_obj_set_height(ui_Puntos, LV_SIZE_CONTENT);    /// 1
-    // lv_obj_set_x(ui_Puntos, 0);
-    // lv_obj_set_y(ui_Puntos, -13);
-    // lv_obj_set_align(ui_Puntos, LV_ALIGN_CENTER);
-    // lv_label_set_text(ui_Puntos, ":");
 
     ui_Menu = lv_btn_create(ui_Pantalla3VisuHora);
     lv_obj_set_width(ui_Menu, 88);
