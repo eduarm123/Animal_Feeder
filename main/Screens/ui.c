@@ -110,7 +110,7 @@ void ui_event_Pantalla1Bienvenido(lv_event_t * e)
         else{
             printf("Dentro de la funcion event pantalla1bienvenido");
             _ui_screen_delete(&ui_Pantalla1Bienvenido);
-            _ui_screen_change(&ui_Pantalla2IngHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 2000, &ui_Pantalla3VisuHora_screen_init);
+            _ui_screen_change(&ui_Pantalla3VisuHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 2000, &ui_Pantalla3VisuHora_screen_init);
         }
     }
 }
@@ -128,7 +128,7 @@ void ui_event_TextoBienvenido(lv_event_t * e)
         }
         else{
             printf("dentro de la funcion event textobienvenido");
-            _ui_screen_change(&ui_Pantalla2IngHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 5000, &ui_Pantalla3VisuHora_screen_init);
+            _ui_screen_change(&ui_Pantalla3VisuHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 5000, &ui_Pantalla3VisuHora_screen_init);
         }
       
     }
