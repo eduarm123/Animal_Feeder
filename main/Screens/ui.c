@@ -6,8 +6,14 @@
 #include "ui.h"
 #include "ui_helpers.h"
 #include "NVM_drivers/NVM_drivers.h"
+#include "Main_Screen.h"
 
 ///////////////////// VARIABLES ////////////////////
+
+extern uint32_t alarm_type;
+
+extern tm_t s_alarmas_manual[];
+
 
 // SCREEN: ui_Pantalla1Bienvenido
 void ui_Pantalla1Bienvenido_screen_init(void);
@@ -95,6 +101,7 @@ const lv_img_dsc_t *ui_imgset_mushu_5[1] = {&ui_img_mushu3_5_png};
 ///////////////////// FUNCTIONS ////////////////////
 void ui_event_Pantalla1Bienvenido(lv_event_t * e)
 {
+    char u8_timeconverted_1[9];  
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_SCREEN_LOADED) {
@@ -112,6 +119,13 @@ void ui_event_Pantalla1Bienvenido(lv_event_t * e)
             _ui_screen_change(&ui_Pantalla3VisuHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 2000, &ui_Pantalla3VisuHora_screen_init);
         }
     }
+    NNVM_read_memory_u32(ALARM_NAMESPACE, &alarm_type);
+    //if (alarm_type!=0){
+        for (size_t i = 0; i < alarm_type; i++){
+            convertTime2StringDisplay(&s_alarmas_manual[i],u8_timeconverted_1);
+            lv_table_set_cell_value(tabla, i, 1, u8_timeconverted_1); //Colocamos en la columna 1 lo concerniente a las alarmas hora
+        }
+    //}
 }
 void ui_event_TextoBienvenido(lv_event_t * e)
 {
