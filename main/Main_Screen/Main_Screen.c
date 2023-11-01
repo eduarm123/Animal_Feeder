@@ -276,63 +276,25 @@ void Main_Screen( void * pvParameters )
 
 
     /*------INICIALIZAR FLASH-----*/
-    // esp_err_t err = nvs_flash_init();
-    // if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-    //     // NVS partition was truncated and needs to be erased
-    //     // Retry nvs_flash_init
-    //     ESP_ERROR_CHECK(nvs_flash_erase());
-    //     err = nvs_flash_init();
-    // }
-    // ESP_ERROR_CHECK( err );
-    /*-----------------------------*/
-    /*------INICIALIZAR FTF-----*/
-    // spi_master_init(SPI3_HOST, LCD_DEF_DMA_CHAN, LCD_DMA_MAX_SIZE, SPI3_DEF_PIN_NUM_MISO, SPI3_DEF_PIN_NUM_MOSI, SPI3_DEF_PIN_NUM_CLK);
-    // spi_lcd_init(SPI3_HOST, 40*1000*1000, LCD_SPI3_DEF_PIN_NUM_CS0);
-    // LCD_Display_Resolution(horizontal);
-    // LCD_Clear(LGRAYBLUE);
-    /*-------INICIALIZAR teclado------------*/
-
-    //keypadInit();// 
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        // NVS partition was truncated and needs to be erased
+        // Retry nvs_flash_init
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK( err );
+ 
     RTC_init(&s_dev); // Inicializa el i2c
 
     
-    // uint32_t restart_counter = 0; // value will default to 0, if not set yet in NVS
-    
-    // NNVM_read_memory_u32("restart_counter", &restart_counter);
 
-    // // Write
-    // printf("Updating restart counter in NVS ... ");
-    
-    // if(restart_counter==0){
-    //     restart_counter=1;
-    //     LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"*************",24,1);
-    //     LCD_ShowString(20-1,60-1,LGRAYBLUE,BLACK,"CAT Feeder",24,1);
-    //     LCD_ShowString(60-1,100-1,LGRAYBLUE,BLACK,"Welcome!",32,1);
-    //     LCD_ShowChar(155,180,LGRAYBLUE,BLACK,':',32,1);
-    //     LCD_ShowPicture_16b(250-1, 50-1, 40, 40, gImage_qq);
-    //     Time_config(&time_tc); //Aqui se configura la hora. El usuario hace esto
-    //     printf("hora configurada... ");
-    //     ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc));
-    //     LCD_Clear(LGRAYBLUE); 
-        
-    //     NNVM_write_memory_u32("restart_counter",restart_counter);         
-    // }
-    //Config_time();
     ui_init();
-    while(!u8_TimeConfigDone){
-       vTaskDelay(pdMS_TO_TICKS(10));
-       lv_timer_handler();
-        
-    }
-    //ESP_ERROR_CHECK(ds3231_set_time(&s_dev, &time_tc)); // Se envia la hora al modulo
-    
+ 
                         
     while(1)
     {  
-        // LCD_Clear(LGRAYBLUE);
-        // LCD_ShowString(1-1,20-1,LGRAYBLUE,BLACK,"*************",24,1);
-        // LCD_ShowString(50-1,50-1,LGRAYBLUE,BLACK,"CAT FEEDER",24,1);
-        // LCD_ShowString(1-1,80-1,LGRAYBLUE,BLACK,"*************",24,1);       
+     
 
         if (ds3231_get_time(&s_dev, &time_tc) != ESP_OK)
         {
@@ -342,16 +304,6 @@ void Main_Screen( void * pvParameters )
         // printf("--- main screen ---\n");
         // printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
 
-        /*---Conversión entero a caracter para imprimir en HMI sin problema---*/
-        // convertTime2StringDisplay(&time_tc,u8_timeconverted);
-        //LCD_ShowString(25-1,180-1,LGRAYBLUE,BLACK,u8_timeconverted,32,1);  
-                
-        // u8_key = readKeypad();
-        // if (u8_key=='C')
-        // {               
-        //     Alarma_menu();
-        //     LCD_Clear(LGRAYBLUE);
-        // }
 
         //mutex_lock(&lvgl_mutex);
         time_till_next = lv_timer_handler();
@@ -361,18 +313,11 @@ void Main_Screen( void * pvParameters )
 
         vTaskDelay(pdMS_TO_TICKS(time_till_next));
         
-        //printf("--- main screen ---\n");
-        //printf("%02d:%02d:%02d\n", time_tc.tm_hour, time_tc.tm_min, time_tc.tm_sec);
-
-        // Suponemos un valor máximo de 999 para el contador
 
         convertTime2StringDisplay(&time_tc,u8_timeconverted);
 
-        // snprintf(contador_str, sizeof(contador_str), "%d", time_tc.tm_min);
-        // snprintf(contador_str1, sizeof(contador_str1), "%d", time_tc.tm_sec); //Reemplazar por los minutos
 
         lv_label_set_text(ui_Hora, u8_timeconverted);
-        //lv_label_set_text(ui_Min, contador_str1);
     }
 
     /* A task should NEVER return */

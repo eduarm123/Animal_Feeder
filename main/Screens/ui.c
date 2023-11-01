@@ -5,6 +5,7 @@
 
 #include "ui.h"
 #include "ui_helpers.h"
+#include "NVM_drivers/NVM_drivers.h"
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -97,8 +98,20 @@ void ui_event_Pantalla1Bienvenido(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_SCREEN_LOADED) {
-        _ui_screen_change(&ui_Pantalla2IngHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 2000, &ui_Pantalla2IngHora_screen_init);
-        _ui_screen_delete(&ui_Pantalla1Bienvenido);
+        uint32_t restart_counter = 0; // value will default to 0, if not set yet in NVS
+        NNVM_read_memory_u32("restart_counter", &restart_counter);
+        if(restart_counter==0){
+            restart_counter=1;
+            printf("Updating restart counter in NVS ... ");
+            NNVM_write_memory_u32("restart_counter",restart_counter);
+            _ui_screen_delete(&ui_Pantalla1Bienvenido);
+            _ui_screen_change(&ui_Pantalla2IngHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 2000, &ui_Pantalla2IngHora_screen_init);
+        }
+        else{
+            printf("Dentro de la funcion event pantalla1bienvenido");
+            _ui_screen_delete(&ui_Pantalla1Bienvenido);
+            _ui_screen_change(&ui_Pantalla2IngHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 2000, &ui_Pantalla3VisuHora_screen_init);
+        }
     }
 }
 void ui_event_TextoBienvenido(lv_event_t * e)
@@ -106,19 +119,21 @@ void ui_event_TextoBienvenido(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_FOCUSED) {
-        _ui_screen_change(&ui_Pantalla2IngHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 5000, &ui_Pantalla2IngHora_screen_init);
+        uint32_t restart_counter = 0; // value will default to 0, if not set yet in NVS
+        NNVM_read_memory_u32("restart_counter", &restart_counter);
+        if(restart_counter==0){
+            restart_counter=1;
+            NNVM_write_memory_u32("restart_counter",restart_counter);
+            _ui_screen_change(&ui_Pantalla2IngHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 5000, &ui_Pantalla2IngHora_screen_init);
+        }
+        else{
+            printf("dentro de la funcion event textobienvenido");
+            _ui_screen_change(&ui_Pantalla2IngHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 5000, &ui_Pantalla3VisuHora_screen_init);
+        }
+      
     }
 }
-/*void ui_event_BotonOK(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        _ui_bar_set_property(ui_Bar2, _UI_BAR_PROPERTY_VALUE_WITH_ANIM, 100);
-        _ui_screen_delete(&ui_Pantalla2IngHora);
-        _ui_screen_change(&ui_Pantalla3VisuHora, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Pantalla3VisuHora_screen_init);
-    }
-}*/
+
 void ui_event_Menu(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);

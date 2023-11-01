@@ -20,3 +20,5 @@ sdkconfig.defaults
 build/
 .vscode/
 FTF_display/spi_lcd.c
+sdkconfig
+sdkconfig.old
