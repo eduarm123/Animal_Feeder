@@ -82,6 +82,7 @@ extern lv_obj_t * ui_AtrasAlarm;
 extern lv_obj_t * ui_Label4;
 extern lv_obj_t * ui____initial_actions0;
 extern lv_obj_t *tabla;
+LV_IMG_DECLARE( ui_img_mushu3_5_png);   // assets\mushu3.5.png
 //extern lv_obj_t *pestanas[10]; //Para el número de pestañas de las alarmas
 //extern lv_obj_t *rollerS[3]; //1er Rodillo del tabview
 //extern lv_obj_t *rollerS1[3]; //2do Rodillo del tabview

@@ -355,6 +355,8 @@ void Main_Screen( void * pvParameters )
 
         //mutex_lock(&lvgl_mutex);
         time_till_next = lv_timer_handler();
+        //lv_task_handler();
+        //vTaskDelay(10 / portTICK_PERIOD_MS);
         //mutex_unlock(&lvgl_mutex);
 
         vTaskDelay(pdMS_TO_TICKS(time_till_next));

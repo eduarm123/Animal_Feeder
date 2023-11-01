@@ -80,7 +80,7 @@ lv_obj_t * ui_AtrasAlarm;
 lv_obj_t * ui_Label4;
 lv_obj_t * ui____initial_actions0;
 lv_obj_t *tabla; 
-
+const lv_img_dsc_t *ui_imgset_mushu_5[1] = {&ui_img_mushu3_5_png};
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
     #error "LV_COLOR_DEPTH should be 16bit to match SquareLine Studio's settings"
@@ -202,11 +202,11 @@ void ui_init(void)
                                                false, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
     ui_Pantalla1Bienvenido_screen_init();
-    // ui_Pantalla2IngHora_screen_init();
-    // ui_Pantalla3VisuHora_screen_init();
-    // ui_Pantalla4Menu_screen_init();
-    // ui_Pantalla5ConfigAlarmas_screen_init();
-    // ui_Pantalla6VisuAlarm_screen_init();
+    ui_Pantalla2IngHora_screen_init();
+    ui_Pantalla3VisuHora_screen_init();
+    ui_Pantalla4Menu_screen_init();
+    ui_Pantalla5ConfigAlarmas_screen_init();
+    ui_Pantalla6VisuAlarm_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_Pantalla1Bienvenido);
 }

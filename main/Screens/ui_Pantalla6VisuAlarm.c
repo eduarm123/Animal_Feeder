@@ -48,12 +48,12 @@ void ui_Pantalla6VisuAlarm_screen_init(void)
     // Crear una tabla inicial con una fila
     tabla = lv_table_create(ui_Pantalla6VisuAlarm);
     //lv_table_set_row_cnt(tabla, 0);
-    lv_obj_align(tabla, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(tabla, LV_ALIGN_RIGHT_MID, 0, 0);
     // Establecer títulos de fila inicial
     //lv_table_set_cell_value(tabla, 0, 0, "ALARMAS");
     lv_table_set_row_cnt(tabla, 1);
     lv_table_set_col_width(tabla, 0, 100);
-    lv_table_set_col_width(tabla, 1, 80);
+    lv_table_set_col_width(tabla, 1, 100);
 
     lv_obj_add_event_cb(ui_AtrasAlarm, ui_event_AtrasAlarm, LV_EVENT_ALL, NULL);
 

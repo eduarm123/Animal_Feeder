@@ -27,6 +27,9 @@ void ui_Pantalla3VisuHora_screen_init(void)
     
     ui_Pantalla3VisuHora = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_Pantalla3VisuHora, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_img_src( ui_Pantalla3VisuHora, &ui_img_mushu3_5_png, LV_PART_MAIN | LV_STATE_DEFAULT );
+    lv_obj_set_style_bg_img_opa(ui_Pantalla3VisuHora, 210, LV_PART_MAIN| LV_STATE_DEFAULT);
+
     lv_obj_set_style_border_color(ui_Pantalla3VisuHora, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_Pantalla3VisuHora, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_Pantalla3VisuHora, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -37,7 +40,8 @@ void ui_Pantalla3VisuHora_screen_init(void)
     lv_obj_set_height(ui_Hora, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_Hora, -39);
     lv_obj_set_y(ui_Hora, -9);
-    lv_obj_set_align(ui_Hora, LV_ALIGN_CENTER);
+    //lv_obj_set_align(ui_Hora, LV_ALIGN_RIGHT_MID);
+    lv_obj_align(ui_Hora, LV_ALIGN_CENTER, 5, -10);
     //lv_label_set_text(ui_Hora, "10");  Esto lo estoy imprimiendo en el main principal
     lv_obj_set_style_text_font(ui_Hora, &lv_font_montserrat_48, LV_PART_MAIN | LV_STATE_DEFAULT);
 

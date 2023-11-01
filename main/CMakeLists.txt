@@ -16,6 +16,7 @@ idf_component_register(SRCS "main.c" "C:/Repos/Animal_Feeder/RCT/i2cdev/i2cdev.c
                             "C:/Repos/Animal_Feeder/main/Screens/ui_Pantalla4Menu.c"
                             "C:/Repos/Animal_Feeder/main/Screens/ui_Pantalla5ConfigAlarmas.c"
                             "C:/Repos/Animal_Feeder/main/Screens/ui_Pantalla6VisuAlarm.c"
+                            "C:/Repos/Animal_Feeder/main/Screens/ui_img_mushu3_5_png.c"
                             "C:/Repos/Animal_Feeder/main/Screens/ui.c"
 
                     INCLUDE_DIRS "." "C:/Repos/Animal_Feeder/RCT/ds3231"

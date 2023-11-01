@@ -51,8 +51,8 @@ void ui_event_OkAlarm(lv_obj_t *e)
             //snprintf(row_name, sizeof(row_name), "%d : %d", u8_hour_A, u8_min_A);
             lv_table_set_cell_value(tabla, i, 1, u8_timeconverted_1); //Colocamos en la columna 1 lo concerniente a las alarmas hora
 
-            // snprintf(row_name1, sizeof(row_name1), "%s %d", "Alarma", i+1);
-            // lv_table_set_cell_value(tabla, i, 0, row_name1); //Colocamos en la columna 0 lo concerniente al nombre alarma "X"
+            snprintf(row_name1, sizeof(row_name1), "%s %d", "Alarma", i+1);
+            lv_table_set_cell_value(tabla, i, 0, row_name1); //Colocamos en la columna 0 lo concerniente al nombre alarma "X"
 
             _ui_screen_delete(&ui_Pantalla5ConfigAlarmas);
             _ui_screen_change(&ui_Pantalla6VisuAlarm, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Pantalla6VisuAlarm_screen_init);
