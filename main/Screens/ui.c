@@ -13,7 +13,7 @@
 extern uint32_t alarm_type;
 
 extern tm_t s_alarmas_manual[];
-
+char fila_nombre[16]; //Nombre de las filas
 
 // SCREEN: ui_Pantalla1Bienvenido
 void ui_Pantalla1Bienvenido_screen_init(void);
@@ -171,6 +171,9 @@ void ui_event_Pantalla1Bienvenido(lv_event_t * e)
         for (size_t i = 0; i < alarm_type; i++){
             convertTime2StringDisplay(&s_alarmas_manual[i],u8_timeconverted_1);
             lv_table_set_cell_value(tabla, i, 1, u8_timeconverted_1); //Colocamos en la columna 1 lo concerniente a las alarmas hora
+
+            snprintf(fila_nombre, sizeof(fila_nombre), "%s %d", "Alarma", i+1);
+            lv_table_set_cell_value(tabla, i, 0, fila_nombre); //Colocamos en la columna 0 lo concerniente al nombre alarma "X"
         }
     }
 }
