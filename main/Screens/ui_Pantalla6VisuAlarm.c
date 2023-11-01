@@ -4,8 +4,15 @@
 // Project name: Pantalla1
 
 #include "ui.h"
+#include "Main_Screen.h"
+
+extern uint32_t alarm_type;
+
+extern tm_t s_alarmas_manual[];
+
 void ui_Pantalla6VisuAlarm_screen_init(void)
 {
+    char u8_timeconverted_1[9];  
     ui_Pantalla6VisuAlarm = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_Pantalla6VisuAlarm, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_border_color(ui_Pantalla6VisuAlarm, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -55,6 +62,14 @@ void ui_Pantalla6VisuAlarm_screen_init(void)
     lv_table_set_col_width(tabla, 0, 100);
     lv_table_set_col_width(tabla, 1, 100);
 
+     
+    if (alarm_type!=0){
+        for (size_t i = 0; i < alarm_type; i++){
+            convertTime2StringDisplay(&s_alarmas_manual[i],u8_timeconverted_1);
+            lv_table_set_cell_value(tabla, i, 1, u8_timeconverted_1); //Colocamos en la columna 1 lo concerniente a las alarmas hora
+        }
+    }
+        
     lv_obj_add_event_cb(ui_AtrasAlarm, ui_event_AtrasAlarm, LV_EVENT_ALL, NULL);
 
 }

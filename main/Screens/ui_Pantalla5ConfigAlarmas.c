@@ -56,7 +56,7 @@ void ui_event_OkAlarm(lv_obj_t *e)
             convertTime2StringDisplay(&s_alarmas_manual[i],u8_timeconverted_1);
 
             
-
+            
              // Establecemos las alarmas en las filas en la tabla de la pantalla 6
             //snprintf(row_name, sizeof(row_name), "%d : %d", u8_hour_A, u8_min_A);
             lv_table_set_cell_value(tabla, i, 1, u8_timeconverted_1); //Colocamos en la columna 1 lo concerniente a las alarmas hora
