@@ -44,8 +44,13 @@ extern QueueHandle_t colaPulsador; // Cola para notificar a las tareas
 extern TaskHandle_t xHandle1;
 extern TaskHandle_t xHandle;
 extern unsigned num;
+//extern uint8_t u8_TimeConfigDone;
+
 
 typedef struct tm tm_t;
+
+
+//extern struct tm time_tc;
 /********************************* (1) PUBLIC METHODS ********************************************/
 
 /**
@@ -69,6 +74,9 @@ void Main_Screen( void * pvParameters );
 void Time_config(tm_t *_time);
 
 void convertTime2StringDisplay(tm_t *_time2Convert, char timeconverted[]);
+
+extern void Time_config_touch(tm_t * const _time, uint8_t _hour,uint8_t _minute );
+
 /******************************** (3) DEFINES & MACROS *******************************************/
 
 

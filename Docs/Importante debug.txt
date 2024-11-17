@@ -57,3 +57,8 @@ openocd -c 'set ESP_RTOS none' -f board/esp32-wrover-kit-3.3v.cfg
 openocd -f interface/ftdi/esp32_devkitj_v1.cfg
 
 openocd -c 'set ESP_RTOS none' -f interface/ftdi/esp32_devkitj_v1.cfg
+
+
+
+Para ILI9341 Cambiar de portrait  a landscape y también poner el display que está en LVGL ESP DRIVERS 
+Además desmarcar Swap XY e Invert Y coordinate value y marcar invert x y invert y y poner pressure only

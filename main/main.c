@@ -44,7 +44,6 @@ extern "C"
 #include "ds3231.h"
 #include "Main_Screen.h"
 #include "Alarm_menu.h"
-#include "Button_Handler.h"
 
 #include "Pwm_motor.h"
 
@@ -75,7 +74,7 @@ void app_main(void)
 
 
 	static uint8_t ucParameterToPass;
-  
+
 
     xTaskCreatePinnedToCore(Main_Screen,
                 "Main_Screen",

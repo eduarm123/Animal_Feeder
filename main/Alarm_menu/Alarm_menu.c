@@ -34,8 +34,7 @@
 #include <freertos/task.h>
 #include "freertos/semphr.h"
 #include <time.h>
-#include "Button_Handler.h"
-#include "easyio.h" //error si incluyo esto de nuevo
+//#include "easyio.h" //error si incluyo esto de nuevo
 //#include "picture.h"
 
 #include "NVM_drivers/NVM_drivers.h"
@@ -104,10 +103,10 @@ void init_manual_alarm_5();
 void Alarm_menu( void * pvParameters )
 {
     gpio_set_direction(CONFIG_LED_PIN, GPIO_MODE_OUTPUT); // Para el motor
-    vTaskDelay(pdMS_TO_TICKS(1000)); // espera de x tiempo para que las otras tareas se inicialicen
+    vTaskDelay(pdMS_TO_TICKS(10)); // espera de x tiempo para que las otras tareas se inicialicen
     for (;;)
     {   
-        printf("--- tarea alarm_menu---\n");    
+        //printf("--- tarea alarm_menu---\n");    
         // Alarm is set, start monitoring the time                        
         NNVM_read_memory_u32(ALARM_NAMESPACE, &alarm_type);
         vTaskDelay(pdMS_TO_TICKS(100)); // Delay for 500 milliseconds or any desired interval            
@@ -140,6 +139,7 @@ void Alarm_menu( void * pvParameters )
         }
          
     }
+
     
 }
 
@@ -493,10 +493,10 @@ void Activacion_motor()
     //LCD_ShowString(50-1,110-1,LGRAYBLUE,BLACK,"Moviendo motor",24,1);
     // Hay que poner mutex
     gpio_set_level(CONFIG_LED_PIN,1); // Para probar en debug
-    //WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_50);
+    WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_50);
     vTaskDelay(500 / portTICK_PERIOD_MS);
     // Hay que poner mutex
-    //WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_0);
+    WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_0);
     gpio_set_level(CONFIG_LED_PIN,0);   
 }
 
