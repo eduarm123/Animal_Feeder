@@ -34,8 +34,7 @@
 #include <freertos/task.h>
 #include "freertos/semphr.h"
 #include <time.h>
-#include "Button_Handler.h"
-#include "easyio.h" //error si incluyo esto de nuevo
+//#include "easyio.h" //error si incluyo esto de nuevo
 //#include "picture.h"
 
 #include "NVM_drivers/NVM_drivers.h"
@@ -494,10 +493,10 @@ void Activacion_motor()
     //LCD_ShowString(50-1,110-1,LGRAYBLUE,BLACK,"Moviendo motor",24,1);
     // Hay que poner mutex
     gpio_set_level(CONFIG_LED_PIN,1); // Para probar en debug
-    //WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_50);
+    WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_50);
     vTaskDelay(500 / portTICK_PERIOD_MS);
     // Hay que poner mutex
-    //WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_0);
+    WPWM_motor(LEDC_CHANNEL, LEDC_DUTY_0);
     gpio_set_level(CONFIG_LED_PIN,0);   
 }
 

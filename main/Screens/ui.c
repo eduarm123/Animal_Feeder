@@ -13,7 +13,7 @@
 extern uint32_t alarm_type;
 
 extern tm_t s_alarmas_manual[];
-char fila_nombre[16]; //Nombre de las filas
+char fila_nombre[20]; //Nombre de las filas
 
 // SCREEN: ui_Pantalla1Bienvenido
 void ui_Pantalla1Bienvenido_screen_init(void);
